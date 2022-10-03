@@ -1,0 +1,29 @@
+{
+  "name": "as-soroban-sdk",
+  "version": "0.0.1",
+  "description": "AssemblyScript SDK for writing contracts for Soroban.",
+  "main": "index.js",
+  "types": "./types/index.d.ts",
+  "scripts": {
+    "test": "test",
+    "asbuild:debug": "asc assembly/index.ts --target debug --transform ./transforms.mjs",
+    "asbuild:release": "asc assembly/index.ts --target release --transform ./transforms.mjs",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
+    "start": "npx serve ."
+  },
+  "author": "Christian Rogobete",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "assemblyscript": "^0.21.4"
+  },
+  "dependencies": {
+    "js-xdr": "^1.1.3"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./build/release.js",
+      "types": "./build/release.d.ts"
+    }
+  }
+}
