@@ -1,4 +1,4 @@
-import { VectorObject, RawVal, SymbolVal, ObjectVal} from "./val";
+import { VectorObject, RawVal, SymbolVal, ObjectVal} from "./host_value";
 
 //TODO
 

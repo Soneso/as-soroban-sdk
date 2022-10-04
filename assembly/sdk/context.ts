@@ -1,6 +1,6 @@
 
 import { RawVal, BinaryObject, Unsigned64BitIntObject, Signed64BitIntObject,
-     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusObject } from "./val";
+     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusObject } from "./host_value";
 
 
 /**

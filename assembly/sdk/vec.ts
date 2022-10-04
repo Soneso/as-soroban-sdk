@@ -1,4 +1,4 @@
-import { VectorObject, RawVal, fromVoid, fromU32, toU32 } from "./val";
+import { VectorObject, RawVal, fromVoid, fromU32, toU32 } from "./host_value";
 
 
 /**

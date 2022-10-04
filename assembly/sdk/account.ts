@@ -1,4 +1,4 @@
-import { RawVal, toBool, toU32, AccountIDObject } from "./val";
+import { RawVal, toBool, toU32, AccountIDObject } from "./host_value";
 
 // TODO AccountIDObject (`a` (`a` is `Bytes`).)
 

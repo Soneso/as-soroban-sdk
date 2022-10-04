@@ -1,5 +1,5 @@
-import { RawVal } from "./val";
-import { ObjectVal } from "./val";
+import { RawVal } from "./host_value";
+import { ObjectVal } from "./host_value";
 
 // TODO: separate files + types
 

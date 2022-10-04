@@ -6,9 +6,6 @@ export type RawVal = u64;
 /// enumerated cases of [ScObject], and the handle values are dynamically
 /// assigned by the host as new objects are allocated during execution.
 export type ObjectVal = RawVal;
-
-
-
 export type SymbolVal = RawVal;
 export type VectorObject = ObjectVal;
 export type MapObject = ObjectVal;

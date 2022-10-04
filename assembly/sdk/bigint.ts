@@ -1,4 +1,4 @@
-import { BigIntObject, RawVal, BinaryObject, toBool, fromU32, fromI32} from "./val";
+import { BigIntObject, RawVal, BinaryObject, toBool, fromU32, fromI32} from "./host_value";
 
 /**
  * Constructs a BigInt on the host from an u64.

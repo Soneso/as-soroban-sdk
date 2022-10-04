@@ -1,4 +1,4 @@
-import { RawVal, MapObject, VectorObject, toU32, toBool } from "./val";
+import { RawVal, MapObject, VectorObject, toU32, toBool } from "./host_value";
 
 /**
  * Creates a new map on the host.
