@@ -17,6 +17,9 @@
     }
   },
   "options": {
-    "bindings": "esm"
+    "bindings": "raw"
+  },
+  "features": {
+    "runtime": "stub"
   }
 }

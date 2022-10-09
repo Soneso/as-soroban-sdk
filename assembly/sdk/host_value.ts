@@ -94,14 +94,14 @@ const staticLedgerKeyContractCodeBody = 3;
  */
 type objectType = u8;
 
-const objTypeVec: objectType = 0;
-const objTypeMap: objectType = 1;
-const objTypeU64: objectType = 2;
-const objTypeI64: objectType = 3;
-const objTypeBytes: objectType = 4;
-const objTypeBigInt: objectType = 5;
-const objTypeContractCode: objectType = 6;
-const objTypeAccountId: objectType = 7;
+export const objTypeVec: objectType = 0;
+export const objTypeMap: objectType = 1;
+export const objTypeU64: objectType = 2;
+export const objTypeI64: objectType = 3;
+export const objTypeBytes: objectType = 4;
+export const objTypeBigInt: objectType = 5;
+export const objTypeContractCode: objectType = 6;
+export const objTypeAccountId: objectType = 7;
 
 
 /*******************
@@ -417,6 +417,51 @@ export function toI64(val: Signed64BitIntObject) : i64 {
   return obj_to_i64(val);
 }
 
+/**
+ * Checks if the given host value represents an object that contains a vector.
+ * @param val host value to check
+ * @returns true if the host value represents an object that contains a vector. otherwise flase.
+ */
+ export function isVector(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeVec;
+}
+
+/**
+ * Checks if the given host value represents an object that contains a map.
+ * @param val host value to check
+ * @returns true if the host value represents an object that contains a map. otherwise flase.
+ */
+ export function isMap(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeMap;
+}
+
+/**
+ * Checks if the given host value represents an object that contains unspecified bytes (binary object).
+ * @param val host value to check
+ * @returns true if the host value represents a binary object. otherwise flase.
+ */
+ export function isBinary(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeBytes;
+}
+
+/**
+ * Checks if the given host value represents a bigint object.
+ * @param val host value to check
+ * @returns true if the host value represents a bigint object. otherwise flase.
+ */
+ export function isBigInt(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeContractCode;
+}
+
+/**
+ * Checks if the given host value represents an account id object.
+ * @param val host value to check
+ * @returns true if the host value represents a account id object. otherwise flase.
+ */
+ export function isAccountId(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeAccountId;
+}
+
 /***********
  * HELPERS *
  ***********/
@@ -565,3 +610,52 @@ const vmTrapCPULimitExceeded: vmErrCode = 18;
 type unknownErrCode = u32;
 const unknownErrGeneral: unknownErrCode = 0;
 const unknownErrXDR: unknownErrCode = 1
+
+export function toUTF8Array(str:string) : u8[] {
+  var utf8 : u8[] = [];
+  /*var index = 0;
+  for (var i=0; i < str.length; i++) {
+      var charcode = str.charCodeAt(i);
+      utf8[index] = charcode as u8;
+      index++;
+      if (charcode < 0x80){
+        utf8[index] = charcode as u8;
+        index++;
+      } 
+      else if (charcode < 0x800) {
+          utf8[index] = 0xc0 | (charcode >> 6) as u8;
+          index++;
+          utf8[index] = 0x80 | (charcode & 0x3f) as u8;
+          index++;
+
+      }
+      else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8[index] = 0xe0 | (charcode >> 12) as u8;
+          index++;
+          utf8[index] = 0x80 | ((charcode>>6) & 0x3f) as u8;
+          index++;  
+          utf8[index] = 0x80 | (charcode & 0x3f) as u8;
+          index++; 
+      }
+      // surrogate pair
+      else {
+          i++;
+          // UTF-16 encodes 0x10000-0x10FFFF by
+          // subtracting 0x10000 and splitting the
+          // 20 bits of 0x0-0xFFFFF into two halves
+          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+                    | (str.charCodeAt(i) & 0x3ff))
+
+          utf8[index] = 0xf0 | (charcode >>18) as u8;
+          index++;
+          utf8[index] = 0x80 | ((charcode>>12) & 0x3f) as u8;
+          index++;  
+          utf8[index] = 0x80 | ((charcode>>6) & 0x3f) as u8;
+          index++; 
+          utf8[index] = 0x80 | (charcode & 0x3f) as u8;
+          index++;           
+      }
+      
+  }*/
+  return utf8;
+}

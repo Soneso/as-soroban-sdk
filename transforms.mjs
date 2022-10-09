@@ -3,7 +3,7 @@ import { Transform } from "assemblyscript/transform";
 import xdr from './xdr.js';
 
 const META_NAME = "contractenvmetav0";
-const HOST_FUNCTIONS_VERSION_SUPPORTED = "11"
+const HOST_FUNCTIONS_VERSION_SUPPORTED = "23"
 const SPEC_NAME = "contractspecv0";
 
 
@@ -47,16 +47,12 @@ class SdkTransform extends Transform {
     var funcAdd = new xdr.ScSpecFunctionV0({name: 'add', inputs: [funcAddInputA, funcAddInputB],outputs: [ti32]});
     var funcAddEntry = xdr.ScSpecEntry.scSpecEntryFunctionV0(funcAdd);
 
-    var funcSubInputA = new xdr.ScSpecFunctionInputV0({name: "a", type: ti32});
-    var funcSubInputB = new xdr.ScSpecFunctionInputV0({name: "b", type: ti32});
-    var funcSub = new xdr.ScSpecFunctionV0({name: 'sub', inputs: [funcSubInputA, funcSubInputB],outputs: [ti32]});
-    var funcSubEntry = xdr.ScSpecEntry.scSpecEntryFunctionV0(funcSub);
-
+    /*
     const tval = xdr.ScSpecTypeDef.scSpecTypeBytes();
     var funcGetObj = new xdr.ScSpecFunctionV0({name: 'obj', inputs: [],outputs: [tval]});
     var funcGetObjEntry = xdr.ScSpecEntry.scSpecEntryFunctionV0(funcGetObj);
-    var res = Buffer.concat([funcAddEntry.toXDR(), funcGetObjEntry.toXDR()]);
-    asModule.addCustomSection(SPEC_NAME, res); //+ funcGetObjEntry.toXDR()
+    var res = Buffer.concat([funcAddEntry.toXDR(), funcGetObjEntry.toXDR()]);*/
+    asModule.addCustomSection(SPEC_NAME, funcAddEntry.toXDR());
   }
 }
 export default SdkTransform

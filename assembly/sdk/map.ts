@@ -1,126 +1,119 @@
 import { RawVal, MapObject, VectorObject, toU32, toBool } from "./host_value";
 
-/**
- * Creates a new map on the host.
- * @returns the map object to be used for further map operations (type: MapObject)
- */
-export function new_map(): MapObject {
-    return map_new();
-}
+export class Map {
+    obj: MapObject;
 
-/**
- * Inserts a key/value mapping into an existing map, and returns the new map object.
- * If the map already has a mapping for the given key, the previous value is overwritten.
- * @param map the map to be updated (type: MapObject)
- * @param key the key of the key/value mapping (type: RawVal)
- * @param value the value to put (type: RawVal)
- * @returns the new map object to be used for further map operations (type: MapObject)
- */
-export function put(map: MapObject, key: RawVal, value: RawVal) : MapObject {
-    return map_put(map, key, value);
-}
+    //@ts-ignore
+    constructor(obj:MapObject = map_new()) {
+      this.obj = obj;
+    }
+  
+    /**
+     * Inserts a key/value mapping into the map
+     * If the map already has a mapping for the given key, the previous value is overwritten.
+     * @param key the key of the key/value mapping (type: RawVal)
+     * @param value the value to put (type: RawVal)
+     * @returns void
+     */
+    put(key: RawVal, value: RawVal) : void {
+        this.obj = map_put(this.obj, key, value);
+    }
 
-/**
- * Get the value for a key from a map. Traps if key is not found.
- * @param map the map to get the value from (type: MapObject)
- * @param key the key to get the value for (type: RawVal)
- * @returns the value if key found, otherwise traps (type: RawVal)
- */
-export function get(map: MapObject, key:RawVal) : RawVal {
-    return map_get(map, key);
-}
+    /**
+     * Get the value for a key from a map. Traps if key is not found.
+     * @param key the key to get the value for (type: RawVal)
+     * @returns the value if key found, otherwise traps (type: RawVal)
+     */
+    get(key:RawVal) : RawVal {
+        return map_get(this.obj, key);
+    }
 
-/**
- * Remove a key/value mapping from a map if it exists, traps if doesn't.
- * @param map the map to remove from (type: MapObject)
- * @param key the key of the key/value mapping to be removed (type: RawVal)
- * @returns the new map object to be used for further map operations (type: MapObject)
- */
-export function del(map: MapObject, key:RawVal) : RawVal {
-    return map_del(map, key);
-}
+    /**
+     * Remove a key/value mapping from this map if it exists, traps if doesn't.
+     * @param key the key of the key/value mapping to be removed (type: RawVal)
+     * @returns void
+     */
+    del(key:RawVal) : void {
+        this.obj = map_del(this.obj, key);
+    }
 
-/**
- * Returns the size of the given map.
- * @param map the map to get the size for (type: MapObject)
- * @returns the size as u32
- */
-export function len(map: MapObject) : u32 {
-    let l = map_len(map);
-    return toU32(l);
-}
+    /**
+     * Returns the size of this map.
+     * @returns the size as u32
+     */
+    len() : u32 {
+        return toU32(map_len(this.obj));
+    }
 
-/**
- * Test for the presence of a key in a map. Returns true or false
- * @param map the map to check (type: MapObject)
- * @param key the key to search for (type: RawVal)
- * @returns true if the key was found, false otherwise
- */
-export function has(map: MapObject, key: RawVal) : bool {
-    let present = map_has(map, key);
-    return toBool(present);
-}
+    /**
+     * Test for the presence of a key in this map. Returns true or false
+     * @param key the key to search for (type: RawVal)
+     * @returns true if the key was found, false otherwise
+     */
+    has(key: RawVal) : bool {
+        return toBool(map_has(this.obj, key));
+    }
 
-/**
- * Given a key, finds the first key lower than itself in the map's sorted order.
- * If such a key does not exist, returns an SCStatus containing the error code (TBD).
- * @param map the map to check (type: MapObject)
- * @param key the key to search for (type: RawVal)
- * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
- */
-export function prev_key(map: MapObject, key: RawVal) : RawVal {
-    return map_prev_key(map, key);
-}
+    /**
+     * Given a key, finds the first key lower than itself in the map's sorted order.
+     * If such a key does not exist, returns an SCStatus containing the error code (TBD).
+     * @param key the key to search for (type: RawVal)
+     * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
+     */
+    prev_key(key: RawVal) : RawVal {
+        return map_prev_key(this.obj, key);
+    }
 
-/**
- * Given a key, finds the first key greater than itself in the map's sorted order.
- * If such a key does not exist, returns an SCStatus containing the error code (TBD).
- * @param map the map to check (type: MapObject)
- * @param key the key to search for (type: RawVal)
- * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
- */
-export function next_key(map: MapObject, key: RawVal) : RawVal {
-    return map_next_key(map, key);
-}
+    /**
+     * Given a key, finds the first key greater than itself in the map's sorted order.
+     * If such a key does not exist, returns an SCStatus containing the error code (TBD).
+     * @param key the key to search for (type: RawVal)
+     * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
+     */
+    next_key(key: RawVal) : RawVal {
+        return map_next_key(this.obj, key);
+    }
 
-/**
- * Finds the minimum key from a map.
- * If the map is empty, returns an SCStatus containing the error code (TBD).
- * @param map the map to check (type: MapObject)
- * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
- */
-export function min_key(map: MapObject) : RawVal {
-    return map_min_key(map);
-}
+    /**
+     * Finds the minimum key from this map.
+     * If the map is empty, returns an SCStatus containing the error code (TBD).
+     * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
+     */
+    min_key() : RawVal {
+        return map_min_key(this.obj);
+    }
 
-/**
- * Finds the maximum key from a map.
- * If the map is empty, returns an SCStatus containing the error code (TBD).
- * @param map the map to check (type: MapObject)
- * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
- */
-export function max_key(map: MapObject) : RawVal {
-    return map_max_key(map);
-}
+    /**
+     * Finds the maximum key from this map.
+     * If the map is empty, returns an SCStatus containing the error code (TBD).
+     * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
+     */
+    max_key() : RawVal {
+        return map_max_key(this.obj);
+    }
 
-/**
- * Return a new vector containing all the keys in a map.
- * The new vector is ordered in the original map's key-sorted order.
- * @param map the map to get the keys for (type: MapObject)
- * @returns the vector containing the keys (type: VectorObject)
- */
-export function keys(map: MapObject) : VectorObject {
-    return map_keys(map);
-}
+    /**
+     * Return a new vector containing all the keys in the map.
+     * The new vector is ordered in the original map's key-sorted order.
+     * @returns the vector containing the keys (type: VectorObject)
+     */
+    keys() : VectorObject {
+        return map_keys(this.obj);
+    }
 
-/**
- * Return a new vector containing all the values in a map.
- * The new vector is ordered in the original map's key-sorted order.
- * @param map the map to get the values for (type: MapObject)
- * @returns the vector containing the values (type: VectorObject)
- */
-export function values(map: MapObject) : VectorObject {
-    return map_values(map);
+    /**
+     * Return a new vector containing all the values in a map.
+     * The new vector is ordered in the original map's key-sorted order.
+     * @returns the vector containing the values (type: VectorObject)
+     */
+    values() : VectorObject {
+        return map_values(this.obj);
+    }
+
+    getHostObject(): MapObject {
+        return this.obj;
+    }
+
 }
 
 /******************
