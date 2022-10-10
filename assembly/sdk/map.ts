@@ -1,9 +1,9 @@
-import { RawVal, MapObject, VectorObject, toU32, toBool } from "./host_value";
+import { RawVal, MapObject, toU32, toBool } from "./host_value";
+import { Vec } from "./vec";
 
 export class Map {
     obj: MapObject;
 
-    //@ts-ignore
     constructor(obj:MapObject = map_new()) {
       this.obj = obj;
     }
@@ -97,8 +97,8 @@ export class Map {
      * The new vector is ordered in the original map's key-sorted order.
      * @returns the vector containing the keys (type: VectorObject)
      */
-    keys() : VectorObject {
-        return map_keys(this.obj);
+    keys() : Vec {
+        return new Vec(map_keys(this.obj));
     }
 
     /**
@@ -106,14 +106,13 @@ export class Map {
      * The new vector is ordered in the original map's key-sorted order.
      * @returns the vector containing the values (type: VectorObject)
      */
-    values() : VectorObject {
-        return map_values(this.obj);
+    values() : Vec {
+        return new Vec(map_values(this.obj));
     }
 
     getHostObject(): MapObject {
         return this.obj;
     }
-
 }
 
 /******************

@@ -3,38 +3,38 @@ import { VectorObject, RawVal, fromVoid, fromU32, toU32 } from "./host_value";
 export class Vec {
     obj: VectorObject;
 
-    //@ts-ignore
-    constructor(capacity:RawVal = fromVoid(), obj:VectorObject = vec_new(capacity)) {
-    //constructor() {
-      this.obj = obj; // vec_new(fromVoid());
-    }
-  
-    /**
-     * Update the value at index `i` in the vector.
-     * @param i the index to be updated
-     * @param value the value to be updated (Type: RawVal)
-     * @returns void. Traps if there is no value at the given index. Traps if the index is out of bound.
-     */
-    put(i:u32, value: RawVal) : void {
-        this.obj = vec_put(this.obj, fromU32(i), value);
+    constructor(obj:VectorObject = vec_new(fromVoid())) {
+      this.obj = obj;
     }
 
     /**
-     *  Returns the element at index `i` of the vector. Traps if the index is out of bound.
-     * @param i the index
-     * @returns the value (Type: RawVal). Traps if the index is out of bound.
+     * Creates a new vector with the given capacity.
+     * @param capacity capacity of the Vector
+     * @returns the new Vector.
      */
-    get(i:u32) : RawVal {
-        return vec_get(this.obj, fromU32(i));
+    static new_with_capacity(capacity: u32) : Vec {
+        return new Vec(vec_new(fromU32(capacity)));
+    }
+ 
+    /**
+     * Inserts an element at index `i` within the vector, shifting all elements after it to the right.
+     * Traps if the index is out of bound.
+     * @param i the index to insert the element to
+     * @param value the element to insert (Type:RawVal).
+     * @returns void
+     */
+     insert(i: u32, value: RawVal) : void {
+        this.obj = vec_insert(this.obj, fromU32(i), value);
     }
 
     /**
-     * Deletes an element in the vector at index `i`, shifting all elements after it to the left.
-     * @param i the index of the element to be deleted
-     * @returns void. Traps if the index is out of bound.
+     * Moves all the elements of vector `vec2` into this vector.
+     * Traps if number of elements in the vector overflows a u32.
+     * @param vec2 the handle of the vector to append from (Type: VectorObject)
+     * @returns void
      */
-    del(i:u32) : void {
-        this.obj = vec_del(this.obj, fromU32(i));
+    append(vec2: VectorObject) : void {
+        this.obj = vec_append(this.obj, vec2);
     }
 
     /**
@@ -51,7 +51,7 @@ export class Vec {
      * @returns void.
      */
     push_front(value: RawVal) : void {
-        this.obj =  vec_push_front(this.obj, value);
+        this.obj = vec_push_front(this.obj, value);
     }
 
     /**
@@ -60,7 +60,7 @@ export class Vec {
      * @returns void.
      */
     pop_front() : void {
-        this.obj =  vec_pop_front(this.obj);
+        this.obj = vec_pop_front(this.obj);
     }
 
     /**
@@ -88,6 +88,7 @@ export class Vec {
     front() : RawVal {
         return vec_front(this.obj);
     }
+
     /**
      * Return the last element in the vector. Traps if the vector is empty.
      * @returns the last element (Type: RawVal)
@@ -97,24 +98,31 @@ export class Vec {
     }
 
     /**
-     * Inserts an element at index `i` within the vector, shifting all elements after it to the right.
-     * Traps if the index is out of bound
-     * @param i the index to insert the element to
-     * @param value the element to insert (Type:RawVal).
-     * @returns void
+     * Update the value at index `i` in the vector.
+     * @param i the index to be updated
+     * @param value the value to be updated (Type: RawVal)
+     * @returns void. Traps if there is no value at the given index. Traps if the index is out of bound.
      */
-    insert(i: u32, value: RawVal) : VectorObject {
-        return vec_insert(this.obj, fromU32(i), value);
+     put(i:u32, value: RawVal) : void {
+        this.obj = vec_put(this.obj, fromU32(i), value);
     }
 
     /**
-     * Moves all the elements of vector `vec2` into this vector.
-     * Traps if number of elements in the vector overflows a u32.
-     * @param vec2 the handle of the vector to append from (Type: VectorObject)
-     * @returns void
+     * Returns the element at index `i` of the vector. Traps if the index is out of bound.
+     * @param i the index
+     * @returns the value (Type: RawVal). Traps if the index is out of bound.
      */
-    append(vec2: VectorObject) : void {
-        this.obj = vec_append(this.obj, vec2);
+    get(i:u32) : RawVal {
+        return vec_get(this.obj, fromU32(i));
+    }
+
+    /**
+     * Deletes an element in the vector at index `i`, shifting all elements after it to the left.
+     * @param i the index of the element to be deleted
+     * @returns void. Traps if the index is out of bound.
+     */
+    del(i:u32) : void {
+        this.obj = vec_del(this.obj, fromU32(i));
     }
 
     /**
