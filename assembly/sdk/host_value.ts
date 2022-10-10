@@ -1,3 +1,5 @@
+import * as context from "./context";
+
 export type RawVal = u64;
 
 /// Wrapper for a [RawVal] that is tagged with [Tag::Object], interpreting the
@@ -462,6 +464,43 @@ export function toI64(val: Signed64BitIntObject) : i64 {
   return isObject(val) && getObjectType(val) == objTypeAccountId;
 }
 
+export function contractError(code: u32) : StatusObject {
+    return fromMajorMinorAndTag(code, statusContractErr, rawValTagStatus);
+}
+
+export function fromString(str: string) : SymbolVal {
+  if (str.length > 10) {
+    context.fail();
+  }
+
+  var accum: u64 = 0;
+  let codeBits:u8 = 6;
+  for (var i=0; i < str.length; i++) {
+    let charcode = str.charCodeAt(i);
+    if (charcode >= 48 && charcode <= 122){
+      let cu8 = charcode as u8;
+      accum <<= codeBits;
+      var v:u64 = 0;
+      if (cu8 == 95) { // "_"
+        v = 1;
+      } else if (cu8 >= 48 && cu8 <= 57) { // 0..9
+        v = 2 + ((cu8 as u64) - 48);
+      } else if (cu8 >= 65 && cu8 <= 90) { // A..Z
+        v = 12 + ((cu8 as u64) - 65);
+      } else if (cu8 >= 97 && cu8 <= 122) { // a..z
+        v = 38 + ((cu8 as u64) - 97);
+      } else {
+        context.fail(); // bad char.
+      }
+      accum |= v;
+    } else {
+      context.fail(); // bad char.
+    }
+    
+  }
+  return addTagToBody(rawValTagSymbol, accum);
+}
+
 /***********
  * HELPERS *
  ***********/
@@ -506,6 +545,12 @@ function addTagToBody(tag: rawValTag, body: u64): RawVal {
     return (body << 4) | ((tag << 1) as u64) | 1;
 }
 
+function fromMajorMinorAndTag(major: u32, minor: u32, tag:rawValTag) : RawVal {
+   let maj = major as u64;
+   let min = minor as u64;
+   return addTagToBody(tag, maj << 28 | min);
+}
+
 /******************
  * HOST FUNCTIONS *
  ******************/
@@ -542,7 +587,7 @@ const statusHostFuncErr: statusType = 4;
 const statusStorageErr: statusType = 5;
 const statusContextErr: statusType = 6;
 const statusVMErr: statusType = 7;
-const statusContractErr: statusType = 7;
+const statusContractErr: statusType = 8;
 
 type hostValErrCode = u32;
 const hostValUnknownErr: hostValErrCode = 0;
@@ -609,53 +654,4 @@ const vmTrapCPULimitExceeded: vmErrCode = 18;
 
 type unknownErrCode = u32;
 const unknownErrGeneral: unknownErrCode = 0;
-const unknownErrXDR: unknownErrCode = 1
-
-export function toUTF8Array(str:string) : u8[] {
-  var utf8 : u8[] = [];
-  /*var index = 0;
-  for (var i=0; i < str.length; i++) {
-      var charcode = str.charCodeAt(i);
-      utf8[index] = charcode as u8;
-      index++;
-      if (charcode < 0x80){
-        utf8[index] = charcode as u8;
-        index++;
-      } 
-      else if (charcode < 0x800) {
-          utf8[index] = 0xc0 | (charcode >> 6) as u8;
-          index++;
-          utf8[index] = 0x80 | (charcode & 0x3f) as u8;
-          index++;
-
-      }
-      else if (charcode < 0xd800 || charcode >= 0xe000) {
-          utf8[index] = 0xe0 | (charcode >> 12) as u8;
-          index++;
-          utf8[index] = 0x80 | ((charcode>>6) & 0x3f) as u8;
-          index++;  
-          utf8[index] = 0x80 | (charcode & 0x3f) as u8;
-          index++; 
-      }
-      // surrogate pair
-      else {
-          i++;
-          // UTF-16 encodes 0x10000-0x10FFFF by
-          // subtracting 0x10000 and splitting the
-          // 20 bits of 0x0-0xFFFFF into two halves
-          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
-                    | (str.charCodeAt(i) & 0x3ff))
-
-          utf8[index] = 0xf0 | (charcode >>18) as u8;
-          index++;
-          utf8[index] = 0x80 | ((charcode>>12) & 0x3f) as u8;
-          index++;  
-          utf8[index] = 0x80 | ((charcode>>6) & 0x3f) as u8;
-          index++; 
-          utf8[index] = 0x80 | (charcode & 0x3f) as u8;
-          index++;           
-      }
-      
-  }*/
-  return utf8;
-}
+const unknownErrXDR: unknownErrCode = 1;

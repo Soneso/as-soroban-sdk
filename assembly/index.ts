@@ -1,23 +1,14 @@
 import * as val from "./sdk/host_value";
-import {Vec} from "./sdk/vec";
+import {BigInt} from "./sdk/bigint";
 
 export function add(a: val.RawVal, b: val.RawVal): val.RawVal {
 
-  let vec = new Vec();
-  vec.push_front(a);
-  vec.put(0,b);
-  return (vec.get(0));
+  let ax = val.toI32(a);
+  let bx = val.toI32(b);
+  let xa:i64 = ax + bx;
+  let bi1 = BigInt.from_i64(xa);
+  let bi2 = BigInt.from_i64(xa);
+  bi1.add_assign(bi2);
+  return (val.fromI32(bi1.to_i64() as i32));
 }
-
-/*
-
-  //let ab = "1jajjsskja";
-  //let abs = String.UTF8.encode(ab);
-  //let hope = toUTF8Array(ab);
-  //var charcode = ab.charCodeAt(0);
-
-function toUTF8Array(str:string) : u8[] {
-  var utf8 : u8[] = [];
-  return utf8;
-}*/
 

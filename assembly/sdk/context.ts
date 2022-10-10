@@ -1,6 +1,6 @@
 
 import { RawVal, BinaryObject, Unsigned64BitIntObject, Signed64BitIntObject,
-     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusObject } from "./host_value";
+     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusObject, contractError } from "./host_value";
 
 
 /**
@@ -80,9 +80,19 @@ export function current_call_stack(): VectorObject {
 
 /**
  * Causes the currently executing contract to fail immediately.
+ * It traps with with contract error status code and error code 0
  */
 export function fail() : void {
-    // TODO fail_with_status
+    fail_with_status(contractError(0));
+}
+
+/**
+ * Causes the currently executing contract to fail immediately.
+ * It traps with with contract error status code and error code as given by parameter.
+ * @param code the error code to use.
+ */
+export function fail_with_error_code(errCode: u32) : void {
+    fail_with_status(contractError(errCode));
 }
 
 /**

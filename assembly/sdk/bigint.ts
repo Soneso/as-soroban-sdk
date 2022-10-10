@@ -1,273 +1,421 @@
 import { BigIntObject, RawVal, BinaryObject, toBool, fromU32, fromI32} from "./host_value";
 
-/**
- * Constructs a BigInt on the host from an u64.
- * @param value the u64 value to construct the BigInt from
- * @returns the handle to the created BigInt object (Type: BigIntObject)
- */
-export function from_u64(value: u64): BigIntObject {
-    return bigint_from_u64(value);
-}
+export class BigInt {
+    obj: BigIntObject;
 
-/**
- * Converts a BigInt to an u64. Traps if the value cannot fit into u64.
- * @param object the handle to the BigInt object (Type: BigIntObject)
- * @returns the u64 value of the bigint
- */
-export function to_u64(object: BigIntObject): u64 {
-    return bigint_to_u64(object);
-}
+    constructor(obj:BigIntObject) {
+      this.obj = obj;
+    }
 
-/**
- * Constructs a BigInt on the host from an i64.
- * @param value the i64 value to construct the BigInt from
- * @returns the handle to the created BigInt object (Type: BigIntObject)
- */
-export function from_i64(value: i64): BigIntObject {
-    return bigint_from_i64(value);
-}
+    /**
+     * Constructs a BigInt on the host from an u64.
+     * @param value the u64 value to construct the BigInt from
+     * @returns the BigInt object containing its host object
+     */
+    static from_u64(value: u64): BigInt {
+        return new BigInt(bigint_from_u64(value));
+    }
 
-/**
- * Converts a BigInt to an i64. Traps if the value cannot fit into i64.
- * @param object the handle to the BigInt object (Type: BigIntObject)
- * @returns the i64 value of the bigint
-*/
-export function to_i64(object: BigIntObject): i64 {
-    return bigint_to_i64(object);
-}
+    /**
+     * Constructs a BigInt on the host from an i64.
+     * @param value the i64 value to construct the BigInt from
+     * @returns the BigInt object containing its host object
+     */
+    static from_i64(value: i64): BigInt {
+        return new BigInt(bigint_from_i64(value));
+    }
 
-/**
- * Performs the `+` operation on the host and returns the handle to the result.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
-export function add(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_add(object1, object2);
-}
+    /**
+     * Creates a BigInt from a byte array and i32 sign.
+     * Bytes are in big-endian order. Sign is interpreted: -1 as negative, 0 as zero, 1 as positive
+     * If sign is 0, then the input bytes are ignored and will return a BigInt of 0.
+     * @param sign the i32 sign [-1 | 0 | 1]
+     * @param bytes the byte array (Type: BinaryObject)
+     * @returns the new BigInt
+     */
+    static from_bytes_be(sign: i32, bytes: BinaryObject): BigInt {
+        return new BigInt(bigint_from_bytes_be(fromI32(sign), bytes));
+    }
 
-/**
- * Performs the `-` operation on the host and returns the handle to the result.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
-export function sub(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_sub(object1, object2);
-}
+    /**
+     * Creates a BigInt from a byte array `buf`, an i32 sign and an u32 radix.
+     * Each u8 of the byte array is interpreted as one digit of the number and
+     * must therefore be less than the radix. The bytes are in big-endian byte order.
+     * Radix must be in the range 2..=256. Sign follows same rule as in `bigint_from_bytes_be`.
+     * @param sign the sign [-1 | 0 | 1]
+     * @param buf the byte array (Type: BinaryObject)
+     * @param radix the radix [2 ... 256]
+     * @returns the new BigInt
+     */
+    static from_radix_be(sign: i32, buf: BinaryObject, radix: u32): BigInt {
+        return new BigInt(bigint_from_radix_be(fromI32(sign), buf, fromU32(radix)));
+    }
 
-/**
- * Performs the `*` operation on the host and returns the handle to the result.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function mul(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_mul(object1, object2);
-}
+    /**
+     * Returns the handle to the host object as BigIntObject.
+     * @returns handle to the host object.
+     */
+    getHostObject() : BigIntObject {
+        return this.obj;
+    }
 
-/**
- * Performs the `/` operation on the host and returns the handle to the result.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function div(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_div(object1, object2);
-}
+    /**
+     * Converts this BigInt to an u64. Traps if the value cannot fit into u64.
+     * @returns the u64 value of this BigInt
+     */
+    to_u64(): u64 {
+        return bigint_to_u64(this.obj);
+    }
 
-/**
- * Performs the `%` operation on the host and returns the handle to the result.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function rem(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_rem(object1, object2);
-}
+    /**
+     * Converts this BigInt to an i64. Traps if the value cannot fit into i64.
+     * @returns the i64 value of the bigint
+     */
+    to_i64(): i64 {
+        return bigint_to_i64(this.obj);
+    }
 
-/**
- * Performs the `&` operation on the host and returns the handle to the result.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param value2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function and(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_and(object1, object2);
-}
+    /**
+     * Performs the `+` operation on the host and returns the result as a new BigInt.
+     * @param value to add to this BigInt
+     * @returns the new BigInt as a result
+     */
+    add(value: BigInt): BigInt {
+        return new BigInt(bigint_add(this.obj, value.getHostObject()));
+    }
 
-/**
- * Performs the `|` operation on the host and returns the handle to the result.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function or(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_or(object1, object2);
-}
+    /**
+     * Performs the `+` operation on the host and assigns the result to this BigInt.
+     * @param value to add to this BigInt
+     * @returns void
+     */
+    add_assign(value: BigInt): void {
+        this.obj = bigint_add(this.obj, value.getHostObject());
+    }
 
-/**
- * Performs the `^` operation on the host and returns the handle to the result.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function xor(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_xor(object1, object2);
-}
+    /**
+     * Performs the `-` operation on the host and returns the result as a new BigInt.
+     * @param value to substract from this BigInt
+     * @returns the new BigInt as a result
+     */
+    sub(value: BigInt): BigInt {
+        return new BigInt(bigint_sub(this.obj, value.getHostObject()));
+    }
 
-/**
- * Performs the `<<` operation on the host and returns the handle to the result.
- * @param value1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function shl(value1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_shl(value1, object2);
-}
+    /**
+     * Performs the `-` operation on the host and assigns the result to this BigInt.
+     * @param value to substract from this BigInt
+     * @returns void
+     */
+    sub_assign(value: BigInt): void {
+        this.obj = bigint_sub(this.obj, value.getHostObject());
+    }
 
-/**
- * Performs the `>>` operation on the host and returns the handle to the result.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function shr(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_shr(object1, object2);
-}
+    /**
+     * Performs the `*` operation on the host and returns the result as a new BigInt.
+     * @param value value to multiply this BigInt with
+     * @returns the new BigInt as a result
+     */
+    mul(value: BigInt): BigInt {
+        return new BigInt(bigint_mul(this.obj, value.getHostObject()));
+    }
 
-/**
- * Returns true if the BigInt is equal to the additive identity.
- * @param object the handle to the BigInt to check (Type: BigIntObject)
- * @returns true or false
- */
-export function is_zero(object: BigIntObject): bool {
-    return toBool(bigint_is_zero(object));
-}
+    /**
+     * Performs the `*` operation on the host and assigns the result to this BigInt.
+     * @param value to multiply this BigInt with
+     * @returns void
+     */
+    mul_assign(value: BigInt): void {
+        this.obj = bigint_mul(this.obj, value.getHostObject());
+    }
 
-/**
- * Performs the unary `-` operation.
- * @param object the handle to the BigInt value on the host (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
-export function neg(object: BigIntObject): BigIntObject {
-    return bigint_neg(object);
-}
+    /**
+     * Performs the `/` operation on the host and returns the result as a new BigInt.
+     * @param value value to divide this BigInt with
+     * @returns the new BigInt as a result
+     */
+    div(value: BigInt): BigInt {
+        return new BigInt(bigint_div(this.obj, value.getHostObject()));
+    }
 
-/**
- * Performs the unary `!` operation.
- * @param object the handle to the BigInt value on the host (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
-export function not(object: BigIntObject): BigIntObject {
-    return bigint_not(object);
-}
+    /**
+     * Performs the `/` operation on the host and assigns the result to this BigInt.
+     * @param value to devide this BigInt with
+     * @returns void
+     */
+    div_assign(value: BigInt): void {
+        this.obj = bigint_div(this.obj, value.getHostObject());
+    }
 
-/**
- * Calculates the Greatest Common Divisor (GCD) of `object1` and `object2`.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
-export function gcd(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_gcd(object1, object2);
-}
+    /**
+     * Performs the `%` operation on the host and returns the result as a new BigInt.
+     * @param value value to perform the `%` operation to this BigInt
+     * @returns the new BigInt as a result
+     */
+    rem(value: BigInt): BigInt {
+        return new BigInt(bigint_rem(this.obj, value.getHostObject()));
+    }
 
-/**
- * Calculates the Lowest Common Multiple (LCM) of `object1` and `object2`.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function lcm(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_lcm(object1, object2);
-}
+    /**
+     * Performs the `%` operation on the host and assigns the result to this BigInt.
+     * @param value value to perform the `%` operation to this BigInt
+     * @returns void
+     */
+    rem_assign(value: BigInt): void {
+        this.obj = bigint_rem(this.obj, value.getHostObject());
+    }
 
-/**
- * Calculates `object1` to the power `object2`. Traps if `object2` is negative or larger than the size of u64.
- * @param object1 handle to the first value (Type: BigIntObject)
- * @param object2 handle to the second value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function pow(object1: BigIntObject, object2: BigIntObject): BigIntObject {
-    return bigint_pow(object1, object2);
-}
+    /**
+     * Performs the `&` operation on the host and returns the result as a new BigInt.
+     * @param value value to perform the `&` operation to this BigInt
+     * @returns the new BigInt as a result
+     */
+    and(value: BigInt): BigInt {
+        return new BigInt(bigint_and(this.obj, value.getHostObject()));
+    }
 
-/**
-* Calculates `(p ^ q) mod m`. Note that this rounds like `mod_floor`, not like the `%` operator, which makes a difference when given a negative `p` or `m`.
-* The result will be in the interval `[0, m)` for `m > 0`, or in the interval `(m, 0]` for `m < 0`.
-* Traps if the `q` is negative or the `m` is zero.
- * @param objectP handle to the p value (Type: BigIntObject)
- * @param objectQ handle to the q value (Type: BigIntObject)
- * @param objectM handle to the m value (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
- export function pow_mod(objectP: BigIntObject, objectQ: BigIntObject, objectM: BigIntObject): BigIntObject {
-    return bigint_pow_mod(objectP, objectQ, objectM);
-}
+    /**
+     * Performs the `&` operation on the host and assigns the result to this BigInt.
+     * @param value value to perform the `&` operation to this BigInt
+     * @returns void
+    */
+    and_assign(value: BigInt): void {
+        this.obj = bigint_and(this.obj, value.getHostObject());
+    }
 
-/**
- * Calculates the truncated principal square root of the given bigint. Traps if the bigint is negative.
- * @param object handle to the bigint value on the host (Type: BigIntObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
-export function sqrt(object: BigIntObject): BigIntObject {
-    return bigint_sqrt(object);
-}
+    /**
+     * Performs the `|` operation on the host and returns the result as a new BigInt.
+     * @param value value to perform the `|` operation to this BigInt
+     * @returns the new BigInt as a result
+     */
+    or(value: BigInt): BigInt {
+        return new BigInt(bigint_or(this.obj, value.getHostObject()));
+    }
 
-/**
- * Determines the fewest bits necessary to express the bigint, not including the sign.
- * @param object handle to the bigint value on the host (Type: BigIntObject)
- * @returns the bits (Type: u64)
- */
- export function bits(object: BigIntObject): u64 {
-    return bigint_bits(object);
-}
+    /**
+     * Performs the `|` operation on the host and assigns the result to this BigInt.
+     * @param value value to perform the `|` operation to this BigInt
+     * @returns void
+     */
+    or_assign(value: BigInt): void {
+        this.obj = bigint_or(this.obj, value.getHostObject());
+    }
+    
+    /**
+     * Performs the `^` operation on the host and returns the result as a new BigInt.
+     * @param value value to perform the `^` operation to this BigInt
+     * @returns the new BigInt as a result
+     */
+    xor(value: BigInt): BigInt {
+        return new BigInt(bigint_xor(this.obj, value.getHostObject()));
+    }
 
-/**
- * Outputs the BigInt's magnitude in big-endian byte order into a byte array. The sign is dropped.n.
- * @param object handle to the bigint value on the host (Type: BigIntObject)
- * @returns the byte array (Type: BinaryObject)
- */
-export function to_bytes_be(object: BigIntObject): BinaryObject {
-    return bigint_to_bytes_be(object);
-}
+    /**
+     * Performs the `^` operation on the host and assigns the result to this BigInt.
+     * @param value value to perform the `^` operation to this BigInt
+     * @returns void
+     */
+    xor_assign(value: BigInt): void {
+        this.obj = bigint_xor(this.obj, value.getHostObject());
+    }
 
-/**
- * Outputs the BigInt's magnitude in the requested base in big-endian digit order into a byte array.
- * The sign is dropped. Radix must be in the range 2...256.
- * @param object handle to the bigint value on the host (Type: BigIntObject)
- * @param radix the radix [2 ... 256]
- * @returns the byte array (Type: BinaryObject)
- */
- export function to_radix_be(object: BigIntObject, radix: u32): BinaryObject {
-    return bigint_to_radix_be(object, fromU32(radix));
-}
+    /**
+     * Performs the `<<` operation on the host and returns the result as a new BigInt.
+     * @param value value to perform the `<<` operation to this BigInt
+     * @returns the new BigInt as a result
+     */
+    shl(value: BigInt): BigInt {
+        return new BigInt(bigint_shl(this.obj, value.getHostObject()));
+    }
 
-/**
- * Creates a BigInt from a byte array and i32 sign.
- * Bytes are in big-endian order. Sign is interpreted: -1 as negative, 0 as zero, 1 as positive
- * If sign is 0, then the input bytes are ignored and will return a BigInt of 0.
- * @param sign the i32 sign [-1 | 0 | 1]
- * @param bytes the byte array (Type: BinaryObject)
- * @returns the handle to the result (Type: BigIntObject)
- */
-export function from_bytes_be(sign: i32, bytes: BinaryObject): BigIntObject {
-    return bigint_from_bytes_be(fromI32(sign), bytes);
-}
+    /**
+     * Performs the `<<` operation on the host and assigns the result to this BigInt.
+     * @param value value to perform the `<<` operation to this BigInt
+     * @returns void
+     */
+    shl_assign(value: BigInt): void {
+        this.obj = bigint_shl(this.obj, value.getHostObject());
+    }
 
-/**
- * Creates a BigInt from a byte array `buf`, an i32 sign and an u32 radix.
- * Each u8 of the byte array is interpreted as one digit of the number and
- * must therefore be less than the radix. The bytes are in big-endian byte order.
- * Radix must be in the range 2..=256. Sign follows same rule as in `bigint_from_bytes_be`.
- * @param sign the sign [-1 | 0 | 1]
- * @param buf the byte array (Type: BinaryObject)
- * @param radix the radix [2 ... 256]
- * @returns the handle to the result (Type: BigIntObject)
- */
-export function from_radix_be(sign: i32, buf: BinaryObject, radix: u32): BigIntObject {
-    return bigint_from_radix_be(fromI32(sign), buf, fromU32(radix));
+    /**
+     * Performs the `>>` operation on the host and returns the result as a new BigInt.
+     * @param value value to perform the `>>` operation to this BigInt
+     * @returns the new BigInt as a result
+     */
+     shr(value: BigInt): BigInt {
+        return new BigInt(bigint_shr(this.obj, value.getHostObject()));
+    }
+
+    /**
+     * Performs the `>>` operation on the host and assigns the result to this BigInt.
+     * @param value value to perform the `>>` operation to this BigInt
+     * @returns void
+     */
+     shr_assign(value: BigInt): void {
+        this.obj = bigint_shr(this.obj, value.getHostObject());
+    }
+
+    /**
+     * Returns true if this BigInt is equal to the additive identity.
+     * @returns true or false
+     */
+    is_zero(): bool {
+        return toBool(bigint_is_zero(this.obj));
+    }
+
+    /**
+     * Performs the unary `-` operation to this BigInt on the host and returns the result as a new BigInt.
+     * @returns the new BigInt as a result
+     */
+    neg(): BigInt {
+        return new BigInt(bigint_neg(this.obj));
+    }
+
+    /**
+     * Performs the unary `-` operation to this BigInt and assigns the result to this BigInt.
+     * @returns void
+     */
+    neg_assign(): void {
+        this.obj = bigint_neg(this.obj);
+    }
+
+    /**
+     * Performs the unary `!` operation to this BigInt on the host and returns the result as a new BigInt.
+     * @returns the new BigInt as a result
+     */
+    not(): BigInt {
+        return new BigInt(bigint_not(this.obj));
+    }
+
+    /**
+     * Performs the unary `!` operation to this BigInt and assigns the result to this BigInt.
+     * @returns void
+     */
+    not_assign(): void {
+        this.obj = bigint_not(this.obj);
+    }
+
+    /**
+     * Calculates the Greatest Common Divisor (GCD) of this BigInt and the value given by parameter. Returns the result as a new BigInt.
+     * @param value value to perform the gdc operation with this BigInt
+     * @returns the new BigInt as a result
+     */
+    gcd(value: BigInt): BigInt {
+        return new BigInt(bigint_gcd(this.obj, value.getHostObject()));
+    }
+
+    /**
+     * Calculates the Greatest Common Divisor (GCD) of this BigInt and the value given by parameter. Assigns the result to this BigInt.
+     * @param value value to perform the gdc operation with this BigInt
+     * @returns void
+     */
+    gcd_assign(value: BigInt): void {
+        this.obj = bigint_gcd(this.obj, value.getHostObject());
+    }
+
+    /**
+     * Calculates the Greatest Common Divisor (GCD) of this BigInt and the value given by parameter. Returns the result as a new BigInt.
+     * @param value value to perform the gdc operation with this BigInt
+     * @returns the new BigInt as a result
+     */
+    lcm(value: BigInt): BigInt {
+        return new BigInt(bigint_lcm(this.obj, value.getHostObject()));
+    }
+
+    /**
+     * Calculates the Lowest Common Multiple (LCM) of this BigInt and the value given by parameter. Assigns the result to this BigInt.
+     * @param value value to perform the lcm operation with this BigInt
+     * @returns void
+     */
+    lcm_assign(value: BigInt): void {
+        this.obj = bigint_lcm(this.obj, value.getHostObject());
+    }
+
+    /**
+     * Calculates this BigInt` to the power `value`. Traps if `value` is negative or larger than the size of u64. Returns the result as a new BigInt.
+     * @param value value to be used for the pow operation
+     * @returns the new BigInt as a result
+     */
+    pow(value: BigInt): BigInt {
+        return new BigInt(bigint_pow(this.obj, value.getHostObject()));
+    }
+
+    /**
+     * Calculates this BigInt` to the power `value`. Traps if `value` is negative or larger than the size of u64. Assigns the result to this BigInt.
+     * @param value value to be used for the pow operation
+     * @returns void
+     */
+    pow_assign(value: BigInt): void {
+        this.obj = bigint_pow(this.obj, value.getHostObject());
+    }
+
+    /**
+    * Calculates `(this ^ q) mod m`. Note that this rounds like `mod_floor`, not like the `%` operator, which makes a difference when given a negative `this` or `m`.
+    * The result will be in the interval `[0, m)` for `m > 0`, or in the interval `(m, 0]` for `m < 0`.
+    * Traps if the `q` is negative or the `m` is zero.
+    * Resturns the result as a new BigInt
+    * @param valueQ handle to the q value (Type: BigIntObject)
+    * @param valueM handle to the m value (Type: BigIntObject)
+    * @returns the new BigInt as a result
+    */
+    pow_mod(valueQ: BigInt, valueM: BigInt): BigInt {
+        return new BigInt(bigint_pow_mod(this.obj, valueQ.getHostObject(), valueM.getHostObject()));
+    }
+
+    /**
+    * Calculates `(this ^ q) mod m`. Note that this rounds like `mod_floor`, not like the `%` operator, which makes a difference when given a negative `this` or `m`.
+    * The result will be in the interval `[0, m)` for `m > 0`, or in the interval `(m, 0]` for `m < 0`.
+    * Traps if the `q` is negative or the `m` is zero.
+    * Assigns the result to this BigInt
+    * @param valueQ handle to the q value (Type: BigIntObject)
+    * @param valueM handle to the m value (Type: BigIntObject)
+    * @returns void
+    */
+    pow_mod_assign(valueQ: BigInt, valueM: BigInt): void {
+        this.obj = bigint_pow_mod(this.obj, valueQ.getHostObject(), valueM.getHostObject());
+    }
+
+    /**
+     * Calculates this BigInt` to the power `value`. Traps if `value` is negative or larger than the size of u64. Returns the result as a new BigInt.
+     * @returns the new BigInt as a result
+     */
+    sqrt(): BigInt {
+        return new BigInt(bigint_sqrt(this.obj));
+    }
+
+    /**
+     * Calculates the truncated principal square root of the this BigInt. Traps if the BigInt is negative. Assigns the result to this BigInt.
+     * @returns void
+     */
+    sqrt_assign(): void {
+        this.obj = bigint_sqrt(this.obj);
+    }
+
+    /**
+     * Determines the fewest bits necessary to express this BigInt, not including the sign.
+     * @returns the bits (Type: u64)
+     */
+    bits(): u64 {
+        return bigint_bits(this.obj);
+    }
+
+    /**
+     * Outputs the BigInt's magnitude in big-endian byte order into a byte array. The sign is dropped.
+     * @returns the byte array (Type: BinaryObject)
+     */
+    to_bytes_be(): BinaryObject {
+        return bigint_to_bytes_be(this.obj);
+    }
+
+    /**
+     * Outputs the BigInt's magnitude in the requested base in big-endian digit order into a byte array.
+     * The sign is dropped. Radix must be in the range 2...256.
+     * @param radix the radix [2 ... 256]
+     * @returns the byte array (Type: BinaryObject)
+     */
+    to_radix_be(radix: u32): BinaryObject {
+        return bigint_to_radix_be(this.obj, fromU32(radix));
+    }
 }
 
 /******************
