@@ -9,6 +9,14 @@ export class Map {
     }
   
     /**
+     * Returns the handle to the host object as MapObject.
+     * @returns handle to the host object.
+     */
+    getHostObject(): MapObject {
+        return this.obj;
+    }
+
+    /**
      * Inserts a key/value mapping into the map
      * If the map already has a mapping for the given key, the previous value is overwritten.
      * @param key the key of the key/value mapping (type: RawVal)
@@ -108,10 +116,6 @@ export class Map {
      */
     values() : Vec {
         return new Vec(map_values(this.obj));
-    }
-
-    getHostObject(): MapObject {
-        return this.obj;
     }
 }
 

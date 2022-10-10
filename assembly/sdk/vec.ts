@@ -8,6 +8,14 @@ export class Vec {
     }
 
     /**
+     * Returns the handle to the host object as MapObject.
+     * @returns handle to the host object.
+     */
+    getHostObject(): VectorObject {
+        return this.obj;
+    }
+
+    /**
      * Creates a new vector with the given capacity.
      * @param capacity capacity of the Vector
      * @returns the new Vector.
@@ -30,11 +38,11 @@ export class Vec {
     /**
      * Moves all the elements of vector `vec2` into this vector.
      * Traps if number of elements in the vector overflows a u32.
-     * @param vec2 the handle of the vector to append from (Type: VectorObject)
+     * @param vec2 the vector to append from
      * @returns void
      */
-    append(vec2: VectorObject) : void {
-        this.obj = vec_append(this.obj, vec2);
+    append(vec2: Vec) : void {
+        this.obj = vec_append(this.obj, vec2.getHostObject());
     }
 
     /**

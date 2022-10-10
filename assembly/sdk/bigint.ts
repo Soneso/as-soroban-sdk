@@ -1,4 +1,5 @@
-import { BigIntObject, RawVal, BinaryObject, toBool, fromU32, fromI32} from "./host_value";
+import { BigIntObject, RawVal, toBool, fromU32, fromI32, BytesObject} from "./host_value";
+import { Bytes} from "./bytes";
 
 export class BigInt {
     obj: BigIntObject;
@@ -30,11 +31,11 @@ export class BigInt {
      * Bytes are in big-endian order. Sign is interpreted: -1 as negative, 0 as zero, 1 as positive
      * If sign is 0, then the input bytes are ignored and will return a BigInt of 0.
      * @param sign the i32 sign [-1 | 0 | 1]
-     * @param bytes the byte array (Type: BinaryObject)
+     * @param bytes the byte array
      * @returns the new BigInt
      */
-    static from_bytes_be(sign: i32, bytes: BinaryObject): BigInt {
-        return new BigInt(bigint_from_bytes_be(fromI32(sign), bytes));
+    static from_bytes_be(sign: i32, bytes: Bytes): BigInt {
+        return new BigInt(bigint_from_bytes_be(fromI32(sign), bytes.getHostObject()));
     }
 
     /**
@@ -43,12 +44,12 @@ export class BigInt {
      * must therefore be less than the radix. The bytes are in big-endian byte order.
      * Radix must be in the range 2..=256. Sign follows same rule as in `bigint_from_bytes_be`.
      * @param sign the sign [-1 | 0 | 1]
-     * @param buf the byte array (Type: BinaryObject)
+     * @param buf the byte array
      * @param radix the radix [2 ... 256]
      * @returns the new BigInt
      */
-    static from_radix_be(sign: i32, buf: BinaryObject, radix: u32): BigInt {
-        return new BigInt(bigint_from_radix_be(fromI32(sign), buf, fromU32(radix)));
+    static from_radix_be(sign: i32, buf: Bytes, radix: u32): BigInt {
+        return new BigInt(bigint_from_radix_be(fromI32(sign), buf.getHostObject(), fromU32(radix)));
     }
 
     /**
@@ -401,20 +402,20 @@ export class BigInt {
 
     /**
      * Outputs the BigInt's magnitude in big-endian byte order into a byte array. The sign is dropped.
-     * @returns the byte array (Type: BinaryObject)
+     * @returns the byte array as Bytes object
      */
-    to_bytes_be(): BinaryObject {
-        return bigint_to_bytes_be(this.obj);
+    to_bytes_be(): Bytes {
+        return new Bytes(bigint_to_bytes_be(this.obj));
     }
 
     /**
      * Outputs the BigInt's magnitude in the requested base in big-endian digit order into a byte array.
      * The sign is dropped. Radix must be in the range 2...256.
      * @param radix the radix [2 ... 256]
-     * @returns the byte array (Type: BinaryObject)
+     * @returns the byte array
      */
-    to_radix_be(radix: u32): BinaryObject {
-        return bigint_to_radix_be(this.obj, fromU32(radix));
+    to_radix_be(radix: u32): Bytes {
+        return new Bytes(bigint_to_radix_be(this.obj, fromU32(radix)));
     }
 }
 
@@ -542,20 +543,20 @@ declare function bigint_bits(x: BigIntObject): u64;
 /// Outputs the BigInt's magnitude in big-endian byte order into a byte array. The sign is dropped.n.
 // @ts-ignore
 @external("g", "M")
-declare function bigint_to_bytes_be(x: BigIntObject): BinaryObject;
+declare function bigint_to_bytes_be(x: BigIntObject): BytesObject;
 
 /// Outputs the BigInt's magnitude in the requested base in big-endian digit order into a byte array.
 /// The sign is dropped. Radix must be in the range 2...256.
 // @ts-ignore
 @external("g", "N")
-declare function bigint_to_radix_be(x: BigIntObject, radix: RawVal): BinaryObject;
+declare function bigint_to_radix_be(x: BigIntObject, radix: RawVal): BytesObject;
 
 /// Creates a BigInt from a byte array and i32 sign.
 /// Bytes are in big-endian order. Sign is interpreted: -1 as negative, 0 as zero, 1 as positive
 /// If sign is 0, then the input bytes are ignored and will return a BigInt of 0.
 // @ts-ignore
 @external("g", "O")
-declare function bigint_from_bytes_be(sign: RawVal, bytes: BinaryObject): BigIntObject;
+declare function bigint_from_bytes_be(sign: RawVal, bytes: BytesObject): BigIntObject;
 
 /// Creates a BigInt from a byte array `buf`, an i32 sign and an u32 radix.
 /// Each u8 of the byte array is interpreted as one digit of the number and
@@ -563,4 +564,4 @@ declare function bigint_from_bytes_be(sign: RawVal, bytes: BinaryObject): BigInt
 /// Radix must be in the range 2..=256. Sign follows same rule as in `bigint_from_bytes_be`.
 // @ts-ignore
 @external("g", "P")
-declare function bigint_from_radix_be(sign: RawVal, buf: BinaryObject, radix: RawVal): BigIntObject;
+declare function bigint_from_radix_be(sign: RawVal, buf: BytesObject, radix: RawVal): BigIntObject;

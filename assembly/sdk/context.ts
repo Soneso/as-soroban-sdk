@@ -1,5 +1,5 @@
 
-import { RawVal, BinaryObject, Unsigned64BitIntObject, Signed64BitIntObject,
+import { RawVal, BytesObject, Unsigned64BitIntObject, Signed64BitIntObject,
      VectorObject, AccountIDObject, toU32, toU64, toI64, StatusObject, contractError } from "./host_value";
 
 
@@ -15,17 +15,17 @@ export function log(value: RawVal): void {
  * Returns the contractID `Bytes` of the contract which invoked the
  * running contract. Traps if the running contract was not
  * invoked by a contract.
- * @returns the invoking contractID Bytes as BinaryObject
+ * @returns the invoking contractID Bytes as BytesObject
  */
-export function invoking_contract(): BinaryObject {
+export function invoking_contract(): BytesObject {
     return get_invoking_contract();
 }
 
 /**
 * Returns the current contractID `Bytes` of the running contract.
-* @returns current contractID `Bytes` of the running contract  (Type: BinaryObject)
+* @returns current contractID `Bytes` of the running contract  (Type: BytesObject)
 */
-export function current_contract(): BinaryObject {
+export function current_contract(): BytesObject {
     return get_current_contract();
 }
 
@@ -61,9 +61,9 @@ export function ledger_timestamp(): u64 {
 
 /**
  * Return the network passphrase of the current ledger as `Bytes`.
- * @returns Return the network passphrase of the current ledger as `Bytes` (type:  BinaryObject)
+ * @returns Return the network passphrase of the current ledger as `Bytes` (type:  BytesObject)
  */
-export function ledger_network_passphrase(): BinaryObject {
+export function ledger_network_passphrase(): BytesObject {
     return get_ledger_network_passphrase();
 }
 
@@ -97,10 +97,10 @@ export function fail_with_error_code(errCode: u32) : void {
 
 /**
  * Record a debug event. Fmt must be a Bytes. Args must be a Vec.
- * @param fmt values (Type: BinaryObject)
+ * @param fmt values (Type: BytesObject)
  * @param args arguments ()
  */
-export function log_fmt_values(fmt: BinaryObject, args: VectorObject) : void {
+export function log_fmt_values(fmt: BytesObject, args: VectorObject) : void {
     host_log_fmt_values(fmt, args);
 }
 
@@ -127,7 +127,7 @@ declare function host_log_value(v: RawVal): RawVal;
 /// invoked by a contract.
 // @ts-ignore
 @external("x", "0")
-declare function get_invoking_contract(): BinaryObject;
+declare function get_invoking_contract(): BytesObject;
 
 // @ts-ignore
 @external("x", "1")
@@ -145,7 +145,7 @@ export declare function contract_event(topics: VectorObject, data: RawVal): RawV
 /// invoked by a contract.
 // @ts-ignore
 @external("x", "3")
-export declare function get_current_contract(): BinaryObject;
+export declare function get_current_contract(): BytesObject;
 
 /// Return the protocol version of the current ledger as a u32.
 // @ts-ignore
@@ -165,7 +165,7 @@ declare function get_ledger_timestamp(): Unsigned64BitIntObject;
 /// Return the network passphrase of the current ledger as `Bytes`.
 // @ts-ignore
 @external("x", "7")
-declare function get_ledger_network_passphrase(): BinaryObject;
+declare function get_ledger_network_passphrase(): BytesObject;
 
 /// Returns the full call stack from the first contract call
 /// to the current one as a vector of vectors, where the inside
@@ -186,7 +186,7 @@ declare function fail_with_status(status: StatusObject): RawVal;
 // Vec. Void is returned.
 // @ts-ignore
 @external("x", "a")
-declare function host_log_fmt_values(fmt: BinaryObject, args: VectorObject): RawVal;
+declare function host_log_fmt_values(fmt: BytesObject, args: VectorObject): RawVal;
 
 /// Get whether the contract invocation is from an account or
 /// another contract. Returns 0 for account, 1 for contract.
