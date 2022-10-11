@@ -501,6 +501,37 @@ export function fromString(str: string) : SymbolVal {
   return addTagToBody(rawValTagSymbol, accum);
 }
 
+export function toString(symbol: SymbolVal) : string {
+    if (!hasTag(symbol, rawValTagSymbol)) {
+      context.fail();
+    }
+    var result:string = "";
+    let codeBits:u8 = 6;
+    var val:u64 = 0;
+    var body = getBody(symbol);
+    for (var i=0; i < 10; i++) {
+      val = body & 63;
+      body = body >> codeBits;
+      if (val == 1) {
+        val = 95;
+      } else if (val > 1 && val < 12) {
+        val += 46;
+      } else if (val > 11 && val < 38) {
+        val += 53;
+      } else if (val > 37 && val < 64) {
+        val += 59;
+      } else if (val == 0) {
+        break;
+      } else {
+        context.fail(); // Bad val.
+      }
+      context.log(fromI32(val as i32));
+      // TODO - gives Status(VmError(Instantiation))
+      //result = String.fromCharCode(val as i32) + result;
+    }
+    return result;
+}
+
 /***********
  * HELPERS *
  ***********/

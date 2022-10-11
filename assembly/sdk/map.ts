@@ -1,4 +1,4 @@
-import { RawVal, MapObject, toU32, toBool } from "./host_value";
+import { RawVal, MapObject, toU32, toBool, VectorObject } from "./host_value";
 import { Vec } from "./vec";
 
 export class Map {
