@@ -176,3 +176,27 @@ Supported return values are the same as the supported arguments. If your functio
 See also (Meta Generation)[https://soroban.stellar.org/docs/SDKs/byo#meta-generation] and (Contract Spec Generation)[https://soroban.stellar.org/docs/SDKs/byo#contract-spec-generation]
 
 
+## Features and limitations
+
+In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official Soroban documentation one can find the requirements for a soroban sdk.
+
+This SDK supports:
+- Value Conversions
+- Host functions
+- SDK Types
+- User Defined Errors
+- Meta Generation
+- Contract Spec Generation
+
+This SDK currently doese not fully support:
+- User Defined Types
+- Testing
+
+Testing must be currently done with the soroban-cli. As a helping feature one can use ```context.log(string)``` to generate outputs during the execution of the contract.
+
+```typescript
+import * as context from 'as-soroban-sdk/lib/context';
+
+///...
+context.log("test");
+```
