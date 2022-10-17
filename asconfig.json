@@ -3,23 +3,18 @@
     "debug": {
       "outFile": "build/debug.wasm",
       "textFile": "build/debug.wat",
-      "sourceMap": false,
       "debug": true
     },
     "release": {
       "outFile": "build/release.wasm",
       "textFile": "build/release.wat",
-      "sourceMap": false,
-      "optimizeLevel": 3,
-      "shrinkLevel": 3,
-      "converge": false,
-      "noAssert": false
+      "optimize": ["size", "speed"],
+      "converge": true
     }
   },
   "options": {
-    "bindings": "raw"
-  },
-  "features": {
-    "runtime": "stub"
+    "transform": ["./transforms.mjs"],
+    "runtime": "stub",
+    "exportStart" : "sdkstart"
   }
 }

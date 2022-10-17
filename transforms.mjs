@@ -3,8 +3,6 @@ import { Transform } from "assemblyscript/transform";
 import xdr from './xdr.js';
 import * as fs from 'fs'
 
-//import data from "./contract.json"
-
 const META_NAME = "contractenvmetav0";
 const SPEC_NAME = "contractspecv0";
 

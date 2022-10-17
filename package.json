@@ -6,8 +6,8 @@
   "types": "./types/index.d.ts",
   "scripts": {
     "test": "test",
-    "asbuild:debug": "asc assembly/index.ts --runtime=stub --exportStart=blubber --disable=bulk-memory -Osize -Ospeed --converge --target debug --transform ./transforms.mjs",
-    "asbuild:release": "asc assembly/index.ts --runtime=stub --exportStart=blubber --disable=bulk-memory -Osize -Ospeed --converge --target release --transform ./transforms.mjs",
+    "asbuild:debug": "asc assembly/index.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target debug --transform ./transforms.mjs",
+    "asbuild:release": "asc assembly/index.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target release --transform ./transforms.mjs",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",
     "start": "npx serve ."
   },
