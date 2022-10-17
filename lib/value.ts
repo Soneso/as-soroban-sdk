@@ -127,7 +127,7 @@ export function isU63(val: RawVal): bool {
  */
 export function toU63(val: RawVal): u64 {
   if(!isU63(val)) {
-    //host.fail_with_status()
+    context.fail();
   }
   return val >> 1;
 }
@@ -138,7 +138,9 @@ export function toU63(val: RawVal): u64 {
  * @returns the created host value (Type: RawVal)
  */
 export function fromU63(i: u64): RawVal {
-  //assert((i >> 63) == 0);
+  if((i >> 63) != 0) {
+    context.fail();
+  }
   const v = (i << 1) as RawVal;
   return v;
 }
@@ -159,7 +161,9 @@ export function isI32(val: RawVal): bool {
  * @returns the extracted 32-bit signed integer.
  */
 export function toI32(v: RawVal): i32 {
-  //assert(isI32(v));
+  if(!isI32(v)) {
+    context.fail();
+  }
   return getBody(v) as i32;
 }
 
@@ -188,7 +192,9 @@ export function isU32(val: RawVal): bool {
  * @returns the extracted 32-bit unsigned integer.
  */
 export function toU32(v: RawVal): u32 {
-  //assert(isU32(v));
+  if (!isU32(v)) {
+    context.fail();
+  }
   return getBody(v) as u32;
 }
 
@@ -262,7 +268,9 @@ export function isFalse(val: RawVal): bool {
  * @returns true if the host value represents the static value of true. otherwise returns false (e.g. for false, void, ledgerkey...)
  */
 export function toBool(v: RawVal): bool {
-  //assert(isBool(v));
+  if(!isBool(v)) {
+    context.fail();
+  }
   return getBody(v) == staticTrueBody;
 }
 
@@ -325,7 +333,9 @@ export function isObject(val: RawVal): bool {
  * @returns true if the host value represents an object with the given type. otherwise false.
  */
 export function hasObjectType(val: RawVal, objType: objectType): bool {
-  //assert(isObject(v));
+  if(!isObject(val)){
+    context.fail();
+  }
   return getObjectType(val) == objType;
 }
 
@@ -336,7 +346,9 @@ export function hasObjectType(val: RawVal, objType: objectType): bool {
  * @returns the type of the object represented by the host value.
  */
 export function getObjectType(val: ObjectVal): objectType {
-  //assert(isObject(v));
+  if(!isObject(val)){
+    context.fail();
+  }
   return getBody(val) as objectType;
 }
 
@@ -347,7 +359,9 @@ export function getObjectType(val: ObjectVal): objectType {
  * @returns the handle of the object from the host value that represents the object
  */
 export function getObjectHandle(val: ObjectVal): u32 {
-  //assert(isObject(v));
+  if(!isObject(val)){
+    context.fail();
+  }
   return getBody(val) as u32;
 }
 
@@ -386,7 +400,9 @@ export function fromU64(val: u64) : Unsigned64BitIntObject {
  * @returns the extracted unsigned 64-bit integer.
  */
 export function toU64(val: Unsigned64BitIntObject) : u64 {
-    //assert(isU64(val));
+    if(!isU64(val)){
+      context.fail();
+    }
     return obj_to_u64(val);
 }
 
@@ -415,7 +431,9 @@ export function fromI64(v:i64) : Signed64BitIntObject {
  * @returns the extracted signed 64-bit integer.
  */
 export function toI64(val: Signed64BitIntObject) : i64 {
-  //assert(isI64(val));
+  if(!isI64(val)){
+    context.fail();
+  }
   return obj_to_i64(val);
 }
 
@@ -468,6 +486,11 @@ export function contractError(code: u32) : StatusObject {
     return fromMajorMinorAndTag(code, statusContractErr, rawValTagStatus);
 }
 
+/**
+ * Creates a SymbolVal from the given string.
+ * @param str the string to create the SymbolVal from. max 10 characters.
+ * @returns the created SymbolVal
+ */
 export function fromString(str: string) : SymbolVal {
   if (str.length > 10) {
     context.fail();
@@ -571,9 +594,11 @@ function getBody(val: RawVal): u64 {
  * @returns the resulting host value.
  */
 function addTagToBody(tag: rawValTag, body: u64): RawVal {
-    //assert(body < (1 << 60));
-    //assert(t < 8);
+    if (!(body < (1 << 60) && tag < 8)) {
+      context.fail();
+    }
     return (body << 4) | ((tag << 1) as u64) | 1;
+    
 }
 
 function fromMajorMinorAndTag(major: u32, minor: u32, tag:rawValTag) : RawVal {

@@ -5,11 +5,9 @@
   "main": "index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "test": "test",
-    "asbuild:debug": "asc assembly/index.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target debug --transform ./transforms.mjs",
-    "asbuild:release": "asc assembly/index.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target release --transform ./transforms.mjs",
-    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
-    "start": "npx serve ."
+    "asbuild:debug": "asc examples/hello.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target debug --transform ./transforms.mjs",
+    "asbuild:release": "asc examples/hello.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target release --transform ./transforms.mjs",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release"
   },
   "author": "Christian Rogobete",
   "license": "Apache-2.0",
@@ -25,6 +23,24 @@
     ".": {
       "import": "./build/release.js",
       "types": "./build/release.d.ts"
-    }
-  }
+    },
+    "./sdkasconfig": "./asconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Soneso/as-soroban-sdk.git"
+  },
+  "keywords": [
+    "soroban",
+    "stellar",
+    "smart",
+    "contract",
+    "assembly",
+    "script",
+    "sdk"
+  ],
+  "bugs": {
+    "url": "https://github.com/Soneso/as-soroban-sdk/issues"
+  },
+  "homepage": "https://github.com/Soneso/as-soroban-sdk#readme"
 }

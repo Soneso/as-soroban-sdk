@@ -1,4 +1,4 @@
-import { BigIntObject, RawVal, toBool, fromU32, fromI32, BytesObject} from "./host_value";
+import { BigIntObject, RawVal, toBool, fromU32, fromI32, BytesObject} from "./value";
 import { Bytes} from "./bytes";
 
 export class BigInt {

@@ -1,5 +1,5 @@
 
-import { BytesObject, RawVal, fromU32, toU32 } from "./host_value";
+import { BytesObject, RawVal, fromU32, toU32 } from "./value";
 
 export class Bytes {
     obj: BytesObject;

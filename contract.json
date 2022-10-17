@@ -5,19 +5,19 @@
     "host_functions_version": 23,
     "functions": [
         {
+            "name" : "hello",
+            "arguments": [
+                {"name": "to", "type": "symbol"}
+            ],
+            "returns" : "val"
+        },
+        {
             "name" : "add",
             "arguments": [
                 {"name": "a", "type": "i32"},
                 {"name": "b", "type": "i32"}
             ],
             "returns" : "i32"
-        },
-        {
-            "name" : "hello",
-            "arguments": [
-                {"name": "to", "type": "symbol"}
-            ],
-            "returns" : "val"
         }
     ]
 }

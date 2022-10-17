@@ -1,7 +1,7 @@
-import { RawVal } from "./host_value";
-import { ObjectVal } from "./host_value";
+import { RawVal } from "./value";
+import { ObjectVal } from "./value";
 
-// TODO: separate files + types
+// TODO: improve
 
 /*****************************************
 * hash - Functions concerned with hashes *

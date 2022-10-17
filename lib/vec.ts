@@ -1,4 +1,4 @@
-import { VectorObject, RawVal, fromVoid, fromU32, toU32 } from "./host_value";
+import { VectorObject, RawVal, fromVoid, fromU32, toU32 } from "./value";
 
 export class Vec {
     obj: VectorObject;
@@ -136,7 +136,6 @@ export class Vec {
     /**
      * Copy the elements from `start` index until `end` index, exclusive, in the vector and create a new vector from it.
      * Traps if the index is out of bound.
-     * @param vec the handle of the vector to slice (Type: VectorObject)
      * @param start start index
      * @param end end index (exclusive)
      * @returns the handle of the new vector (Type: VectorObject)

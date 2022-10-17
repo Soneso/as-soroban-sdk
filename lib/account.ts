@@ -1,6 +1,4 @@
-import { RawVal, toBool, toU32, AccountIDObject } from "./host_value";
-
-// TODO AccountIDObject (`a` (`a` is `Bytes`).)
+import { RawVal, toBool, toU32, AccountIDObject } from "./value";
 
 /**
  * Returns true if the account exists. Otherwise false.

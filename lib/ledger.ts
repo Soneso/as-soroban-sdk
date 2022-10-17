@@ -1,6 +1,6 @@
-import { ObjectVal, RawVal} from "./host_value";
+import { ObjectVal, RawVal} from "./value";
 
-//TODO
+//TODO: improve
 
 /******************
  * HOST FUNCTIONS *

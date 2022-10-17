@@ -1,6 +1,6 @@
-import { VectorObject, RawVal, SymbolVal, ObjectVal} from "./host_value";
+import { VectorObject, RawVal, SymbolVal, ObjectVal} from "./value";
 
-//TODO
+//TODO: improve
 
 /******************
  * HOST FUNCTIONS *

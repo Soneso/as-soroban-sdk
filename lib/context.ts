@@ -1,10 +1,10 @@
 
 import { RawVal, BytesObject, Unsigned64BitIntObject, Signed64BitIntObject,
-     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusObject, contractError } from "./host_value";
+     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusObject, contractError } from "./value";
 
 
 /**
-* TODO
+* Log value during execution on host. Good for debugging.
 * @param value the value to log
 */
 export function log(value: RawVal): void {
@@ -89,7 +89,7 @@ export function fail() : void {
 /**
  * Causes the currently executing contract to fail immediately.
  * It traps with with contract error status code and error code as given by parameter.
- * @param code the error code to use.
+ * @param errCode the error code to use.
  */
 export function fail_with_error_code(errCode: u32) : void {
     fail_with_status(contractError(errCode));
