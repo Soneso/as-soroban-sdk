@@ -525,7 +525,7 @@ export function toString(symbol: SymbolVal) : string {
       } else {
         context.fail(); // Bad val.
       }
-      context.log(fromI32(val as i32));
+      //context.log(fromI32(val as i32));
       // TODO - gives Status(VmError(Instantiation))
       //result = String.fromCharCode(val as i32) + result;
     }

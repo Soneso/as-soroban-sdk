@@ -1,0 +1,23 @@
+{
+    "name": "as-soroban-sdk",
+    "version": "0.0.1",
+    "description": "eee",
+    "host_functions_version": 23,
+    "functions": [
+        {
+            "name" : "add",
+            "arguments": [
+                {"name": "a", "type": "i32"},
+                {"name": "b", "type": "i32"}
+            ],
+            "returns" : "i32"
+        },
+        {
+            "name" : "hello",
+            "arguments": [
+                {"name": "to", "type": "symbol"}
+            ],
+            "returns" : "val"
+        }
+    ]
+}
