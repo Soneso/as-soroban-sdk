@@ -171,7 +171,7 @@ Supported argument types are currently: ```val``` (any type of host value), ```u
 
 Supported return value types are the same as the supported argument types. If your function has no return value you can use ```void``` or provide no ```returns``` field.
 
-See also (Meta Generation)[https://soroban.stellar.org/docs/SDKs/byo#meta-generation] and (Contract Spec Generation)[https://soroban.stellar.org/docs/SDKs/byo#contract-spec-generation]
+See also [Meta Generation](https://soroban.stellar.org/docs/SDKs/byo#meta-generation) and [Contract Spec Generation](https://soroban.stellar.org/docs/SDKs/byo#contract-spec-generation)
 
 
 ## Features and limitations
@@ -198,4 +198,4 @@ import * as context from 'as-soroban-sdk/lib/context';
 ///...
 context.log("test");
 ```
-Please keep in mind that the SDK is not tested. It is under heavy development. Also supported features may be extended or refactored.
+Please keep in mind that the SDK is not tested. It is under heavy development. Also supported features will be extended or refactored.
