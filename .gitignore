@@ -97,6 +97,9 @@ dist
 # FuseBox cache
 .fusebox/
 
+# Soroban ledger
+.soroban/
+
 # DynamoDB Local files
 .dynamodb/
 
