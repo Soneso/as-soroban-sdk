@@ -10,7 +10,7 @@ This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.s
 
 ### 1. Setup a new project
 
-Set up the AS project as described in the [AssemblyScript Book](https://www.assemblyscript.org/getting-started.html#setting-up-a-new-project)
+Set up a new AS project as described in the [AssemblyScript Book](https://www.assemblyscript.org/getting-started.html#setting-up-a-new-project)
 
 ```shell
 $ mkdir hello
@@ -21,13 +21,14 @@ $ npx asinit .
 
 ```
 
-Install the SDK:
+### 2. Install the SDK
 
 ```shell
 $ npm install as-soroban-sdk
 
 ```
 
+### 3. Write your contract
 You can now write your contract in the ```./assembly/index.ts``` file.
 
 E.g.
@@ -84,6 +85,8 @@ Next, edit the asconfig.json file of your project. Replace its content with foll
 }
 ```
 
+### 4. Compile your contract
+
 Now you should be able to compile your contract:
 
 ```shell
@@ -91,6 +94,8 @@ $ asc assembly/index.ts --target release
 ```
 
 You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` folder. You can also find the ```.wat``` file there (Text format of the .wasm).
+
+### 5. Run your contract (sandbox)
 
 To run the contract, you must first install the official soroban cli as described here: [stellar soroban cli](https://github.com/stellar/soroban-cli).
 
@@ -106,3 +111,68 @@ $ soroban invoke --wasm build/release.wasm --id 6 --fn hello --arg friend
 
 ## Examples
 You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-soroban-examples) repository.
+
+## Understanding contract metadata
+
+To be able to run a contract, the compiled ```.wasm``` file needs to contain the web assembly module metadata.
+
+The metadata needs to be attached to the module by the compiler. Therefore we need the ```contract.json``` file.
+
+The SDK parses the ```contract.json``` file when compiling the contract and converts it to the needed data structure to be added to the ```.wasm``` module. This is done by usingd an AssemblyScript transform (see: transforms.mjs). 
+
+Required fields are ```host_functions_version``` and the ```functions``` array in the ```contract.json``` file.
+
+Example:
+
+```json
+{
+    "name": "hello word",
+    "version": "0.0.1",
+    "description": "my first contract",
+    "host_functions_version": 23,
+    "functions": [
+        {
+            "name" : "hello",
+            "arguments": [{"name": "to", "type": "symbol"}],
+            "returns" : "val"
+        }
+    ]
+}
+```
+
+To find out the needed ```host_functions_version``` you can execute the ```soroban version``` command of the soroban cli.
+
+``` shell
+$ soroban version
+```
+output at the time of writing:
+
+``` shell
+soroban-cli 0.1.2 (1b5786d5f4b895e7ed70315efcb987d38426539c)
+soroban-env-interface-version: 23
+```
+
+Additionally you must define the metadata for each function exported by your contract. In the upper example there is only one function named ```hello```.
+You must define the name, the arguments and the return value of the function so that the host environment can execute it.
+
+```json
+{
+    //...
+
+    "functions": [
+        {
+            "name" : "hello",
+            "arguments": [{"name": "to", "type": "symbol"}],
+            "returns" : "val"
+        }
+    ]
+}
+```
+
+Supported argument types are currently: ```val``` (any type of host value), ```u32```, ```i32```, ```u64```, ```i64```, ```bool```, ```symbol```, ```bitset```, ```status```, ```bytes```, ```bigint``` and ```invoker```. If your function has no arguments, you can pass an empty array.
+
+Supported return values are the same as the supported arguments. If your function has no return value you can use ```void``` or provide no ```returns``` field.
+
+See also (Meta Generation)[https://soroban.stellar.org/docs/SDKs/byo#meta-generation] and (Contract Spec Generation)[https://soroban.stellar.org/docs/SDKs/byo#contract-spec-generation]
+
+

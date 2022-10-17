@@ -8,27 +8,6 @@ const SPEC_NAME = "contractspecv0";
 
 class SdkTransform extends Transform {
   
-  /*afterParse(parser) {
-    this.log("[mytransform.js] afterParse called, baseDir = " + this.baseDir);
-    var sources = this.program.sources;
-    sources.forEach((source) =>
-      this.log("  " + source.internalPath + " [" + assemblyscript.SourceKind[source.sourceKind] + "]")
-    );
-  }
-  afterInitialize(program) {
-    this.log("[mytransform.js] afterInitialize called");
-    var elements = program.elementsByName;
-    elements.forEach((element) => {
-      
-      if (element.internalName.startsWith("assembly/index")) {
-        this.log("  " + element.internalName + " [" + assemblyscript.ElementKind[element.kind] + "]")
-        if (assemblyscript.ElementKind[element.kind] === "FUNCTION_PROTOTYPE") {
-          this.log(element.declaration);
-        }
-      }
-    });
-  }*/
-
   afterCompile(asModule) { 
     //this.log(asModule);
     
@@ -129,7 +108,7 @@ class SdkTransform extends Transform {
       case "bigint":
         typ = xdr.ScSpecTypeDef.scSpecTypeBigInt();
         break;
-      case "bigint":
+      case "invoker":
         typ = xdr.ScSpecTypeDef.scSpecTypeInvoker();
         break;
       default:
