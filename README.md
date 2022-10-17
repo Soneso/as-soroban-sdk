@@ -92,13 +92,13 @@ $ asc assembly/index.ts --target release
 
 You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` folder. You can also find the ```.wat``` file there (Text format of the .wasm).
 
-To execute the contract, you must first install the official soroban cli as described here: [stellar soroban cli](https://github.com/stellar/soroban-cli).
+To run the contract, you must first install the official soroban cli as described here: [stellar soroban cli](https://github.com/stellar/soroban-cli).
 
 ```shell
 $ cargo install --locked soroban-cli
 ```
 
-Now you can execute your contract:
+Now you can run your contract:
 
 ```shell
 $ soroban invoke --wasm build/release.wasm --id 6 --fn hello --arg friend
