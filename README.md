@@ -114,13 +114,13 @@ You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-
 
 ## Understanding contract metadata
 
-To be able to run a contract, the compiled ```.wasm``` file needs to contain the web assembly module metadata.
+To be able to run a contract, the compiled ```.wasm``` file needs to contain the web assembly module metadata and contract spec.
 
-The metadata needs to be attached to the module by the compiler. Therefore we need the ```contract.json``` file.
+They need to be attached to the module by the compiler. Therefore we need the ```contract.json``` file.
 
-The SDK parses the ```contract.json``` file when compiling the contract and converts it to the needed data structure to be added to the ```.wasm``` module. This is done by usingd an AssemblyScript transform (see: transforms.mjs). 
+The SDK parses the ```contract.json``` file when compiling the contract and converts it to the needed data structures to be added to the ```.wasm``` module. This is done by using an AssemblyScript transform (see: [transforms.mjs](https://github.com/Soneso/as-soroban-sdk/blob/main/transforms.mjs)). 
 
-Required fields are ```host_functions_version``` and the ```functions``` array in the ```contract.json``` file.
+Required fields are ```host_functions_version``` and the ```functions``` array in a ```contract.json``` file located in the root directory of your AS project.
 
 Example:
 
@@ -140,7 +140,7 @@ Example:
 }
 ```
 
-To find out the needed ```host_functions_version``` you can execute the ```soroban version``` command of the soroban cli.
+To find out the needed ```host_functions_version``` you can execute the ```soroban version``` command of the soroban cli. The interface version stored within should match the version of the host functions supported.
 
 ``` shell
 $ soroban version
@@ -153,12 +153,10 @@ soroban-env-interface-version: 23
 ```
 
 Additionally you must define the metadata for each function exported by your contract. In the upper example there is only one function named ```hello```.
-You must define the name, the arguments and the return value of the function so that the host environment can execute it.
+You must define the name, the arguments and the return value of the function, so that the host environment can execute it.
 
 ```json
 {
-    //...
-
     "functions": [
         {
             "name" : "hello",
@@ -171,14 +169,14 @@ You must define the name, the arguments and the return value of the function so 
 
 Supported argument types are currently: ```val``` (any type of host value), ```u32```, ```i32```, ```u64```, ```i64```, ```bool```, ```symbol```, ```bitset```, ```status```, ```bytes```, ```bigint``` and ```invoker```. If your function has no arguments, you can pass an empty array.
 
-Supported return values are the same as the supported arguments. If your function has no return value you can use ```void``` or provide no ```returns``` field.
+Supported return value types are the same as the supported argument types. If your function has no return value you can use ```void``` or provide no ```returns``` field.
 
 See also (Meta Generation)[https://soroban.stellar.org/docs/SDKs/byo#meta-generation] and (Contract Spec Generation)[https://soroban.stellar.org/docs/SDKs/byo#contract-spec-generation]
 
 
 ## Features and limitations
 
-In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official Soroban documentation one can find the requirements for a soroban sdk.
+In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official Soroban documentation, one can find the requirements for a soroban sdk.
 
 This SDK supports:
 - Value Conversions
@@ -200,3 +198,4 @@ import * as context from 'as-soroban-sdk/lib/context';
 ///...
 context.log("test");
 ```
+Please keep in mind that the SDK is not tested. It is under heavy development. Also supported features may be extended or refactored.
