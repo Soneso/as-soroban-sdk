@@ -488,7 +488,7 @@ export function contractError(code: u32) : StatusObject {
 
 /**
  * Creates a SymbolVal from the given string.
- * @param str the string to create the SymbolVal from. max 10 characters.
+ * @param str the string to create the SymbolVal from. max 10 characters. [_0-9A-Za-z]
  * @returns the created SymbolVal
  */
 export function fromString(str: string) : SymbolVal {

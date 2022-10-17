@@ -1,6 +1,81 @@
-import { ObjectVal, RawVal} from "./value";
+import { ObjectVal, RawVal, toBool, fromString} from "./value";
 
-//TODO: improve
+//TODO: improve (see: directly exposed host functions below)
+
+
+/**
+ * Checks if the ledger storse contract data for the given string key.
+ * @param key a string max 10 characters [_0-9A-Za-z]
+ * @returns true if the ledger has data for the given key
+ */
+export function has_data_for(key: string): bool {
+    let keySymbolVal = fromString(key);
+    return toBool(has_contract_data(keySymbolVal));
+}
+
+/**
+ * Checks if the ledger storse contract data for the given key.
+ * @param key any host value. e.g. SymbolVal
+ * @returns true if the ledger has data for the given key
+ */
+export function has_data(key: RawVal): bool {
+    return toBool(has_contract_data(key));
+}
+
+/**
+ * Stores contract data in the ledger for a given string key.
+ * @param key a string max 10 characters [_0-9A-Za-z]
+ * @param value value to store. Any host value. E.g. SymbolVal, VectorObject, etc.
+ */
+ export function put_data_for(key: string, value:RawVal) : void {
+    let keySymbolVal = fromString(key);
+    put_contract_data(keySymbolVal, value);
+}
+
+/**
+ * Stores contract data in the ledger for a given string key.
+ * @param key a string max 10 characters [_0-9A-Za-z]
+ * @param value value to store. Any host value. E.g. SymbolVal, VectorObject, etc.
+ */
+ export function put_data(key: RawVal, value:RawVal) : void {
+    put_contract_data(key, value);
+}
+
+/**
+ * Returns contract data from the ledger for a given string key.
+ * @param key a string max 10 characters [_0-9A-Za-z]
+ * @return the found value if any.
+ */
+ export function get_data_for(key: string): RawVal {
+    let keySymbolVal = fromString(key);
+    return get_contract_data(keySymbolVal);
+}
+
+/**
+ * Stores contract data in the ledger for a given string key.
+ * @param key a string max 10 characters [_0-9A-Za-z]
+ * @return the found value if any.
+ */
+ export function get_data(key: RawVal) : RawVal  {
+    return get_contract_data(key);
+}
+
+/**
+ * Deletes contract data from the ledger for a given string key.
+ * @param key a string max 10 characters [_0-9A-Za-z]
+ */
+ export function del_data_for(key: string): void {
+    let keySymbolVal = fromString(key);
+    del_contract_data(keySymbolVal);
+}
+
+/**
+ * Deletes contract data from the ledger for a given string key.
+ * @param key a string max 10 characters [_0-9A-Za-z]
+ */
+ export function del_data_(key: RawVal): void {
+    del_contract_data(key);
+}
 
 /******************
  * HOST FUNCTIONS *
@@ -8,19 +83,19 @@ import { ObjectVal, RawVal} from "./value";
 
 // @ts-ignore
 @external("l", "_")
-export declare function put_contract_data(k:RawVal, v:RawVal): RawVal;
+declare function put_contract_data(k:RawVal, v:RawVal): RawVal;
 
 // @ts-ignore
 @external("l", "0")
-export declare function has_contract_data(k:RawVal): RawVal;
+declare function has_contract_data(k:RawVal): RawVal;
 
 // @ts-ignore
 @external("l", "1")
-export declare function get_contract_data(k:RawVal): RawVal;
+declare function get_contract_data(k:RawVal): RawVal;
 
 // @ts-ignore
 @external("l", "2")
-export declare function del_contract_data(k:RawVal): RawVal;
+declare function del_contract_data(k:RawVal): RawVal;
 
 // @ts-ignore
 @external("l", "3")

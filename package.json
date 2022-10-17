@@ -5,8 +5,8 @@
   "main": "index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "asbuild:debug": "asc examples/hello.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target debug --transform ./transforms.mjs",
-    "asbuild:release": "asc examples/hello.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target release --transform ./transforms.mjs",
+    "asbuild:debug": "asc test/hello.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target debug --transform ./transforms.mjs",
+    "asbuild:release": "asc test/hello.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target release --transform ./transforms.mjs",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release"
   },
   "author": "Christian Rogobete",

@@ -18,6 +18,11 @@
                 {"name": "b", "type": "i32"}
             ],
             "returns" : "i32"
+        },
+        {
+            "name" : "increment",
+            "arguments": [],
+            "returns" : "u32"
         }
     ]
 }
