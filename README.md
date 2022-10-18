@@ -1,6 +1,6 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v0.0.2](https://img.shields.io/badge/v0.0.2-yellow.svg)
+![v0.0.3](https://img.shields.io/badge/v0.0.3-yellow.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org).
 
