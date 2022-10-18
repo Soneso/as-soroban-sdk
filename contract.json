@@ -23,6 +23,11 @@
             "name" : "increment",
             "arguments": [],
             "returns" : "u32"
+        },
+        {
+            "name" : "logging",
+            "arguments": [],
+            "returns" : "val"
         }
     ]
 }

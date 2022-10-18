@@ -1,5 +1,5 @@
 
-import { BytesObject, RawVal, fromU32, toU32 } from "./value";
+import { BytesObject, RawVal, fromU32, toU32, fromI32 } from "./value";
 
 export class Bytes {
     obj: BytesObject;
@@ -14,6 +14,19 @@ export class Bytes {
      */
     getHostObject() : BytesObject {
         return this.obj;
+    }
+
+    /**
+     * Creates a new Bytes object on the host from the given string. The string must contain only utf8 characters.
+     * @param str the string to create the bytes object from
+     * @returns the Bystes object created.
+     */
+    static fromString(str: string) : Bytes {
+        let result = new Bytes();
+        for (var i=0; i < str.length; i++) {
+          result.push(fromU32(str.charCodeAt(i)));
+        }
+        return result;
     }
 
     /**

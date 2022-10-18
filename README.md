@@ -169,7 +169,7 @@ You must define the name, the arguments and the return value of the function, so
 
 Supported argument types are currently: ```val``` (any type of host value), ```u32```, ```i32```, ```u64```, ```i64```, ```bool```, ```symbol```, ```bitset```, ```status```, ```bytes```, ```bigint``` and ```invoker```. If your function has no arguments, you can pass an empty array.
 
-Supported return value types are the same as the supported argument types. If your function has no return value you can use ```void``` or provide no ```returns``` field.
+Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static value. You can obtain it by using ```value.fromVoid()```. For this case you can also set ```"returns" : "val"``` in the contract.json.
 
 See also [Meta Generation](https://soroban.stellar.org/docs/SDKs/byo#meta-generation) and [Contract Spec Generation](https://soroban.stellar.org/docs/SDKs/byo#contract-spec-generation)
 
@@ -190,12 +190,28 @@ This SDK currently doese not support:
 - User Defined Types
 - Testing
 
-Testing must be currently done with the soroban-cli. As a helping feature one can use ```context.log(string)``` to generate outputs during the execution of the contract.
+Testing must be currently done with the soroban-cli. As a helping feature one can use logging to generate outputs during the execution of the contract in the sandbox (soroban-cli).
+
+## Logging
+
+You can log for purpose of debugging. Logs are only visible in tests, or when executing contracts using soroban-cli. Do not use logs elsewhere.
+
+### Log an utf8 string
 
 ```typescript
 import * as context from 'as-soroban-sdk/lib/context';
 
-///...
-context.log("test");
+context.log_str("Today is a sunny day!");
 ```
-Please keep in mind that the SDK is very basic and is not tested. It is under heavy development. Also supported features will be extended or refactored.
+
+### Log a formatted utf8 string message
+
+```typescript
+import * as context from 'as-soroban-sdk/lib/context';
+
+let args = new Vec();
+args.push_back(val.fromI32(30));
+args.push_back(val.fromString("celsius"));
+context.log_ftm("We have {} degrees {}!", args);
+
+```

@@ -1,6 +1,8 @@
 import * as val from "../lib/value";
 import * as ledger from "../lib/ledger";
 import { Vec } from "../lib/vec";
+import { Bytes } from "../lib/bytes";
+import * as context from '../lib/context';
 
 export function hello(to: val.SymbolVal): val.VectorObject {
 
@@ -32,4 +34,17 @@ export function increment(): val.RawVal {
   let counterObj = val.fromU32(counter);
   ledger.put_data_for(key, counterObj);
   return counterObj;
+}
+
+export function logging(): val.RawVal {
+
+  context.log_str("Hello, today is a sunny day!");
+
+  let args = new Vec();
+  args.push_back(val.fromI32(30));
+  args.push_back(val.fromString("celsius"));
+  context.log_ftm("We have {} degrees {}!", args);
+
+  return val.fromVoid();
+
 }

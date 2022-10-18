@@ -44,22 +44,21 @@ class SdkTransform extends Transform {
           valid = false;
         }
       });
-      let functionReturn = item.returns;
-      console.log('return: ' + functionReturn);
-      let returnTypes = [];
-      if (functionReturn && functionReturn !== "void" && valid) {
+
+      if (valid) {
+        let functionReturn = item.returns;
+        console.log('return: ' + functionReturn);
+        let returnTypes = [];
         let returnTyp = SdkTransform.getType(functionReturn);
         if (returnTyp) {
           returnTypes.push(returnTyp);
+          let ffunc = new xdr.ScSpecFunctionV0({name: functionName, inputs: args, outputs: returnTypes});
+          let funcEntry = xdr.ScSpecEntry.scSpecEntryFunctionV0(ffunc);
+          functions.push(funcEntry.toXDR());
         } else {
           console.error("Unsupported return type: " + functionReturn);
           valid = false;
         }
-      }
-      if (valid) {
-        let ffunc = new xdr.ScSpecFunctionV0({name: functionName, inputs: args, outputs: returnTypes});
-        let funcEntry = xdr.ScSpecEntry.scSpecEntryFunctionV0(ffunc);
-        functions.push(funcEntry.toXDR());
       }
     });
 
@@ -68,7 +67,7 @@ class SdkTransform extends Transform {
       asModule.addCustomSection(SPEC_NAME, res);
       console.log('done generating metadata');
     } else {
-      console.error("COULD NOT GENERATE METADATA");
+      console.error("ERROR::COULD NOT GENERATE METADATA");
     }
   }
 

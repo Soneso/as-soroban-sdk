@@ -1,13 +1,37 @@
 
+import { Bytes } from "./bytes";
 import { RawVal, BytesObject, Unsigned64BitIntObject, Signed64BitIntObject,
      VectorObject, AccountIDObject, toU32, toU64, toI64, StatusObject, contractError } from "./value";
+import { Vec } from "./vec";
 
+
+
+/**
+ * Log a formated message. Builds a string from the format string, and a list of arguments. 
+ * Arguments are substituted wherever the {} value appears in the format string. 
+ * @param msg the format string. E.g. "Hello {}".
+ * @param args The arguments as values in the Vector.
+ */
+export function log_ftm(msg: string, args:Vec): void {
+    let b = Bytes.fromString(msg);
+    host_log_fmt_values(b.getHostObject(), args.getHostObject());
+}
+
+/**
+* Log string during execution on host. Good for debugging.
+* @param msg the message to log
+*/
+export function log_str(msg: string): void {
+    let b = Bytes.fromString(msg);
+    let args = new Vec();
+    host_log_fmt_values(b.getHostObject(), args.getHostObject());
+}
 
 /**
 * Log value during execution on host. Good for debugging.
 * @param value the value to log
 */
-export function log(value: RawVal): void {
+export function log_value(value: RawVal): void {
     host_log_value(value);
 }
 
@@ -96,15 +120,6 @@ export function fail_with_error_code(errCode: u32) : void {
 }
 
 /**
- * Record a debug event. Fmt must be a Bytes. Args must be a Vec.
- * @param fmt values (Type: BytesObject)
- * @param args arguments ()
- */
-export function log_fmt_values(fmt: BytesObject, args: VectorObject) : void {
-    host_log_fmt_values(fmt, args);
-}
-
-/**
  * Returns whether the contract invocation is from an account or another contract.
  * @returns 0 for account, 1 for contract.
  */
@@ -131,7 +146,7 @@ declare function get_invoking_contract(): BytesObject;
 
 // @ts-ignore
 @external("x", "1")
-export declare function obj_cmp(a: RawVal, b: RawVal): Signed64BitIntObject;
+declare function obj_cmp(a: RawVal, b: RawVal): Signed64BitIntObject;
 
 /// Records a contract event. `topics` is expected to be a `SCVec` with
 /// length <= 4 that cannot contain `Vec`, `Map`, or `Bytes` with length > 32
@@ -145,7 +160,7 @@ export declare function contract_event(topics: VectorObject, data: RawVal): RawV
 /// invoked by a contract.
 // @ts-ignore
 @external("x", "3")
-export declare function get_current_contract(): BytesObject;
+declare function get_current_contract(): BytesObject;
 
 /// Return the protocol version of the current ledger as a u32.
 // @ts-ignore
@@ -155,7 +170,7 @@ declare function get_ledger_version(): RawVal;
 /// Return the sequence number of the current ledger as a u32.
 // @ts-ignore
 @external("x", "5")
-export declare function get_ledger_sequence(): RawVal;
+declare function get_ledger_sequence(): RawVal;
 
 /// Return the timestamp number of the current ledger as a u64.
 // @ts-ignore
@@ -200,4 +215,4 @@ declare function get_invoker_type(): Unsigned64BitIntObject;
 /// invoked by an account.
 // @ts-ignore
 @external("x", "c")
-declare function get_invoking_account(): AccountIDObject;
+export declare function get_invoking_account(): AccountIDObject;
