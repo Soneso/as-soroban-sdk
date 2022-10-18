@@ -3,6 +3,7 @@ import * as ledger from "../lib/ledger";
 import { Vec } from "../lib/vec";
 import { Bytes } from "../lib/bytes";
 import * as context from '../lib/context';
+import * as contract from "../lib/contract";
 
 export function hello(to: val.SymbolVal): val.VectorObject {
 
@@ -46,5 +47,18 @@ export function logging(): val.RawVal {
   context.log_ftm("We have {} degrees {}!", args);
 
   return val.fromVoid();
+
+}
+
+export function callctr(): val.RawVal {
+
+  let b = Bytes.fromContractId("11");
+
+  let func = val.fromString("add");
+  let args = new Vec();
+  args.push_back(val.fromI32(3));
+  args.push_back(val.fromI32(12));
+
+  return contract.call(b.getHostObject(), func, args.getHostObject());
 
 }

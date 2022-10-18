@@ -28,6 +28,11 @@
             "name" : "logging",
             "arguments": [],
             "returns" : "val"
+        },
+        {
+            "name" : "callctr",
+            "arguments": [],
+            "returns" : "val"
         }
     ]
 }

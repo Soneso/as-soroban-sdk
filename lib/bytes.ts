@@ -1,4 +1,3 @@
-
 import { BytesObject, RawVal, fromU32, toU32, fromI32 } from "./value";
 
 export class Bytes {
@@ -25,6 +24,45 @@ export class Bytes {
         let result = new Bytes();
         for (var i=0; i < str.length; i++) {
           result.push(fromU32(str.charCodeAt(i)));
+        }
+        return result;
+    }
+
+    /**
+     * Creates a new Bytes object on the host from the given contract id.
+     * If the contract id is shorter than 32 bytes, it fills the needed bytes with 0.
+     * @param contractId contract id as hex string
+     * @returns the new Bytes object created.
+     */
+    static fromContractId(contractId: string) : Bytes {
+        let result = Bytes.fromHexString(contractId);
+        let len = result.len();
+        if (len == 32) {
+            return result;
+        }
+        var fill = 32 - len;
+        var filled = new Bytes();
+        while(fill > 0) {
+            filled.push(fromU32(0));
+            fill -= 1;
+        }
+        filled = filled.append(result);
+        return filled;
+    }
+
+    /**
+     * Creates a new Bytes object on the host from the given hex string.
+     * @param hex the hex string to create the bytes object from
+     * @returns the new Bytes object created.
+     */
+    static fromHexString(hex: string) : Bytes {
+        let result = new Bytes();
+        let length =  hex.length;
+        for (var i = 0; i < (length / 2); i++) {
+            let temp_high = Bytes.charToInt(hex.charCodeAt(i*2));
+            let temp_low = Bytes.charToInt(hex.charCodeAt(i*2+1));
+            let app = Bytes.appendNumbers(temp_high, temp_low);
+            result.push(fromU32(app as u32));
         }
         return result;
     }
@@ -170,7 +208,7 @@ export class Bytes {
      * @param bytes2 the 'Bytes' object to append from
      * @returns the new `Bytes` object.
      */
-     append(bytes2: Bytes) : Bytes {
+    append(bytes2: Bytes) : Bytes {
         return new Bytes(bytes_append(this.obj, bytes2.getHostObject()));
     }
 
@@ -182,6 +220,35 @@ export class Bytes {
      */
     slice(start:u32, end:u32): Bytes {
         return new Bytes(bytes_slice(this.obj, fromU32(start), fromU32(end)));
+    }
+
+    static charToInt(letter:i32) : i32
+    {
+        // First we want to check if its 0-9, A-F, or a-f) --> See ASCII Table
+        if(letter > 47 && letter < 58) {
+            // 0-9
+            return letter - 48;
+            // The Letter "0" is in the ASCII table at position 48 -> meaning if we subtract 48 we get 0 and so on...
+        } else if(letter > 64 && letter < 71) {
+            // A-F
+            return letter - 55 
+            // The Letter "A" (dec 10) is at Pos 65 --> 65-55 = 10 and so on..
+        } else if(letter > 96 && letter < 103) {
+            // a-f
+            return letter - 87
+            // The Letter "a" (dec 10) is at Pos 97--> 97-87 = 10 and so on...
+        }
+        // Not supported letter...
+        return -1;
+    }
+
+    static appendNumbers(higherNibble:i32, lowerNibble:i32) : i32
+    {
+        var myNumber = higherNibble << 4;
+        myNumber |= lowerNibble;
+        return myNumber;
+        // Example: higherNibble = 0x0A, lowerNibble = 0x03;  -> myNumber 0 0xA3
+        // Of course you have to ensure that the parameters are not bigger than 0x0F 
     }
 }
 
