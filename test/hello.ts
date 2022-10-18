@@ -52,13 +52,10 @@ export function logging(): val.RawVal {
 
 export function callctr(): val.RawVal {
 
-  let b = Bytes.fromContractId("11");
-
-  let func = val.fromString("add");
   let args = new Vec();
   args.push_back(val.fromI32(3));
   args.push_back(val.fromI32(12));
 
-  return contract.call(b.getHostObject(), func, args.getHostObject());
+  return contract.call_by_id("11", "add", args.getHostObject());
 
 }

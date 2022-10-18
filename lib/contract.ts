@@ -9,7 +9,7 @@ import { VectorObject, RawVal, SymbolVal, fromString, BytesObject} from "./value
  * @returns If the call is successful, forwards the result of the called function. Traps otherwise.
  */
 export function call_by_id(id: string, func: string, args: VectorObject): RawVal {
-    let b = Bytes.fromHexString(id);
+    let b = Bytes.fromContractId(id);
     return call_ctr(b.getHostObject(), fromString(func), args);
 }
 
@@ -32,7 +32,7 @@ export function call(contract: BytesObject, func: SymbolVal, args: VectorObject)
  * @returns If the call is successful, forwards the result of the called function. Otherwise, an `SCStatus` containing the error status code.
  */
 export function try_call_by_id(id: string, func: string, args: VectorObject): RawVal {
-    let b = Bytes.fromHexString(id);
+    let b = Bytes.fromContractId(id);
     return try_call_ctr(b.getHostObject(), fromString(func), args);
 }
 
