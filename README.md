@@ -4,7 +4,7 @@
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org).
 
-**This repository contains code that is in early development, incomplete, not tested, and not recommended for use. The API is unstable, experimental, and is receiving breaking changes frequently.**
+**This repository contains code that is in very early development, incomplete, not tested, and not recommended for use. The API is unstable, experimental, and is receiving breaking changes frequently.**
 
 ## Quick Start
 
@@ -178,7 +178,7 @@ See also [Meta Generation](https://soroban.stellar.org/docs/SDKs/byo#meta-genera
 
 In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official Soroban documentation, one can find the requirements for a soroban sdk.
 
-This SDK supports:
+This SDK can help you with:
 - Value Conversions
 - Host functions
 - SDK Types
@@ -186,7 +186,7 @@ This SDK supports:
 - Meta Generation
 - Contract Spec Generation
 
-This SDK currently doese not fully support:
+This SDK currently doese not support:
 - User Defined Types
 - Testing
 
@@ -198,4 +198,4 @@ import * as context from 'as-soroban-sdk/lib/context';
 ///...
 context.log("test");
 ```
-Please keep in mind that the SDK is not tested. It is under heavy development. Also supported features will be extended or refactored.
+Please keep in mind that the SDK is very basic and is not tested. It is under heavy development. Also supported features will be extended or refactored.
