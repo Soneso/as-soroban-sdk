@@ -63,7 +63,7 @@ Next you need to add a ```contract.json``` file to the project. It must contain 
 }
 ```
 
-Finally, edit the asconfig.json file of your project. Replace it's content with the following:
+Finally, edit the ```asconfig.json``` file of your project. Replace it's content with the following:
 
 ```json
 {
@@ -83,8 +83,6 @@ Finally, edit the asconfig.json file of your project. Replace it's content with 
 
 ### 4. Compile your contract
 
-Now you should be able to compile your contract:
-
 ```shell
 $ asc assembly/index.ts --target release
 ```
@@ -99,7 +97,7 @@ To run the contract, you must first install the official soroban cli as describe
 $ cargo install --locked soroban-cli
 ```
 
-Now you can run your contract:
+Run your contract:
 
 ```shell
 $ soroban invoke --wasm build/release.wasm --id 1 --fn hello --arg friend
@@ -107,9 +105,9 @@ $ soroban invoke --wasm build/release.wasm --id 1 --fn hello --arg friend
 
 ## Features and limitations
 
-In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official Soroban documentation, one can find the requirements for a Soroban SDK.
+In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official [Soroban documentation](https://soroban.stellar.org), one can find the requirements for a Soroban SDK.
 
-This SDK can help you with:
+This SDK **can** help you with:
 - Value Conversions
 - Host functions
 - SDK Types
@@ -117,11 +115,11 @@ This SDK can help you with:
 - Meta Generation
 - Contract Spec Generation
 
-This SDK currently does not support:
+This SDK currently does **not** support:
 - User Defined Types
 - Testing
 
-As helping features for testing one can use logging to generate outputs during the execution of the contract in the sandbox (only sandbox - soroban-cli). The SDK also provided the possibility to publish events. 
+As helping features for testing one can use **logging** to generate outputs during the execution of the contract in the sandbox (only sandbox - soroban-cli). The SDK also provided the possibility to **publish events**. 
 
 ### Value Conversions
 
@@ -130,7 +128,7 @@ When calling a contract function the host will only pass ```u64``` raw values. T
 The SDK can encode and decode this values.
 
 
-```RawVals``` divide up the space of 64 bits according to a 2-level tagging scheme. The first tag is a bit in the least-significant position, indicating whether the `RawVal` is a plain "u63" 63-bit unsigned integer, or some more-structured value with a second-level tag in the next most significant 3 bits. The 63-bit unsigned integer case can also be thought of as handling the complete range of non-negative signed 64-bit integers.
+```RawVals``` divide up the space of 64 bits according to a 2-level tagging scheme. The first tag is a bit in the least-significant position, indicating whether the `RawVal` is a plain ```u63``` 63-bit unsigned integer, or some more-structured value with a second-level tag in the next most significant 3 bits. The 63-bit unsigned integer case can also be thought of as handling the complete range of non-negative signed 64-bit integers.
 
 The remaining 3 bit tags are assigned to cases, of which 7 are defined and one is currently reserved.
 
@@ -148,7 +146,7 @@ Schematically, the bit-assignment for `RawVal` looks like this:
 0x_NNNN_NNNN_NNNN_NNNf  - reserved
 ```
 
-The SDK can convert this values back and forth. For example converting primitives like i32:
+The AS SDK can convert this values back and forth. For example converting primitives like i32:
 
 ```typescript
 import * as val from "as-soroban-sdk/lib/value";
@@ -223,9 +221,7 @@ return myMap.getHostObject();
 
 ### User Defined Errors
 
-Errors are u32 values that are translated into a Status.
-
-This SDK helps you to create and parse such errors. For example:
+Errors are u32 values that are translated into a Status. This SDK helps you to create and parse such errors. For example:
 
 ```typescript
 context.failWithErrorCode(AGE_ERR_CODES.TOO_YOUNG);
@@ -244,7 +240,7 @@ See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
 
 Contracts must contain a WASM custom section with name ```contractenvmetav0``` and containing a serialized ```SCEnvMetaEntry```. The interface version stored within should match the version of the host functions supported.
 
-The SDK simplifies this by providing the possibility to enter the interface version number in the ```contract.json``` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
+The AS Soroban SDK simplifies this by providing the possibility to enter the interface version number in the ```contract.json``` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
 
 
 ### Contract spec generation
@@ -288,11 +284,11 @@ export function checkAge(age: RawVal): RawVal {
 
 ## Testing
 
-Testing is currently not supported but can be done manually to some extent using logging and events.
+Testing is currently **not supported** but can be done manually to some extent using **logging** and **events**.
 
 ## Logging
 
-You can log for purpose of debugging. Logs are only visible when executing contracts using soroban-cli. Do not use logs elsewhere.
+You can log for purpose of debugging. Logs are only visible when executing contracts using ```soroban-cli```. Do not use logs elsewhere.
 
 ### Log an utf8 string
 
@@ -407,16 +403,12 @@ See also [Meta Generation](https://soroban.stellar.org/docs/SDKs/byo#meta-genera
 ## Examples
 You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-soroban-examples) repository:
 
-The [add example](https://github.com/Soneso/as-soroban-examples/tree/main/add) demonstrates how to write a simple contract, with a single function that takes two i32 inputs and returns their sum as an output.
-
-The [hello word example](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word) demonstrates how to write a simple contract, with a single function that takes one input and returns it as an output.
-
-The [increment example](https://github.com/Soneso/as-soroban-examples/tree/main/increment) demonstrates how to write a simple contract that stores data, with a single function that increments an internal counter and returns the value.
-
-The [logging example](https://github.com/Soneso/as-soroban-examples/tree/main/logging) demonstrates how to log for the purpose of debugging.
-
-The [cross contract call example](https://github.com/Soneso/as-soroban-examples/tree/main/cross_contract) demonstrates how to call a contract from another contract.
-
-The [errors example](https://github.com/Soneso/as-soroban-examples/tree/main/errors) demonstrates how to define and generate errors in a contract that invokers of the contract can understand and handle.
-
-The [events example](https://github.com/Soneso/as-soroban-examples/tree/main/contract_events) demonstrates how to publish events from a contract.
+| Example | Description |
+| :--- | :--- |
+| [add example](https://github.com/Soneso/as-soroban-examples/tree/main/add)| Demonstrates how to write a simple contract, with a single function that takes two i32 inputs and returns their sum as an output. |
+| [hello word example](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word)| Demonstrates how to write a simple contract, with a single function that takes one input and returns it as an output. |
+The [increment example](https://github.com/Soneso/as-soroban-examples/tree/main/increment)| Demonstrates how to write a simple contract that stores data, with a single function that increments an internal counter and returns the value.| 
+The [logging example](https://github.com/Soneso/as-soroban-examples/tree/main/logging)| Demonstrates how to log for the purpose of debugging.|
+The [cross contract call example](https://github.com/Soneso/as-soroban-examples/tree/main/cross_contract)| Demonstrates how to call a contract from another contract.|
+The [errors example](https://github.com/Soneso/as-soroban-examples/tree/main/errors)| Demonstrates how to define and generate errors in a contract that invokers of the contract can understand and handle.|
+The [events example](https://github.com/Soneso/as-soroban-examples/tree/main/contract_events)| Demonstrates how to publish events from a contract.|
