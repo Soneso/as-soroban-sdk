@@ -1,4 +1,4 @@
-import { ObjectVal, RawVal, toBool, fromString} from "./value";
+import { ObjectVal, RawVal, toBool, fromSymbolStr} from "./value";
 
 //TODO: improve (see: directly exposed host functions below)
 
@@ -9,7 +9,7 @@ import { ObjectVal, RawVal, toBool, fromString} from "./value";
  * @returns true if the ledger has data for the given key
  */
 export function has_data_for(key: string): bool {
-    let keySymbolVal = fromString(key);
+    let keySymbolVal = fromSymbolStr(key);
     return toBool(has_contract_data(keySymbolVal));
 }
 
@@ -28,7 +28,7 @@ export function has_data(key: RawVal): bool {
  * @param value value to store. Any host value. E.g. SymbolVal, VectorObject, etc.
  */
  export function put_data_for(key: string, value:RawVal) : void {
-    let keySymbolVal = fromString(key);
+    let keySymbolVal = fromSymbolStr(key);
     put_contract_data(keySymbolVal, value);
 }
 
@@ -47,7 +47,7 @@ export function has_data(key: RawVal): bool {
  * @return the found value if any.
  */
  export function get_data_for(key: string): RawVal {
-    let keySymbolVal = fromString(key);
+    let keySymbolVal = fromSymbolStr(key);
     return get_contract_data(keySymbolVal);
 }
 
@@ -65,7 +65,7 @@ export function has_data(key: RawVal): bool {
  * @param key a string max 10 characters [_0-9A-Za-z]
  */
  export function del_data_for(key: string): void {
-    let keySymbolVal = fromString(key);
+    let keySymbolVal = fromSymbolStr(key);
     del_contract_data(keySymbolVal);
 }
 

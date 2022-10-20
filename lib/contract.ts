@@ -1,5 +1,5 @@
 import { Bytes } from "./bytes";
-import { VectorObject, RawVal, SymbolVal, fromString, BytesObject} from "./value";
+import { VectorObject, RawVal, SymbolVal, fromSymbolStr, BytesObject} from "./value";
 
 /**
  * Calls another contracts function by using the contract id, function name and arguments contained in vector `args`.
@@ -10,7 +10,7 @@ import { VectorObject, RawVal, SymbolVal, fromString, BytesObject} from "./value
  */
 export function call_by_id(id: string, func: string, args: VectorObject): RawVal {
     let b = Bytes.fromContractId(id);
-    return call_ctr(b.getHostObject(), fromString(func), args);
+    return call_ctr(b.getHostObject(), fromSymbolStr(func), args);
 }
 
 /**
@@ -33,7 +33,7 @@ export function call(contract: BytesObject, func: SymbolVal, args: VectorObject)
  */
 export function try_call_by_id(id: string, func: string, args: VectorObject): RawVal {
     let b = Bytes.fromContractId(id);
-    return try_call_ctr(b.getHostObject(), fromString(func), args);
+    return try_call_ctr(b.getHostObject(), fromSymbolStr(func), args);
 }
 
 /**

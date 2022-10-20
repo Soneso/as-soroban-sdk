@@ -40,7 +40,7 @@ import {Vec} from 'as-soroban-sdk/lib/vec';
 export function hello(to: val.SymbolVal): val.VectorObject {
 
   let vec = new Vec();
-  vec.push_front(val.fromString("Hello"));
+  vec.push_front(val.fromSymbolStr("Hello"));
   vec.push_back(to);
   
   return vec.getHostObject();
@@ -211,7 +211,7 @@ import * as context from 'as-soroban-sdk/lib/context';
 
 let args = new Vec();
 args.push_back(val.fromI32(30));
-args.push_back(val.fromString("celsius"));
+args.push_back(val.fromSymbolStr("celsius"));
 context.log_ftm("We have {} degrees {}!", args);
 
 ```

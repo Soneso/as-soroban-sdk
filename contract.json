@@ -33,6 +33,18 @@
             "name" : "callctr",
             "arguments": [],
             "returns" : "val"
+        },
+        {
+            "name" : "checkAge",
+            "arguments": [
+                {"name": "age", "type": "i32"}
+            ],
+            "returns" : "i32"
+        },
+        {
+            "name" : "eventTest",
+            "arguments": [],
+            "returns" : "val"
         }
     ]
 }

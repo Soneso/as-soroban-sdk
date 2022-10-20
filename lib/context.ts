@@ -1,7 +1,7 @@
 
 import { Bytes } from "./bytes";
 import { RawVal, BytesObject, Unsigned64BitIntObject, Signed64BitIntObject,
-     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusObject, contractError } from "./value";
+     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusVal, contractError, ObjectVal, statusType, fromSymbolStr } from "./value";
 import { Vec } from "./vec";
 
 
@@ -127,6 +127,29 @@ export function invoker_type(): u64 {
     return toU64(get_invoker_type());
 }
 
+/**
+ * Lets the host publish a contract event. 
+ * `topics` is expected to be a `Vec` with length <= 4 that CANNOT contain `Vec`, `Map`, or `Bytes` with length > 32
+ * Returns nothing on success, and panics on failure
+ * @param topics the vector containing the topics.
+ * @param data the data value to publish in the event
+ */
+export function publish_event(topics: Vec, data: RawVal): void {
+    contract_event(topics.getHostObject(), data);
+}
+
+/**
+ * Lets the host publish a "simple" contract event that has only one topic given as a symbol.
+ * @param topicSymbol the symbol string to be used as a topic. max 10 characters. [_0-9A-Za-z]
+ * @param data datat to be published in the event.
+ */
+export function publish_simple_event(topicSymbol: string, data: RawVal): void {
+    let topic = fromSymbolStr(topicSymbol);
+    let topics = new Vec();
+    topics.push_back(topic);
+    contract_event(topics.getHostObject(), data);
+}
+
 /******************
  * HOST FUNCTIONS *
  ******************/
@@ -149,11 +172,11 @@ declare function get_invoking_contract(): BytesObject;
 declare function obj_cmp(a: RawVal, b: RawVal): Signed64BitIntObject;
 
 /// Records a contract event. `topics` is expected to be a `SCVec` with
-/// length <= 4 that cannot contain `Vec`, `Map`, or `Bytes` with length > 32
-/// On success, returns an `SCStatus::Ok`.
+/// length <= 4 that CANNOT contain `Vec`, `Map`, or `Bytes` with length > 32
+/// Returns nothing on success, and panics on failure
 // @ts-ignore
 @external("x", "2")
-export declare function contract_event(topics: VectorObject, data: RawVal): RawVal;
+declare function contract_event(topics: ObjectVal, data: RawVal): RawVal;
 
 /// Get the contractID `Bytes` of the contract which invoked the
 /// running contract. Traps if the running contract was not
@@ -195,7 +218,7 @@ declare function get_current_call_stack(): VectorObject;
 /// `ScStatusType::ContractError`. Does not actually return.
 // @ts-ignore
 @external("x", "9")
-declare function fail_with_status(status: StatusObject): RawVal;
+declare function fail_with_status(status: StatusVal): RawVal;
 
 // Record a debug event. Fmt must be a Bytes. Args must be a
 // Vec. Void is returned.

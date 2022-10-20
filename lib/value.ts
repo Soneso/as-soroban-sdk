@@ -12,7 +12,7 @@ export type SymbolVal = RawVal;
 export type VectorObject = ObjectVal;
 export type MapObject = ObjectVal;
 export type BytesObject = ObjectVal;
-export type StatusObject = RawVal;
+export type StatusVal = RawVal;
 export type Unsigned64BitIntObject = ObjectVal;
 export type Signed64BitIntObject = ObjectVal;
 export type BigIntObject = ObjectVal;
@@ -482,8 +482,56 @@ export function toI64(val: Signed64BitIntObject) : i64 {
   return isObject(val) && getObjectType(val) == objTypeAccountId;
 }
 
-export function contractError(code: u32) : StatusObject {
-    return fromMajorMinorAndTag(code, statusContractErr, rawValTagStatus);
+/**
+ * Builds a StatusVal for a contract error for the given error code.
+ * @param errCode the error code to create the StatusVal from
+ * @returns the created StatusVal.
+ */
+export function contractError(errCode: u32) : StatusVal {
+    return fromMajorMinorAndTag(errCode, statusContractErr, rawValTagStatus);
+}
+
+/**
+ * Creates a StatusVal from a given status type and status code.
+ * @param type status type. e.g. statusContractErr, or statusOk
+ * @param code status code. e.g. unknownErrGeneral
+ * @returns the created StatusVal
+ */
+export function fromStatus(type: statusType, code: u32) : StatusVal {
+  return fromMajorMinorAndTag(code, type, rawValTagStatus);
+}
+
+/**
+ * Checks if the given host value represents a status value.
+ * @param val host value to check (Type: RawVal)
+ * @returns true if the host value represents a status value. otherwise false. 
+ */
+export function isStatus(val: RawVal): bool {
+  return hasTag(val, rawValTagStatus);
+}
+
+/**
+ * Retruns the status type from a given StatusVal. Traps if no StatusVal. To avoid, you can check it with isStatus().
+ * @param status the status to get the type from
+ * @returns the status type
+ */
+export function getStatusType(status: StatusVal) : statusType {
+  if (!isStatus(status)) {
+    context.fail();
+  }
+  return getMinor(status) as u8;
+}
+
+/**
+ * Retruns the status type from a given StatusVal. Traps if no StatusVal. To avoid, you can check it with isStatus().
+ * @param status the status to get the code from
+ * @returns the status code
+ */
+export function getStatusCode(status: StatusVal) : u32 {
+  if (!isStatus(status)) {
+    context.fail();
+  }
+  return getMajor(status);
 }
 
 /**
@@ -491,7 +539,7 @@ export function contractError(code: u32) : StatusObject {
  * @param str the string to create the SymbolVal from. max 10 characters. [_0-9A-Za-z]
  * @returns the created SymbolVal
  */
-export function fromString(str: string) : SymbolVal {
+export function fromSymbolStr(str: string) : SymbolVal {
   if (str.length > 10) {
     context.fail();
   }
@@ -601,11 +649,106 @@ function addTagToBody(tag: rawValTag, body: u64): RawVal {
     
 }
 
+const MINOR_BITS: u32 = 28;
+const MAJOR_BITS: u32 = 32;
+const MAJOR_MASK: u64 = ((1 as u64) << MAJOR_BITS) - 1;
+const MINOR_MASK: u64 = ((1 as u64) << MINOR_BITS) - 1;
+
 function fromMajorMinorAndTag(major: u32, minor: u32, tag:rawValTag) : RawVal {
    let maj = major as u64;
    let min = minor as u64;
-   return addTagToBody(tag, maj << 28 | min);
+   return addTagToBody(tag, maj << MINOR_BITS | min);
 }
+
+function getMinor(val:RawVal) : u32 {
+  return (getBody(val) & MINOR_MASK) as u32;
+}
+
+function getMajor(val:RawVal) : u32 {
+  return (getBody(val) >> MINOR_MASK) as u32;
+}
+
+
+/***********************************************************************************************************
+* [Status] - rawValTag 6: a status value consisting of a 28-bit type code followed by a 32-bit status code.*
+************************************************************************************************************/
+export type statusType = u8;
+export const statusOk: statusType = 0;
+export const statusUnknownErr: statusType = 1;
+export const statusHostValErr: statusType = 2;
+export const statusHostObjErr: statusType = 3;
+export const statusHostFuncErr: statusType = 4;
+export const statusStorageErr: statusType = 5;
+export const statusContextErr: statusType = 6;
+export const statusVMErr: statusType = 7;
+export const statusContractErr: statusType = 8;
+
+export type hostValErrCode = u32;
+export const hostValUnknownErr: hostValErrCode = 0;
+export const hostValReservedTagVal: hostValErrCode = 1;
+export const hostValUnexpectedValType: hostValErrCode = 2;
+export const hostValU63OutOfRange: hostValErrCode = 3;
+export const hostValU32OutOfRange: hostValErrCode = 4;
+export const hostValStaticUnknown: hostValErrCode = 5;
+export const hostValMissingObj: hostValErrCode = 6;
+export const hostValSymbolToLong: hostValErrCode = 7;
+export const hostValSymbolBadChar: hostValErrCode = 8;
+export const hostValContainsNonUTF8: hostValErrCode = 9;
+export const hostValBitsetTooManyBits: hostValErrCode = 10;
+export const hostValStatusUnknown: hostValErrCode = 11;
+
+export type hostObjErrCode = u32;
+export const hostObjUnknownErr: hostObjErrCode = 0;
+export const hostObjUnknownReference: hostObjErrCode = 1;
+export const hostObjUnexpectedType: hostObjErrCode = 2;
+export const hostObjObjCountExceedsU32Max: hostObjErrCode = 3;
+export const hostObjObjNotExists: hostObjErrCode = 4;
+export const hostObjVecIndexOutOfBounds: hostObjErrCode = 5;
+export const hostObjContractHashWrongLength: hostObjErrCode = 6;
+
+export type hostFuncErrCode = u32;
+export const hostFuncUnknownErr: hostFuncErrCode = 0;
+export const hostFuncUnexpectedHostFuncAction: hostFuncErrCode = 1;
+export const hostFuncInputArgsWrongLenght: hostFuncErrCode = 2;
+export const hostFuncInputArgsWrongType: hostFuncErrCode = 3;
+export const hostFuncInputArgsInvalid: hostFuncErrCode = 4;
+
+export type hostStorageErrCode = u32;
+export const hostStorageUnknownErr: hostStorageErrCode = 0;
+export const hostStorageExpectCOntractData: hostStorageErrCode = 1;
+export const hostStorageReadWriteAccessToReadonlyEntry: hostStorageErrCode = 2;
+export const hostStorageAccessToUnknownEntry: hostStorageErrCode = 3;
+export const hostStorageMissingKeyInGet: hostStorageErrCode = 4;
+export const hostStorageGetOnDeletedKey: hostStorageErrCode = 5;
+
+export type hostContextErrCode = u32;
+export const hostContextUnknownErr: hostContextErrCode = 0;
+export const hostContextNoContractRunning: hostContextErrCode = 1;
+
+export type vmErrCode = u32;
+export const vmUnknown: vmErrCode = 0;
+export const vmValidation: vmErrCode = 1;
+export const vmInstantiation: vmErrCode = 2;
+export const vmFunction: vmErrCode = 3;
+export const vmTable: vmErrCode = 4;
+export const vmMemory: vmErrCode = 5;
+export const vmGlobal: vmErrCode = 6;
+export const vmValue: vmErrCode = 7;
+export const vmTrapUnreachable: vmErrCode = 8;
+export const vmTrapMemoryAccessOutOfBounds: vmErrCode = 9;
+export const vmTrapTableAccessOutOfBounds: vmErrCode = 10;
+export const vmTrapElemUninitialized: vmErrCode = 11;
+export const vmTrapDivisionByZero: vmErrCode = 12;
+export const vmTrapIntegerOverflow: vmErrCode = 13;
+export const vmTrapInvalidConversionToInt: vmErrCode = 14;
+export const vmTrapStackOverflow: vmErrCode = 15;
+export const vmTrapUnexpectedSignature: vmErrCode = 16;
+export const vmTrapMemLimitExceeded: vmErrCode = 17;
+export const vmTrapCPULimitExceeded: vmErrCode = 18;
+
+export type unknownErrCode = u32;
+export const unknownErrGeneral: unknownErrCode = 0;
+export const unknownErrXDR: unknownErrCode = 1;
 
 /******************
  * HOST FUNCTIONS *
@@ -630,84 +773,3 @@ declare function obj_from_i64(v:i64): ObjectVal;
 // @ts-ignore
 @external("i", "0")
 declare function obj_to_i64(ojb:ObjectVal): i64;
-
-/***********************************************************************************************************
-* [Status] - rawValTag 6: a status value consisting of a 28-bit type code followed by a 32-bit status code.*
-************************************************************************************************************/
-type statusType = u8;
-const statusOk: statusType = 0;
-const statusUnknownErr: statusType = 1;
-const statusHostValErr: statusType = 2;
-const statusHostObjErr: statusType = 3;
-const statusHostFuncErr: statusType = 4;
-const statusStorageErr: statusType = 5;
-const statusContextErr: statusType = 6;
-const statusVMErr: statusType = 7;
-const statusContractErr: statusType = 8;
-
-type hostValErrCode = u32;
-const hostValUnknownErr: hostValErrCode = 0;
-const hostValReservedTagVal: hostValErrCode = 1;
-const hostValUnexpectedValType: hostValErrCode = 2;
-const hostValU63OutOfRange: hostValErrCode = 3;
-const hostValU32OutOfRange: hostValErrCode = 4;
-const hostValStaticUnknown: hostValErrCode = 5;
-const hostValMissingObj: hostValErrCode = 6;
-const hostValSymbolToLong: hostValErrCode = 7;
-const hostValSymbolBadChar: hostValErrCode = 8;
-const hostValContainsNonUTF8: hostValErrCode = 9;
-const hostValBitsetTooManyBits: hostValErrCode = 10;
-const hostValStatusUnknown: hostValErrCode = 11;
-
-type hostObjErrCode = u32;
-const hostObjUnknownErr: hostObjErrCode = 0;
-const hostObjUnknownReference: hostObjErrCode = 1;
-const hostObjUnexpectedType: hostObjErrCode = 2;
-const hostObjObjCountExceedsU32Max: hostObjErrCode = 3;
-const hostObjObjNotExists: hostObjErrCode = 4;
-const hostObjVecIndexOutOfBounds: hostObjErrCode = 5;
-const hostObjContractHashWrongLength: hostObjErrCode = 6;
-
-type hostFuncErrCode = u32;
-const hostFuncUnknownErr: hostFuncErrCode = 0;
-const hostFuncUnexpectedHostFuncAction: hostFuncErrCode = 1;
-const hostFuncInputArgsWrongLenght: hostFuncErrCode = 2;
-const hostFuncInputArgsWrongType: hostFuncErrCode = 3;
-const hostFuncInputArgsInvalid: hostFuncErrCode = 4;
-
-type hostStorageErrCode = u32;
-const hostStorageUnknownErr: hostStorageErrCode = 0;
-const hostStorageExpectCOntractData: hostStorageErrCode = 1;
-const hostStorageReadWriteAccessToReadonlyEntry: hostStorageErrCode = 2;
-const hostStorageAccessToUnknownEntry: hostStorageErrCode = 3;
-const hostStorageMissingKeyInGet: hostStorageErrCode = 4;
-const hostStorageGetOnDeletedKey: hostStorageErrCode = 5;
-
-type hostContextErrCode = u32;
-const hostContextUnknownErr: hostContextErrCode = 0;
-const hostContextNoContractRunning: hostContextErrCode = 1;
-
-type vmErrCode = u32;
-const vmUnknown: vmErrCode = 0;
-const vmValidation: vmErrCode = 1;
-const vmInstantiation: vmErrCode = 2;
-const vmFunction: vmErrCode = 3;
-const vmTable: vmErrCode = 4;
-const vmMemory: vmErrCode = 5;
-const vmGlobal: vmErrCode = 6;
-const vmValue: vmErrCode = 7;
-const vmTrapUnreachable: vmErrCode = 8;
-const vmTrapMemoryAccessOutOfBounds: vmErrCode = 9;
-const vmTrapTableAccessOutOfBounds: vmErrCode = 10;
-const vmTrapElemUninitialized: vmErrCode = 11;
-const vmTrapDivisionByZero: vmErrCode = 12;
-const vmTrapIntegerOverflow: vmErrCode = 13;
-const vmTrapInvalidConversionToInt: vmErrCode = 14;
-const vmTrapStackOverflow: vmErrCode = 15;
-const vmTrapUnexpectedSignature: vmErrCode = 16;
-const vmTrapMemLimitExceeded: vmErrCode = 17;
-const vmTrapCPULimitExceeded: vmErrCode = 18;
-
-type unknownErrCode = u32;
-const unknownErrGeneral: unknownErrCode = 0;
-const unknownErrXDR: unknownErrCode = 1;
