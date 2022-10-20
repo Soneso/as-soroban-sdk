@@ -8,7 +8,7 @@ import { VectorObject, RawVal, SymbolVal, fromSymbolStr, BytesObject} from "./va
  * @param args arguments of the function to call. vector af raw values.
  * @returns If the call is successful, forwards the result of the called function. Traps otherwise.
  */
-export function call_by_id(id: string, func: string, args: VectorObject): RawVal {
+export function callContractById(id: string, func: string, args: VectorObject): RawVal {
     let b = Bytes.fromContractId(id);
     return call_ctr(b.getHostObject(), fromSymbolStr(func), args);
 }
@@ -20,7 +20,7 @@ export function call_by_id(id: string, func: string, args: VectorObject): RawVal
  * @param args arguments of the function to call. vector af raw values.
  * @returns If the call is successful, forwards the result of the called function. Traps otherwise.
  */
-export function call(contract: BytesObject, func: SymbolVal, args: VectorObject): RawVal {
+export function callContract(contract: BytesObject, func: SymbolVal, args: VectorObject): RawVal {
     return call_ctr(contract,func,args);
 }
 
@@ -31,7 +31,7 @@ export function call(contract: BytesObject, func: SymbolVal, args: VectorObject)
  * @param args arguments of the function to call. vector af raw values.
  * @returns If the call is successful, forwards the result of the called function. Otherwise, an `SCStatus` containing the error status code.
  */
-export function try_call_by_id(id: string, func: string, args: VectorObject): RawVal {
+export function tryCallContractById(id: string, func: string, args: VectorObject): RawVal {
     let b = Bytes.fromContractId(id);
     return try_call_ctr(b.getHostObject(), fromSymbolStr(func), args);
 }
@@ -43,7 +43,7 @@ export function try_call_by_id(id: string, func: string, args: VectorObject): Ra
  * @param args arguments of the function to call. vector af raw values.
  * @returns If the call is successful, forwards the result of the called function. Otherwise, an `SCStatus` containing the error status code.
  */
-export function try_call(contract: BytesObject, func: SymbolVal, args: VectorObject): RawVal {
+export function tryCallContract(contract: BytesObject, func: SymbolVal, args: VectorObject): RawVal {
     return try_call_ctr(contract,func,args);
 }
 

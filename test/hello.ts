@@ -7,8 +7,8 @@ import * as contract from "../lib/contract";
 export function hello(to: val.SymbolVal): val.VectorObject {
 
   let vec = new Vec();
-  vec.push_front(val.fromSymbolStr("Hello"));
-  vec.push_back(to);
+  vec.pushFront(val.fromSymbolStr("Hello"));
+  vec.pushBack(to);
   
   return vec.getHostObject();
   
@@ -26,24 +26,24 @@ export function increment(): val.RawVal {
 
   let key = "COUNTER";
   var counter = 0;
-  if (ledger.has_data_for(key)) {
-    let dataObj = ledger.get_data_for(key);
+  if (ledger.hasDataFor(key)) {
+    let dataObj = ledger.getDataFor(key);
     counter = val.toU32(dataObj);
   }
   counter += 1;
   let counterObj = val.fromU32(counter);
-  ledger.put_data_for(key, counterObj);
+  ledger.putDataFor(key, counterObj);
   return counterObj;
 }
 
 export function logging(): val.RawVal {
 
-  context.log_str("Hello, today is a sunny day!");
+  context.logStr("Hello, today is a sunny day!");
 
   let args = new Vec();
-  args.push_back(val.fromI32(30));
-  args.push_back(val.fromSymbolStr("celsius"));
-  context.log_ftm("We have {} degrees {}!", args);
+  args.pushBack(val.fromI32(30));
+  args.pushBack(val.fromSymbolStr("celsius"));
+  context.logFtm("We have {} degrees {}!", args);
 
   return val.fromVoid();
 
@@ -52,10 +52,10 @@ export function logging(): val.RawVal {
 export function callctr(): val.RawVal {
 
   let args = new Vec();
-  args.push_back(val.fromI32(3));
-  args.push_back(val.fromI32(12));
+  args.pushBack(val.fromI32(3));
+  args.pushBack(val.fromI32(12));
 
-  return contract.call_by_id("11", "add", args.getHostObject());
+  return contract.callContractById("11", "add", args.getHostObject());
 
 }
 
@@ -73,11 +73,11 @@ export function checkAge(age: val.RawVal): val.RawVal {
   let age2check = val.toI32(age);
 
   if (age2check < ALLOWED_AGE_RANGE.MIN) {
-    context.fail_with_error_code(AGE_ERR_CODES.TOO_YOUNG);
+    context.failWithErrorCode(AGE_ERR_CODES.TOO_YOUNG);
   }
 
   if (age2check > ALLOWED_AGE_RANGE.MAX) {
-    context.fail_with_error_code(AGE_ERR_CODES.TOO_OLD);
+    context.failWithErrorCode(AGE_ERR_CODES.TOO_OLD);
   }
 
   return val.fromSymbolStr("OK");
@@ -87,27 +87,27 @@ export function eventTest(): val.RawVal {
 
   let topicsVec = new Vec();
 
-  topicsVec.push_back(val.fromSymbolStr("TEST"));
-  topicsVec.push_back(val.fromSymbolStr("THE"));
-  topicsVec.push_back(val.fromSymbolStr("EVENTS"));
+  topicsVec.pushBack(val.fromSymbolStr("TEST"));
+  topicsVec.pushBack(val.fromSymbolStr("THE"));
+  topicsVec.pushBack(val.fromSymbolStr("EVENTS"));
 
   let dataVec = new Vec();
-  dataVec.push_back(val.fromU32(223));
-  dataVec.push_back(val.fromU32(222));
-  dataVec.push_back(val.fromU32(221));
+  dataVec.pushBack(val.fromU32(223));
+  dataVec.pushBack(val.fromU32(222));
+  dataVec.pushBack(val.fromU32(221));
 
-  context.publish_event(topicsVec, dataVec.getHostObject());
+  context.publishEvent(topicsVec, dataVec.getHostObject());
 
 
   let statusTest = val.fromStatus(val.statusContractErr, val.unknownErrGeneral)
   if (val.isStatus(statusTest)) {
-    context.publish_simple_event("STATUS", val.fromU32(1));
+    context.publishSimpleEvent("STATUS", val.fromU32(1));
   }
   if (val.getStatusType(statusTest) == val.statusContractErr) {
-    context.publish_simple_event("STATUS", val.fromU32(2));
+    context.publishSimpleEvent("STATUS", val.fromU32(2));
   }
   if (val.getStatusCode(statusTest) == val.unknownErrGeneral) {
-    context.publish_simple_event("STATUS", val.fromU32(3));
+    context.publishSimpleEvent("STATUS", val.fromU32(3));
   }
 
   return val.fromVoid();

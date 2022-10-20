@@ -93,7 +93,7 @@ export class Bytes {
      * @param len see decription
      * @returns the slice of bytes as RawVal.
      */
-    copy_to_linear_memory(b_pos:RawVal, lm_pos:RawVal, len:RawVal): RawVal {
+    copyToLinearMemory(b_pos:RawVal, lm_pos:RawVal, len:RawVal): RawVal {
         return bytes_copy_to_linear_memory(this.obj, b_pos, lm_pos, len);
     }
 
@@ -108,7 +108,7 @@ export class Bytes {
      * @param len see description
      * @returns void
      */
-    copy_from_linear_memory(b_pos:RawVal, lm_pos:RawVal, len:RawVal): void {
+    copyFromLinearMemory(b_pos:RawVal, lm_pos:RawVal, len:RawVal): void {
         this.obj = bytes_copy_from_linear_memory(this.obj, b_pos, lm_pos, len);
     }
 
@@ -118,7 +118,7 @@ export class Bytes {
      * @param len  see desctiption
      * @returns the new Bytes object.
      */
-    static new_from_linear_memory(lm_pos:RawVal, len:RawVal): Bytes {
+    static newFromLinearMemory(lm_pos:RawVal, len:RawVal): Bytes {
         return new Bytes(bytes_new_from_linear_memory(lm_pos, len));
     }
 
@@ -221,6 +221,10 @@ export class Bytes {
     slice(start:u32, end:u32): Bytes {
         return new Bytes(bytes_slice(this.obj, fromU32(start), fromU32(end)));
     }
+
+    /*****************
+    * HELPERS *
+    ******************/
 
     static charToInt(letter:i32) : i32
     {

@@ -5,14 +5,13 @@ import { RawVal, BytesObject, Unsigned64BitIntObject, Signed64BitIntObject,
 import { Vec } from "./vec";
 
 
-
 /**
  * Log a formated message. Builds a string from the format string, and a list of arguments. 
  * Arguments are substituted wherever the {} value appears in the format string. 
  * @param msg the format string. E.g. "Hello {}".
  * @param args The arguments as values in the Vector.
  */
-export function log_ftm(msg: string, args:Vec): void {
+export function logFtm(msg: string, args:Vec): void {
     let b = Bytes.fromString(msg);
     host_log_fmt_values(b.getHostObject(), args.getHostObject());
 }
@@ -21,7 +20,7 @@ export function log_ftm(msg: string, args:Vec): void {
 * Log string during execution on host. Good for debugging.
 * @param msg the message to log
 */
-export function log_str(msg: string): void {
+export function logStr(msg: string): void {
     let b = Bytes.fromString(msg);
     let args = new Vec();
     host_log_fmt_values(b.getHostObject(), args.getHostObject());
@@ -31,7 +30,7 @@ export function log_str(msg: string): void {
 * Log value during execution on host. Good for debugging.
 * @param value the value to log
 */
-export function log_value(value: RawVal): void {
+export function logValue(value: RawVal): void {
     host_log_value(value);
 }
 
@@ -41,7 +40,7 @@ export function log_value(value: RawVal): void {
  * invoked by a contract.
  * @returns the invoking contractID Bytes as BytesObject
  */
-export function invoking_contract(): BytesObject {
+export function getInvokingContract(): BytesObject {
     return get_invoking_contract();
 }
 
@@ -49,7 +48,7 @@ export function invoking_contract(): BytesObject {
 * Returns the current contractID `Bytes` of the running contract.
 * @returns current contractID `Bytes` of the running contract  (Type: BytesObject)
 */
-export function current_contract(): BytesObject {
+export function getCurrentContract(): BytesObject {
     return get_current_contract();
 }
 
@@ -67,7 +66,7 @@ export function compare(val1: RawVal, val2: RawVal): i64 {
  * Return the protocol version of the current ledger as a u32.
  * @returns protocol version of the current ledger as a u32.
  */
-export function ledger_version(): u32 {
+export function getLedgerVersion(): u32 {
     return toU32(get_ledger_version());
 }
 
@@ -75,11 +74,11 @@ export function ledger_version(): u32 {
  * Return the sequence number of the current ledger as a u32.
  * @returns sequence number of the current ledger as a u32.
  */
- export function ledger_sequence(): u32 {
+ export function getLedgerSequence(): u32 {
     return toU32(get_ledger_sequence());
 }
 
-export function ledger_timestamp(): u64 {
+export function getLedgerTimestamp(): u64 {
     return toU64(get_ledger_timestamp());
 }
 
@@ -87,7 +86,7 @@ export function ledger_timestamp(): u64 {
  * Return the network passphrase of the current ledger as `Bytes`.
  * @returns Return the network passphrase of the current ledger as `Bytes` (type:  BytesObject)
  */
-export function ledger_network_passphrase(): BytesObject {
+export function getLedgerNetworkPassphrase(): BytesObject {
     return get_ledger_network_passphrase();
 }
 
@@ -98,7 +97,7 @@ export function ledger_network_passphrase(): BytesObject {
  * a Symbol.
  * @returns the full call stack (type: VectorObject)
  */
-export function current_call_stack(): VectorObject {
+export function getCurrentCallStack(): VectorObject {
     return get_current_call_stack();
 }
 
@@ -115,7 +114,7 @@ export function fail() : void {
  * It traps with with contract error status code and error code as given by parameter.
  * @param errCode the error code to use.
  */
-export function fail_with_error_code(errCode: u32) : void {
+export function failWithErrorCode(errCode: u32) : void {
     fail_with_status(contractError(errCode));
 }
 
@@ -123,7 +122,7 @@ export function fail_with_error_code(errCode: u32) : void {
  * Returns whether the contract invocation is from an account or another contract.
  * @returns 0 for account, 1 for contract.
  */
-export function invoker_type(): u64 {
+export function getInvokerType(): u64 {
     return toU64(get_invoker_type());
 }
 
@@ -134,7 +133,7 @@ export function invoker_type(): u64 {
  * @param topics the vector containing the topics.
  * @param data the data value to publish in the event
  */
-export function publish_event(topics: Vec, data: RawVal): void {
+export function publishEvent(topics: Vec, data: RawVal): void {
     contract_event(topics.getHostObject(), data);
 }
 
@@ -143,10 +142,10 @@ export function publish_event(topics: Vec, data: RawVal): void {
  * @param topicSymbol the symbol string to be used as a topic. max 10 characters. [_0-9A-Za-z]
  * @param data datat to be published in the event.
  */
-export function publish_simple_event(topicSymbol: string, data: RawVal): void {
+export function publishSimpleEvent(topicSymbol: string, data: RawVal): void {
     let topic = fromSymbolStr(topicSymbol);
     let topics = new Vec();
-    topics.push_back(topic);
+    topics.pushBack(topic);
     contract_event(topics.getHostObject(), data);
 }
 

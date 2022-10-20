@@ -14,7 +14,7 @@ export function exists(acc: AccountIDObject): bool {
  * @param acc the account id
  * @returns the low threshold of the account
  */
-export function low_threshold(acc: AccountIDObject): u32 {
+export function getLowTreshold(acc: AccountIDObject): u32 {
     return toU32(account_get_low_threshold(acc));
 }
 
@@ -23,7 +23,7 @@ export function low_threshold(acc: AccountIDObject): u32 {
  * @param acc the account id
  * @returns the medium threshold of the account
  */
- export function medium_threshold(acc: AccountIDObject): u32 {
+ export function getMediumThreshold(acc: AccountIDObject): u32 {
     return toU32(account_get_medium_threshold(acc));
 }
 
@@ -32,7 +32,7 @@ export function low_threshold(acc: AccountIDObject): u32 {
  * @param acc the account id
  * @returns the high threshold of the account
  */
- export function high_threshold(acc: AccountIDObject): u32 {
+ export function getHighTreshold(acc: AccountIDObject): u32 {
     return toU32(account_get_high_threshold(acc));
 }
 
@@ -44,7 +44,7 @@ export function low_threshold(acc: AccountIDObject): u32 {
  * @param signer the signer account id
  * @returns the high threshold of the account
  */
- export function signer_weight(acc: AccountIDObject, signer: AccountIDObject): u32 {
+ export function getSignerWeight(acc: AccountIDObject, signer: AccountIDObject): u32 {
     return toU32(account_get_signer_weight(acc, signer));
 }
 

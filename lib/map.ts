@@ -68,7 +68,7 @@ export class Map {
      * @param key the key to search for (type: RawVal)
      * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
      */
-    prev_key(key: RawVal) : RawVal {
+    getPrevKey(key: RawVal) : RawVal {
         return map_prev_key(this.obj, key);
     }
 
@@ -78,7 +78,7 @@ export class Map {
      * @param key the key to search for (type: RawVal)
      * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
      */
-    next_key(key: RawVal) : RawVal {
+    getNextKey(key: RawVal) : RawVal {
         return map_next_key(this.obj, key);
     }
 
@@ -87,7 +87,7 @@ export class Map {
      * If the map is empty, returns an SCStatus containing the error code (TBD).
      * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
      */
-    min_key() : RawVal {
+    getMinKey() : RawVal {
         return map_min_key(this.obj);
     }
 
@@ -96,7 +96,7 @@ export class Map {
      * If the map is empty, returns an SCStatus containing the error code (TBD).
      * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
      */
-    max_key() : RawVal {
+    getMaxKey() : RawVal {
         return map_max_key(this.obj);
     }
 

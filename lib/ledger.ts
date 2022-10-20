@@ -5,30 +5,30 @@ import { ObjectVal, RawVal, toBool, fromSymbolStr} from "./value";
 
 /**
  * Checks if the ledger storse contract data for the given string key.
- * @param key a string max 10 characters [_0-9A-Za-z]
+ * @param symbolKey a string max 10 characters [_0-9A-Za-z]
  * @returns true if the ledger has data for the given key
  */
-export function has_data_for(key: string): bool {
-    let keySymbolVal = fromSymbolStr(key);
+export function hasDataFor(symbolKey: string): bool {
+    let keySymbolVal = fromSymbolStr(symbolKey);
     return toBool(has_contract_data(keySymbolVal));
 }
 
 /**
- * Checks if the ledger storse contract data for the given key.
+ * Checks if the ledger stores contract data for the given key.
  * @param key any host value. e.g. SymbolVal
  * @returns true if the ledger has data for the given key
  */
-export function has_data(key: RawVal): bool {
+export function hasData(key: RawVal): bool {
     return toBool(has_contract_data(key));
 }
 
 /**
  * Stores contract data in the ledger for a given string key.
- * @param key a string max 10 characters [_0-9A-Za-z]
+ * @param symbolKey a string max 10 characters [_0-9A-Za-z]
  * @param value value to store. Any host value. E.g. SymbolVal, VectorObject, etc.
  */
- export function put_data_for(key: string, value:RawVal) : void {
-    let keySymbolVal = fromSymbolStr(key);
+ export function putDataFor(symbolKey: string, value:RawVal) : void {
+    let keySymbolVal = fromSymbolStr(symbolKey);
     put_contract_data(keySymbolVal, value);
 }
 
@@ -37,17 +37,17 @@ export function has_data(key: RawVal): bool {
  * @param key a string max 10 characters [_0-9A-Za-z]
  * @param value value to store. Any host value. E.g. SymbolVal, VectorObject, etc.
  */
- export function put_data(key: RawVal, value:RawVal) : void {
+ export function putData(key: RawVal, value:RawVal) : void {
     put_contract_data(key, value);
 }
 
 /**
  * Returns contract data from the ledger for a given string key.
- * @param key a string max 10 characters [_0-9A-Za-z]
+ * @param symbolKey a string max 10 characters [_0-9A-Za-z]
  * @return the found value if any.
  */
- export function get_data_for(key: string): RawVal {
-    let keySymbolVal = fromSymbolStr(key);
+ export function getDataFor(symbolKey: string): RawVal {
+    let keySymbolVal = fromSymbolStr(symbolKey);
     return get_contract_data(keySymbolVal);
 }
 
@@ -56,16 +56,16 @@ export function has_data(key: RawVal): bool {
  * @param key a string max 10 characters [_0-9A-Za-z]
  * @return the found value if any.
  */
- export function get_data(key: RawVal) : RawVal  {
+ export function getData(key: RawVal) : RawVal  {
     return get_contract_data(key);
 }
 
 /**
  * Deletes contract data from the ledger for a given string key.
- * @param key a string max 10 characters [_0-9A-Za-z]
+ * @param symbolKey a string max 10 characters [_0-9A-Za-z]
  */
- export function del_data_for(key: string): void {
-    let keySymbolVal = fromSymbolStr(key);
+ export function delDataFor(symbolKey: string): void {
+    let keySymbolVal = fromSymbolStr(symbolKey);
     del_contract_data(keySymbolVal);
 }
 
@@ -73,7 +73,7 @@ export function has_data(key: RawVal): bool {
  * Deletes contract data from the ledger for a given string key.
  * @param key a string max 10 characters [_0-9A-Za-z]
  */
- export function del_data_(key: RawVal): void {
+ export function delData(key: RawVal): void {
     del_contract_data(key);
 }
 

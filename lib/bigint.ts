@@ -13,7 +13,7 @@ export class BigInt {
      * @param value the u64 value to construct the BigInt from
      * @returns the BigInt object containing its host object
      */
-    static from_u64(value: u64): BigInt {
+    static fromU64(value: u64): BigInt {
         return new BigInt(bigint_from_u64(value));
     }
 
@@ -22,7 +22,7 @@ export class BigInt {
      * @param value the i64 value to construct the BigInt from
      * @returns the BigInt object containing its host object
      */
-    static from_i64(value: i64): BigInt {
+    static fromI64(value: i64): BigInt {
         return new BigInt(bigint_from_i64(value));
     }
 
@@ -34,7 +34,7 @@ export class BigInt {
      * @param bytes the byte array
      * @returns the new BigInt
      */
-    static from_bytes_be(sign: i32, bytes: Bytes): BigInt {
+    static fromBytesBe(sign: i32, bytes: Bytes): BigInt {
         return new BigInt(bigint_from_bytes_be(fromI32(sign), bytes.getHostObject()));
     }
 
@@ -48,7 +48,7 @@ export class BigInt {
      * @param radix the radix [2 ... 256]
      * @returns the new BigInt
      */
-    static from_radix_be(sign: i32, buf: Bytes, radix: u32): BigInt {
+    static fromRadixBe(sign: i32, buf: Bytes, radix: u32): BigInt {
         return new BigInt(bigint_from_radix_be(fromI32(sign), buf.getHostObject(), fromU32(radix)));
     }
 
@@ -64,7 +64,7 @@ export class BigInt {
      * Converts this BigInt to an u64. Traps if the value cannot fit into u64.
      * @returns the u64 value of this BigInt
      */
-    to_u64(): u64 {
+    toU64(): u64 {
         return bigint_to_u64(this.obj);
     }
 
@@ -72,7 +72,7 @@ export class BigInt {
      * Converts this BigInt to an i64. Traps if the value cannot fit into i64.
      * @returns the i64 value of the bigint
      */
-    to_i64(): i64 {
+    toI64(): i64 {
         return bigint_to_i64(this.obj);
     }
 
@@ -90,7 +90,7 @@ export class BigInt {
      * @param value to add to this BigInt
      * @returns void
      */
-    add_assign(value: BigInt): void {
+    addAssign(value: BigInt): void {
         this.obj = bigint_add(this.obj, value.getHostObject());
     }
 
@@ -108,7 +108,7 @@ export class BigInt {
      * @param value to substract from this BigInt
      * @returns void
      */
-    sub_assign(value: BigInt): void {
+    subAssign(value: BigInt): void {
         this.obj = bigint_sub(this.obj, value.getHostObject());
     }
 
@@ -126,7 +126,7 @@ export class BigInt {
      * @param value to multiply this BigInt with
      * @returns void
      */
-    mul_assign(value: BigInt): void {
+    mulAssign(value: BigInt): void {
         this.obj = bigint_mul(this.obj, value.getHostObject());
     }
 
@@ -144,7 +144,7 @@ export class BigInt {
      * @param value to devide this BigInt with
      * @returns void
      */
-    div_assign(value: BigInt): void {
+    divAssign(value: BigInt): void {
         this.obj = bigint_div(this.obj, value.getHostObject());
     }
 
@@ -162,7 +162,7 @@ export class BigInt {
      * @param value value to perform the `%` operation to this BigInt
      * @returns void
      */
-    rem_assign(value: BigInt): void {
+    remAssign(value: BigInt): void {
         this.obj = bigint_rem(this.obj, value.getHostObject());
     }
 
@@ -180,7 +180,7 @@ export class BigInt {
      * @param value value to perform the `&` operation to this BigInt
      * @returns void
     */
-    and_assign(value: BigInt): void {
+    andAssign(value: BigInt): void {
         this.obj = bigint_and(this.obj, value.getHostObject());
     }
 
@@ -198,7 +198,7 @@ export class BigInt {
      * @param value value to perform the `|` operation to this BigInt
      * @returns void
      */
-    or_assign(value: BigInt): void {
+    orAssign(value: BigInt): void {
         this.obj = bigint_or(this.obj, value.getHostObject());
     }
     
@@ -216,7 +216,7 @@ export class BigInt {
      * @param value value to perform the `^` operation to this BigInt
      * @returns void
      */
-    xor_assign(value: BigInt): void {
+    xorAssign(value: BigInt): void {
         this.obj = bigint_xor(this.obj, value.getHostObject());
     }
 
@@ -234,7 +234,7 @@ export class BigInt {
      * @param value value to perform the `<<` operation to this BigInt
      * @returns void
      */
-    shl_assign(value: BigInt): void {
+    shlAssign(value: BigInt): void {
         this.obj = bigint_shl(this.obj, value.getHostObject());
     }
 
@@ -252,7 +252,7 @@ export class BigInt {
      * @param value value to perform the `>>` operation to this BigInt
      * @returns void
      */
-     shr_assign(value: BigInt): void {
+     shrAssign(value: BigInt): void {
         this.obj = bigint_shr(this.obj, value.getHostObject());
     }
 
@@ -260,7 +260,7 @@ export class BigInt {
      * Returns true if this BigInt is equal to the additive identity.
      * @returns true or false
      */
-    is_zero(): bool {
+    isZero(): bool {
         return toBool(bigint_is_zero(this.obj));
     }
 
@@ -276,7 +276,7 @@ export class BigInt {
      * Performs the unary `-` operation to this BigInt and assigns the result to this BigInt.
      * @returns void
      */
-    neg_assign(): void {
+    negAssign(): void {
         this.obj = bigint_neg(this.obj);
     }
 
@@ -292,7 +292,7 @@ export class BigInt {
      * Performs the unary `!` operation to this BigInt and assigns the result to this BigInt.
      * @returns void
      */
-    not_assign(): void {
+    notAssign(): void {
         this.obj = bigint_not(this.obj);
     }
 
@@ -310,7 +310,7 @@ export class BigInt {
      * @param value value to perform the gdc operation with this BigInt
      * @returns void
      */
-    gcd_assign(value: BigInt): void {
+    gcdAssign(value: BigInt): void {
         this.obj = bigint_gcd(this.obj, value.getHostObject());
     }
 
@@ -328,7 +328,7 @@ export class BigInt {
      * @param value value to perform the lcm operation with this BigInt
      * @returns void
      */
-    lcm_assign(value: BigInt): void {
+    lcmAssign(value: BigInt): void {
         this.obj = bigint_lcm(this.obj, value.getHostObject());
     }
 
@@ -346,7 +346,7 @@ export class BigInt {
      * @param value value to be used for the pow operation
      * @returns void
      */
-    pow_assign(value: BigInt): void {
+    powAssign(value: BigInt): void {
         this.obj = bigint_pow(this.obj, value.getHostObject());
     }
 
@@ -359,7 +359,7 @@ export class BigInt {
     * @param valueM handle to the m value (Type: BigIntObject)
     * @returns the new BigInt as a result
     */
-    pow_mod(valueQ: BigInt, valueM: BigInt): BigInt {
+    powMod(valueQ: BigInt, valueM: BigInt): BigInt {
         return new BigInt(bigint_pow_mod(this.obj, valueQ.getHostObject(), valueM.getHostObject()));
     }
 
@@ -372,7 +372,7 @@ export class BigInt {
     * @param valueM handle to the m value (Type: BigIntObject)
     * @returns void
     */
-    pow_mod_assign(valueQ: BigInt, valueM: BigInt): void {
+    powModAssign(valueQ: BigInt, valueM: BigInt): void {
         this.obj = bigint_pow_mod(this.obj, valueQ.getHostObject(), valueM.getHostObject());
     }
 
@@ -388,7 +388,7 @@ export class BigInt {
      * Calculates the truncated principal square root of the this BigInt. Traps if the BigInt is negative. Assigns the result to this BigInt.
      * @returns void
      */
-    sqrt_assign(): void {
+    sqrtAssign(): void {
         this.obj = bigint_sqrt(this.obj);
     }
 
@@ -404,7 +404,7 @@ export class BigInt {
      * Outputs the BigInt's magnitude in big-endian byte order into a byte array. The sign is dropped.
      * @returns the byte array as Bytes object
      */
-    to_bytes_be(): Bytes {
+    toBytesBe(): Bytes {
         return new Bytes(bigint_to_bytes_be(this.obj));
     }
 
@@ -414,7 +414,7 @@ export class BigInt {
      * @param radix the radix [2 ... 256]
      * @returns the byte array
      */
-    to_radix_be(radix: u32): Bytes {
+    toRadixBe(radix: u32): Bytes {
         return new Bytes(bigint_to_radix_be(this.obj, fromU32(radix)));
     }
 }

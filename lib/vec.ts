@@ -20,7 +20,7 @@ export class Vec {
      * @param capacity capacity of the Vector
      * @returns the new Vector.
      */
-    static new_with_capacity(capacity: u32) : Vec {
+    static newWithCapacity(capacity: u32) : Vec {
         return new Vec(vec_new(fromU32(capacity)));
     }
  
@@ -58,7 +58,7 @@ export class Vec {
      * @param value the value to push (Type: RawVal)
      * @returns void.
      */
-    push_front(value: RawVal) : void {
+    pushFront(value: RawVal) : void {
         this.obj = vec_push_front(this.obj, value);
     }
 
@@ -67,7 +67,7 @@ export class Vec {
      * Traps if original vector is empty.
      * @returns void.
      */
-    pop_front() : void {
+    popFront() : void {
         this.obj = vec_pop_front(this.obj);
     }
 
@@ -76,7 +76,7 @@ export class Vec {
      * @param value the element to be appended (Type: RawVal)
      * @returns void
      */
-    push_back(value: RawVal) : void {
+    pushBack(value: RawVal) : void {
         this.obj = vec_push_back(this.obj, value);
     }
 
@@ -85,7 +85,7 @@ export class Vec {
      * Traps if original vector is empty.
      * @returns void.
      */
-    pop_back() : void {
+    popBack() : void {
         this.obj = vec_pop_back(this.obj);
     }
 
@@ -149,7 +149,7 @@ export class Vec {
      * @param value the value to search for (Type: RawVal)
      * @returns u32 (as RawVal) index of the value if it's there. Otherwise, it returns `ScStatic::Void` (as RawVal).
      */
-    first_index_of(value: RawVal) : RawVal {
+    getFirstIndexOf(value: RawVal) : RawVal {
         return vec_first_index_of(this.obj, value);
     }
 
@@ -158,7 +158,7 @@ export class Vec {
      * @param value the value to search for (Type: RawVal)
      * @returns u32 (as RawVal) index of the value if it's there. Otherwise, it returns `ScStatic::Void` (as RawVal).
      */
-    last_index_of(value: RawVal) : RawVal {
+    getLastIndexOf(value: RawVal) : RawVal {
         return vec_last_index_of(this.obj, value);
     }
 
@@ -172,7 +172,7 @@ export class Vec {
      * @param value the value to search for (Type: RawVal)
      * @returns see description.
      */
-    binary_search(value: RawVal) : u64 {
+    binarySearch(value: RawVal) : u64 {
         return vec_binary_search(this.obj, value);
     }
 }

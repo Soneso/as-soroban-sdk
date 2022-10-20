@@ -1,6 +1,6 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v0.0.3](https://img.shields.io/badge/v0.0.3-yellow.svg)
+![v0.0.4](https://img.shields.io/badge/v0.0.4-yellow.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org).
 
@@ -40,8 +40,8 @@ import {Vec} from 'as-soroban-sdk/lib/vec';
 export function hello(to: val.SymbolVal): val.VectorObject {
 
   let vec = new Vec();
-  vec.push_front(val.fromSymbolStr("Hello"));
-  vec.push_back(to);
+  vec.pushFront(val.fromSymbolStr("Hello"));
+  vec.pushBack(to);
   
   return vec.getHostObject();
 }
@@ -201,7 +201,7 @@ You can log for purpose of debugging. Logs are only visible in tests, or when ex
 ```typescript
 import * as context from 'as-soroban-sdk/lib/context';
 
-context.log_str("Today is a sunny day!");
+context.logStr("Today is a sunny day!");
 ```
 
 ### Log a formatted utf8 string message
@@ -210,8 +210,8 @@ context.log_str("Today is a sunny day!");
 import * as context from 'as-soroban-sdk/lib/context';
 
 let args = new Vec();
-args.push_back(val.fromI32(30));
-args.push_back(val.fromSymbolStr("celsius"));
-context.log_ftm("We have {} degrees {}!", args);
+args.pushBack(val.fromI32(30));
+args.pushBack(val.fromSymbolStr("celsius"));
+context.logFtm("We have {} degrees {}!", args);
 
 ```
