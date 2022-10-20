@@ -129,11 +129,10 @@ When calling a contract function the host will only pass ```u64``` raw values. T
 
 The SDK can encode and decode this values.
 
-A 64-bit value encoding a bit-packed disjoint union between several different types (numbers, booleans, symbols, object handles, etc.)
 
 ```RawVals``` divide up the space of 64 bits according to a 2-level tagging scheme. The first tag is a bit in the least-significant position, indicating whether the `RawVal` is a plain "u63" 63-bit unsigned integer, or some more-structured value with a second-level tag in the next most significant 3 bits. The 63-bit unsigned integer case can also be thought of as handling the complete range of non-negative signed 64-bit integers.
 
-The remaining 3 bit tags are assigned to cases enumerated in [Tag], of which 7 are defined and one is currently reserved.
+The remaining 3 bit tags are assigned to cases, of which 7 are defined and one is currently reserved.
 
 Schematically, the bit-assignment for `RawVal` looks like this:
 
