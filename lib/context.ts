@@ -1,7 +1,7 @@
 
 import { Bytes } from "./bytes";
 import { RawVal, BytesObject, Unsigned64BitIntObject, Signed64BitIntObject,
-     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusVal, contractError, ObjectVal, statusType, fromSymbolStr } from "./value";
+     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusVal, contractError, ObjectVal, fromSymbolStr } from "./value";
 import { Vec } from "./vec";
 
 

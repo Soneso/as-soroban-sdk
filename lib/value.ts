@@ -267,11 +267,11 @@ export function isFalse(val: RawVal): bool {
  * @param val the host value to extract the boolean from
  * @returns true if the host value represents the static value of true. otherwise returns false (e.g. for false, void, ledgerkey...)
  */
-export function toBool(v: RawVal): bool {
-  if(!isBool(v)) {
+export function toBool(val: RawVal): bool {
+  if(!isBool(val)) {
     context.fail();
   }
-  return getBody(v) == staticTrueBody;
+  return getBody(val) == staticTrueBody;
 }
 
 /**

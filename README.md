@@ -34,20 +34,20 @@ You can now write your contract in the ```./assembly/index.ts``` file.
 E.g.
 
 ```typescript
-import * as val from 'as-soroban-sdk/lib/value';
+import {SymbolVal, VectorObject, fromSymbolStr} from 'as-soroban-sdk/lib/value';
 import {Vec} from 'as-soroban-sdk/lib/vec';
 
-export function hello(to: val.SymbolVal): val.VectorObject {
+export function hello(to: SymbolVal): VectorObject {
 
   let vec = new Vec();
-  vec.pushFront(val.fromSymbolStr("Hello"));
+  vec.pushFront(fromSymbolStr("Hello"));
   vec.pushBack(to);
   
   return vec.getHostObject();
 }
 ```
 
-Next you need to add a contract.json file to the project. It must contain the metadata for your contract.
+Next you need to add a ```contract.json``` file to the project. It must contain the metadata for your contract.
 
 E.g.
 
@@ -106,11 +106,264 @@ $ cargo install --locked soroban-cli
 Now you can run your contract:
 
 ```shell
-$ soroban invoke --wasm build/release.wasm --id 6 --fn hello --arg friend
+$ soroban invoke --wasm build/release.wasm --id 1 --fn hello --arg friend
 ```
 
 ## Examples
-You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-soroban-examples) repository.
+You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-soroban-examples) repository:
+
+The [add example](https://github.com/Soneso/as-soroban-examples/tree/main/add) demonstrates how to write a simple contract, with a single function that takes two i32 inputs and returns their sum as an output.
+
+The [hello word example](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word) demonstrates how to write a simple contract, with a single function that takes one input and returns it as an output.
+
+The [increment exammple](https://github.com/Soneso/as-soroban-examples/tree/main/increment) demonstrates how to write a simple contract that stores data, with a single function that increments an internal counter and returns the value.
+
+The [logging exammple](https://github.com/Soneso/as-soroban-examples/tree/main/logging) demonstrates how to log for the purpose of debugging.
+
+The [cross contract call exammple](https://github.com/Soneso/as-soroban-examples/tree/main/cross_contract) demonstrates how to call a contract from another contract.
+
+The [errors exammple](https://github.com/Soneso/as-soroban-examples/tree/main/errors) demonstrates how to define and generate errors in a contract that invokers of the contract can understand and handle.
+
+The [events exammple](https://github.com/Soneso/as-soroban-examples/tree/main/contract_events) demonstrates how to publish events from a contract.
+
+
+## Features and limitations
+
+In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official Soroban documentation, one can find the requirements for a soroban sdk.
+
+This SDK can help you with:
+- Value Conversions
+- Host functions
+- SDK Types
+- User Defined Errors
+- Meta Generation
+- Contract Spec Generation
+
+This SDK currently does not support:
+- User Defined Types
+- Testing
+
+Testing must be currently done with the soroban-cli. As a helping feature one can use logging to generate outputs during the execution of the contract in the sandbox (soroban-cli).
+
+### Value Conversions
+
+When calling a contract function the host will only pass ```u64``` raw values. The raw values can encode different types of values (e.g. ```i32```, ```u32```, ```symbol```, ```bitset```, etc.) or ```object handles```. Please read more details about them in [CAP-46](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md#host-value-type).
+
+The SDK can be used to encode and decode this values.
+
+A 64-bit value encoding a bit-packed disjoint union between several different types (numbers, booleans, symbols, object handles, etc.)
+
+```RawVals``` divide up the space of 64 bits according to a 2-level tagging scheme. The first tag is a bit in the least-significant position, indicating whether the `RawVal` is a plain "u63" 63-bit unsigned integer, or some more-structured value with a second-level tag in the next most significant 3 bits. The 63-bit unsigned integer case can also be thought of as handling the complete range of non-negative signed 64-bit integers.
+
+The remaining 3 bit tags are assigned to cases enumerated in [Tag], of which 7 are defined and one is currently reserved.
+
+Schematically, the bit-assignment for `RawVal` looks like this:
+
+```text
+0x_NNNN_NNNN_NNNN_NNNX  - u63, for any even X
+0x_0000_000N_NNNN_NNN1  - u32
+0x_0000_000N_NNNN_NNN3  - i32
+0x_NNNN_NNNN_NNNN_NNN5  - static: void, true, false, ...
+0x_IIII_IIII_TTTT_TTT7  - object: 32-bit index I, 28-bit type code T
+0x_NNNN_NNNN_NNNN_NNN9  - symbol: up to 10 6-bit identifier characters
+0x_NNNN_NNNN_NNNN_NNNb  - bitset: up to 60 bits
+0x_CCCC_CCCC_TTTT_TTTd  - status: 32-bit code C, 28-bit type code T
+0x_NNNN_NNNN_NNNN_NNNf  - reserved
+```
+
+The SDK can convert this values back and forth. For example converting primitives like i32:
+
+```typescript
+import * as val from "as-soroban-sdk/lib/value";
+
+// primitives
+let xi32 = val.toI32(rawValue);
+let xRaw = val.fromI32(xi32); 
+
+// static values
+let isTrue = val.fromBool(rawVal);
+let rawStaticBool = val.toBool(isTrue);
+
+// objects
+let isObject = val.isObject(rawVal);
+
+if (isObject && val.getObjectType(rawVal) == val.objTypeVec) {
+    let myVec = new Vec(rawVal);
+    myVec.pushFront(val.fromSymbolStr("Hello"));
+    let rawVecObj = myVec.getHostObject();
+}
+
+// symbols
+let myRawSymbol = val.fromSymbolStr("Hello");
+
+// status
+if (val.getStatusType(rawVal) == val.statusOk) {
+    ...
+}
+// etc.
+```
+
+### Host functions
+
+The host functions defined in [env.rs](https://github.com/stellar/rs-soroban-env/blob/main/soroban-env-common/src/env.rs) are functions callable from within the WASM Guest environment. The SDK makes them available to contracts to call in a wrapped form so that contracts have a nicer interface.
+
+For example:
+
+```typescript
+function callContractById(id: string, func: string, args: VectorObject): RawVal 
+```
+or 
+
+```typescript
+function putDataFor(symbolKey: string, value: RawVal) : void
+```
+
+### SDK Types
+
+Following types are supported: `Map`, `Vec`, `Bytes`, `BigInt`.
+
+For example work with a vector:
+
+``` typescript
+let vec = new Vec();
+
+vec.pushFront(fromSymbolStr("Hello"));
+vec.pushBack(fromSymbolStr("friend"));
+
+return vec.getHostObject();
+```
+
+or a map:
+``` typescript
+let myMap = new Map();
+
+myMap.put(fromU32(1), fromSymbolStr("Hello"));
+myMap.put(fromU32(2), fromSymbolStr("friend"));
+myMap.put(vec.getHostObject(), fromTrue());
+
+return myMap.getHostObject();
+```
+
+### User Defined Errors
+
+Errors are u32 values that are translated into a Status.
+
+This SDK helps you to create and parse such errors. For example:
+
+```typescript
+context.failWithErrorCode(AGE_ERR_CODES.TOO_YOUNG);
+```
+
+or 
+```typescript
+if(isStatus(rawVal) && getStatusType(rawVal) == statusStorageErr) {
+    return fromU32(getStatusCode(rawVal))
+}
+```
+
+See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
+
+### Meta generation
+
+Contracts must contain a WASM custom section with name ```contractenvmetav0``` and containing a serialized ```SCEnvMetaEntry```. The interface version stored within should match the version of the host functions supported.
+
+The SDK simplifies this by providing the possibility to enter the interface version number in the ```contract.json``` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
+
+
+### Contract spec generation
+
+Contracts should contain a WASM custom section with name ```contractspecv0``` and containing a serialized stream of ```SCSpecEntry```. There should be a SCSpecEntry for every function, struct, and union exported by the contract.
+
+The SDK simplifies this by providing the possibility to enter the function specs in the ```contract.json``` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
+
+
+### User Defined Types
+
+User defined types are currently only partially supported by this SDK. Currently it support only simple enums.
+
+For example:
+
+```typescript
+enum ALLOWED_AGE_RANGE {
+  MIN = 18,
+  MAX = 99
+}
+enum AGE_ERR_CODES {
+  TOO_YOUNG = 1,
+  TOO_OLD = 2
+}
+
+export function checkAge(age: RawVal): RawVal {
+
+  let age2check = toI32(age);
+
+  if (age2check < ALLOWED_AGE_RANGE.MIN) {
+    failWithErrorCode(AGE_ERR_CODES.TOO_YOUNG);
+  }
+
+  if (age2check > ALLOWED_AGE_RANGE.MAX) {
+    failWithErrorCode(AGE_ERR_CODES.TOO_OLD);
+  }
+
+  return fromSymbolStr("OK");
+}
+```
+
+## Testing
+
+Testing is currently not supported but can be done manually to some extent using logging and events.
+
+## Logging
+
+You can log for purpose of debugging. Logs are only visible in tests, or when executing contracts using soroban-cli. Do not use logs elsewhere.
+
+### Log an utf8 string
+
+```typescript
+import * as context from 'as-soroban-sdk/lib/context';
+
+context.logStr("Today is a sunny day!");
+```
+
+### Log a formatted utf8 string message
+
+```typescript
+import * as context from 'as-soroban-sdk/lib/context';
+
+let args = new Vec();
+args.pushBack(val.fromI32(30));
+args.pushBack(val.fromSymbolStr("celsius"));
+context.logFtm("We have {} degrees {}!", args);
+
+```
+
+See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
+
+## Publishing events
+
+This sdk makes it easy to publish events from a contract. This can also be very useful for testing.
+
+```typescript
+context.publishSimpleEvent("STATUS", val.fromU32(1));
+```
+or
+```typescript
+let topicsVec = new Vec();
+
+topicsVec.pushBack(val.fromSymbolStr("TOPIC1"));
+topicsVec.pushBack(val.fromSymbolStr("TOPIC2"));
+topicsVec.pushBack(val.fromSymbolStr("TOPIC3"));
+
+let dataVec = new Vec();
+dataVec.pushBack(val.fromU32(223));
+dataVec.pushBack(val.fromU32(222));
+dataVec.pushBack(val.fromU32(221));
+
+context.publishEvent(topicsVec, dataVec.getHostObject());
+```
+
+See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
+
 
 ## Understanding contract metadata
 
@@ -173,45 +426,3 @@ Supported return value types are the same as the supported argument types. If yo
 
 See also [Meta Generation](https://soroban.stellar.org/docs/SDKs/byo#meta-generation) and [Contract Spec Generation](https://soroban.stellar.org/docs/SDKs/byo#contract-spec-generation)
 
-
-## Features and limitations
-
-In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official Soroban documentation, one can find the requirements for a soroban sdk.
-
-This SDK can help you with:
-- Value Conversions
-- Host functions
-- SDK Types
-- User Defined Errors
-- Meta Generation
-- Contract Spec Generation
-
-This SDK currently doese not support:
-- User Defined Types
-- Testing
-
-Testing must be currently done with the soroban-cli. As a helping feature one can use logging to generate outputs during the execution of the contract in the sandbox (soroban-cli).
-
-## Logging
-
-You can log for purpose of debugging. Logs are only visible in tests, or when executing contracts using soroban-cli. Do not use logs elsewhere.
-
-### Log an utf8 string
-
-```typescript
-import * as context from 'as-soroban-sdk/lib/context';
-
-context.logStr("Today is a sunny day!");
-```
-
-### Log a formatted utf8 string message
-
-```typescript
-import * as context from 'as-soroban-sdk/lib/context';
-
-let args = new Vec();
-args.pushBack(val.fromI32(30));
-args.pushBack(val.fromSymbolStr("celsius"));
-context.logFtm("We have {} degrees {}!", args);
-
-```
