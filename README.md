@@ -2,7 +2,7 @@
 
 ![v0.0.4](https://img.shields.io/badge/v0.0.4-yellow.svg)
 
-This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org).
+This AS SDK is for writing contracts for [Soroban](https://soroban.stellar.org).
 
 **This repository contains code that is in very early development, incomplete, not tested, and not recommended for use. The API is unstable, experimental, and is receiving breaking changes frequently.**
 
@@ -29,9 +29,7 @@ $ npm install as-soroban-sdk
 ```
 
 ### 3. Write your contract
-You can now write your contract in the ```./assembly/index.ts``` file.
-
-E.g.
+You can now write your contract in the ```./assembly/index.ts``` file. For example:
 
 ```typescript
 import {SymbolVal, VectorObject, fromSymbolStr} from 'as-soroban-sdk/lib/value';
@@ -49,8 +47,6 @@ export function hello(to: SymbolVal): VectorObject {
 
 Next you need to add a ```contract.json``` file to the project. It must contain the metadata for your contract.
 
-E.g.
-
 ```json
 {
     "name": "hello word",
@@ -67,7 +63,7 @@ E.g.
 }
 ```
 
-Next, edit the asconfig.json file of your project. Replace its content with following:
+Finally, edit the asconfig.json file of your project. Replace it's content with the following:
 
 ```json
 {
@@ -93,7 +89,7 @@ Now you should be able to compile your contract:
 $ asc assembly/index.ts --target release
 ```
 
-You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` folder. You can also find the ```.wat``` file there (Text format of the .wasm).
+You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` folder. You can also find the ```.wat``` file there (Text format of the ```.wasm```).
 
 ### 5. Run your contract (sandbox)
 
@@ -109,27 +105,9 @@ Now you can run your contract:
 $ soroban invoke --wasm build/release.wasm --id 1 --fn hello --arg friend
 ```
 
-## Examples
-You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-soroban-examples) repository:
-
-The [add example](https://github.com/Soneso/as-soroban-examples/tree/main/add) demonstrates how to write a simple contract, with a single function that takes two i32 inputs and returns their sum as an output.
-
-The [hello word example](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word) demonstrates how to write a simple contract, with a single function that takes one input and returns it as an output.
-
-The [increment exammple](https://github.com/Soneso/as-soroban-examples/tree/main/increment) demonstrates how to write a simple contract that stores data, with a single function that increments an internal counter and returns the value.
-
-The [logging exammple](https://github.com/Soneso/as-soroban-examples/tree/main/logging) demonstrates how to log for the purpose of debugging.
-
-The [cross contract call exammple](https://github.com/Soneso/as-soroban-examples/tree/main/cross_contract) demonstrates how to call a contract from another contract.
-
-The [errors exammple](https://github.com/Soneso/as-soroban-examples/tree/main/errors) demonstrates how to define and generate errors in a contract that invokers of the contract can understand and handle.
-
-The [events exammple](https://github.com/Soneso/as-soroban-examples/tree/main/contract_events) demonstrates how to publish events from a contract.
-
-
 ## Features and limitations
 
-In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official Soroban documentation, one can find the requirements for a soroban sdk.
+In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official Soroban documentation, one can find the requirements for a Soroban SDK.
 
 This SDK can help you with:
 - Value Conversions
@@ -143,13 +121,13 @@ This SDK currently does not support:
 - User Defined Types
 - Testing
 
-Testing must be currently done with the soroban-cli. As a helping feature one can use logging to generate outputs during the execution of the contract in the sandbox (soroban-cli).
+As helping features for testing one can use logging to generate outputs during the execution of the contract in the sandbox (only sandbox - soroban-cli). The SDK also provided the possibility to publish events. 
 
 ### Value Conversions
 
 When calling a contract function the host will only pass ```u64``` raw values. The raw values can encode different types of values (e.g. ```i32```, ```u32```, ```symbol```, ```bitset```, etc.) or ```object handles```. Please read more details about them in [CAP-46](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md#host-value-type).
 
-The SDK can be used to encode and decode this values.
+The SDK can encode and decode this values.
 
 A 64-bit value encoding a bit-packed disjoint union between several different types (numbers, booleans, symbols, object handles, etc.)
 
@@ -220,7 +198,7 @@ function putDataFor(symbolKey: string, value: RawVal) : void
 
 ### SDK Types
 
-Following types are supported: `Map`, `Vec`, `Bytes`, `BigInt`.
+Following types are supported by this SDK: `Map`, `Vec`, `Bytes`, `BigInt`.
 
 For example work with a vector:
 
@@ -272,9 +250,9 @@ The SDK simplifies this by providing the possibility to enter the interface vers
 
 ### Contract spec generation
 
-Contracts should contain a WASM custom section with name ```contractspecv0``` and containing a serialized stream of ```SCSpecEntry```. There should be a SCSpecEntry for every function, struct, and union exported by the contract.
+Contracts should contain a WASM custom section with name ```contractspecv0``` and containing a serialized stream of ```SCSpecEntry```. There should be a ```SCSpecEntry``` for every function, struct, and union exported by the contract.
 
-The SDK simplifies this by providing the possibility to enter the function specs in the ```contract.json``` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
+The AS Soroban SDK simplifies this by providing the possibility to enter the functions spec in the ```contract.json``` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
 
 
 ### User Defined Types
@@ -315,7 +293,7 @@ Testing is currently not supported but can be done manually to some extent using
 
 ## Logging
 
-You can log for purpose of debugging. Logs are only visible in tests, or when executing contracts using soroban-cli. Do not use logs elsewhere.
+You can log for purpose of debugging. Logs are only visible when executing contracts using soroban-cli. Do not use logs elsewhere.
 
 ### Log an utf8 string
 
@@ -341,7 +319,7 @@ See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
 
 ## Publishing events
 
-This sdk makes it easy to publish events from a contract. This can also be very useful for testing.
+This SDK makes it easy to publish events from a contract. This can also be very useful for testing.
 
 ```typescript
 context.publishSimpleEvent("STATUS", val.fromU32(1));
@@ -369,7 +347,7 @@ See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
 
 To be able to run a contract, the compiled ```.wasm``` file needs to contain the web assembly module metadata and contract spec.
 
-They need to be attached to the module by the compiler. Therefore we need the ```contract.json``` file.
+They need to be attached to the ```.wasm``` module. Therefore we need the ```contract.json``` file.
 
 The SDK parses the ```contract.json``` file when compiling the contract and converts it to the needed data structures to be added to the ```.wasm``` module. This is done by using an AssemblyScript transform (see: [transforms.mjs](https://github.com/Soneso/as-soroban-sdk/blob/main/transforms.mjs)). 
 
@@ -393,7 +371,7 @@ Example:
 }
 ```
 
-To find out the needed ```host_functions_version``` you can execute the ```soroban version``` command of the soroban cli. The interface version stored within should match the version of the host functions supported.
+To find out the needed ```host_functions_version``` you can execute the ```soroban version``` command of the soroban-cli. The interface version stored within should match the version of the host functions supported.
 
 ``` shell
 $ soroban version
@@ -422,7 +400,24 @@ You must define the name, the arguments and the return value of the function, so
 
 Supported argument types are currently: ```val``` (any type of host value), ```u32```, ```i32```, ```u64```, ```i64```, ```bool```, ```symbol```, ```bitset```, ```status```, ```bytes```, ```bigint``` and ```invoker```. If your function has no arguments, you can pass an empty array.
 
-Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static value. You can obtain it by using ```value.fromVoid()```. For this case you can also set ```"returns" : "val"``` in the contract.json.
+Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static raw value. You can obtain it by using ```val.fromVoid()```. For this case you can also set ```"returns" : "val"``` in the contract.json.
 
 See also [Meta Generation](https://soroban.stellar.org/docs/SDKs/byo#meta-generation) and [Contract Spec Generation](https://soroban.stellar.org/docs/SDKs/byo#contract-spec-generation)
 
+
+## Examples
+You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-soroban-examples) repository:
+
+The [add example](https://github.com/Soneso/as-soroban-examples/tree/main/add) demonstrates how to write a simple contract, with a single function that takes two i32 inputs and returns their sum as an output.
+
+The [hello word example](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word) demonstrates how to write a simple contract, with a single function that takes one input and returns it as an output.
+
+The [increment example](https://github.com/Soneso/as-soroban-examples/tree/main/increment) demonstrates how to write a simple contract that stores data, with a single function that increments an internal counter and returns the value.
+
+The [logging example](https://github.com/Soneso/as-soroban-examples/tree/main/logging) demonstrates how to log for the purpose of debugging.
+
+The [cross contract call example](https://github.com/Soneso/as-soroban-examples/tree/main/cross_contract) demonstrates how to call a contract from another contract.
+
+The [errors example](https://github.com/Soneso/as-soroban-examples/tree/main/errors) demonstrates how to define and generate errors in a contract that invokers of the contract can understand and handle.
+
+The [events example](https://github.com/Soneso/as-soroban-examples/tree/main/contract_events) demonstrates how to publish events from a contract.
