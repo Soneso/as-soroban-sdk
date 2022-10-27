@@ -45,6 +45,11 @@
             "name" : "eventTest",
             "arguments": [],
             "returns" : "val"
+        },
+        {
+            "name" : "auth",
+            "arguments": [],
+            "returns" : "val"
         }
     ]
 }

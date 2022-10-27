@@ -35,6 +35,24 @@ export function logValue(value: RawVal): void {
 }
 
 /**
+ * Returns whether the contract invocation is from an account or another contract.
+ * @returns 0 for account, 1 for contract.
+ */
+ export function getInvokerType(): u64 {
+    return get_invoker_type();
+}
+
+/**
+ * Returns the accountID `Object` of the account which invoked the
+ * running contract. Traps if the running contract was not
+ * invoked by an account.
+ * @returns the invoking accountID as AccountIDObject
+ */
+export function getInvokingAccount(): AccountIDObject {
+    return get_invoking_account();
+}
+
+/**
  * Returns the contractID `Bytes` of the contract which invoked the
  * running contract. Traps if the running contract was not
  * invoked by a contract.
@@ -116,14 +134,6 @@ export function fail() : void {
  */
 export function failWithErrorCode(errCode: u32) : void {
     fail_with_status(contractError(errCode));
-}
-
-/**
- * Returns whether the contract invocation is from an account or another contract.
- * @returns 0 for account, 1 for contract.
- */
-export function getInvokerType(): u64 {
-    return toU64(get_invoker_type());
 }
 
 /**
@@ -229,7 +239,7 @@ declare function host_log_fmt_values(fmt: BytesObject, args: VectorObject): RawV
 /// another contract. Returns 0 for account, 1 for contract.
 // @ts-ignore
 @external("x", "b")
-declare function get_invoker_type(): Unsigned64BitIntObject;
+declare function get_invoker_type(): u64;
 
 
 /// Get the AccountID object type of the account which invoked
@@ -237,4 +247,4 @@ declare function get_invoker_type(): Unsigned64BitIntObject;
 /// invoked by an account.
 // @ts-ignore
 @external("x", "c")
-export declare function get_invoking_account(): AccountIDObject;
+declare function get_invoking_account(): AccountIDObject;

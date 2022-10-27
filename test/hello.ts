@@ -113,3 +113,21 @@ export function eventTest(): val.RawVal {
   return val.fromVoid();
 
 }
+
+export function auth(): val.RawVal {
+
+  let key = context.getInvokerType() == 0 ? context.getInvokingAccount() : context.getInvokingContract();
+  var counter = 0;
+  if (ledger.hasData(key)) {
+    let dataObj = ledger.getData(key);
+    counter = val.toU32(dataObj);
+  }
+  counter += 1;
+  let counterObj = val.fromU32(counter);
+  ledger.putData(key, counterObj);
+
+  let vec = new Vec();
+  vec.pushFront(key);
+  vec.pushBack(counterObj);
+  return vec.getHostObject();
+}
