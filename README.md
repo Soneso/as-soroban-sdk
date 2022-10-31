@@ -284,7 +284,9 @@ export function checkAge(age: RawVal): RawVal {
 
 ## Testing
 
-Testing is currently **not supported** but can be done manually to some extent using **logging** and **events**.
+Testing can be done to some extent by using **logging**, **events** and the **soroban-cli**.
+
+See the [testing example](https://github.com/Soneso/as-soroban-examples/tree/main/testing) that demonstrates a simple way to test a contract.
 
 ## Logging
 
@@ -413,3 +415,4 @@ You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-
 | [auth example](https://github.com/Soneso/as-soroban-examples/tree/main/auth)| Demonstrates how to tell who has invoked a contract, and verify that a contract has been invoked by an account or contract.|
 | [errors example](https://github.com/Soneso/as-soroban-examples/tree/main/errors)| Demonstrates how to define and generate errors in a contract that invokers of the contract can understand and handle.|
 | [events example](https://github.com/Soneso/as-soroban-examples/tree/main/contract_events)| Demonstrates how to publish events from a contract.|
+| [testing example](https://github.com/Soneso/as-soroban-examples/tree/main/testing)| Shows a simple way to test your contract.|
