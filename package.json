@@ -5,9 +5,9 @@
   "main": "index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "asbuild:debug": "asc test/hello.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target debug --transform ./transforms.mjs",
-    "asbuild:release": "asc test/hello.ts --runtime=stub --exportStart=sdkstart -Osize -Ospeed --converge --target release --transform ./transforms.mjs",
-    "asbuild": "npm run asbuild:debug && npm run asbuild:release"
+    "asbuild:valtest": "asc ./test/value-conversion/tests.ts --runtime=stub --exportStart=sdkstart -Osize --converge --target release --outFile ./test/value-conversion/build/release.wasm --textFile ./test/value-conversion/build/release.wat --transform ./test/value-conversion/transform.mjs",
+    "asbuild:examplestest": "asc ./test/examples/tests.ts --runtime=stub --exportStart=sdkstart -Osize --converge --target release --outFile ./test/examples/build/release.wasm --textFile ./test/examples/build/release.wat --transform ./test/examples/transform.mjs",
+    "asbuild:tests": "npm run asbuild:valtest && npm run asbuild:examplestest"
   },
   "author": "Christian Rogobete",
   "license": "Apache-2.0",

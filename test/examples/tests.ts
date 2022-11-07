@@ -1,8 +1,8 @@
-import * as val from "../lib/value";
-import * as ledger from "../lib/ledger";
-import { Vec } from "../lib/vec";
-import * as context from '../lib/context';
-import * as contract from "../lib/contract";
+import * as val from "../../lib/value";
+import * as ledger from "../../lib/ledger";
+import { Vec } from "../../lib/vec";
+import * as context from '../../lib/context';
+import * as contract from "../../lib/contract";
 
 export function hello(to: val.SymbolVal): val.VectorObject {
 
@@ -45,17 +45,7 @@ export function logging(): val.RawVal {
   args.pushBack(val.fromSymbolStr("celsius"));
   context.logFtm("We have {} degrees {}!", args);
 
-  return val.fromVoid();
-
-}
-
-export function callctr(): val.RawVal {
-
-  let args = new Vec();
-  args.pushBack(val.fromI32(3));
-  args.pushBack(val.fromI32(12));
-
-  return contract.callContractById("11", "add", args.getHostObject());
+  return val.fromTrue();
 
 }
 
@@ -110,7 +100,17 @@ export function eventTest(): val.RawVal {
     context.publishSimpleEvent("STATUS", val.fromU32(3));
   }
 
-  return val.fromVoid();
+  return val.fromTrue();
+
+}
+
+export function callctr(): val.RawVal {
+
+  let args = new Vec();
+  args.pushBack(val.fromI32(2));
+  args.pushBack(val.fromI32(40));
+
+  return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "add", args.getHostObject());
 
 }
 
@@ -130,4 +130,11 @@ export function auth(): val.RawVal {
   vec.pushFront(key);
   vec.pushBack(counterObj);
   return vec.getHostObject();
+}
+
+export function callctr2(): val.RawVal {
+
+  let args = new Vec();
+  return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "auth", args.getHostObject());
+
 }

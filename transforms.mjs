@@ -1,17 +1,26 @@
-import * as assemblyscript from "assemblyscript";
 import { Transform } from "assemblyscript/transform";
 import xdr from './xdr.js';
 import * as fs from 'fs'
 
 const META_NAME = "contractenvmetav0";
 const SPEC_NAME = "contractspecv0";
+const CONTRACT_JSON = "./contract.json";
 
-class SdkTransform extends Transform {
-  
+export class SdkTransform extends Transform {
+
+  getContractJson() {
+    return CONTRACT_JSON;
+  }
+
   afterCompile(asModule) { 
     //this.log(asModule);
     
-    const contractDataFile = fs.readFileSync("./contract.json");
+    if (!fs.existsSync(this.getContractJson())) {
+      console.log(this.getContractJson() + " not found");
+      return;
+    }
+
+    const contractDataFile = fs.readFileSync(this.getContractJson());
     const contractData = JSON.parse(contractDataFile);
 
     console.log('generate metadata for contract: ');

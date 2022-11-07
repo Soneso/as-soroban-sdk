@@ -362,7 +362,7 @@ export function getObjectHandle(val: ObjectVal): u32 {
   if(!isObject(val)){
     context.fail();
   }
-  return getBody(val) as u32;
+  return (getBody(val) >> 8) as u32;
 }
 
 /**
@@ -372,7 +372,7 @@ export function getObjectHandle(val: ObjectVal): u32 {
  * @returns the host value created.
  */
 export function fromObject(objType: objectType, handle: u32): ObjectVal {
-  return addTagToBody(rawValTagObject, (handle << 8) | objType);
+  return addTagToBody(rawValTagObject, ((handle as u64) << 8) | objType);
 }
 
 /**
@@ -470,7 +470,7 @@ export function toI64(val: Signed64BitIntObject) : i64 {
  * @returns true if the host value represents a bigint object. otherwise flase.
  */
  export function isBigInt(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeContractCode;
+  return isObject(val) && getObjectType(val) == objTypeBigInt;
 }
 
 /**
@@ -489,6 +489,18 @@ export function toI64(val: Signed64BitIntObject) : i64 {
  */
 export function contractError(errCode: u32) : StatusVal {
     return fromMajorMinorAndTag(errCode, statusContractErr, rawValTagStatus);
+}
+
+/**
+ * Checks if the given value is of type status and represents status ok.
+ * @param value the StatusVal to check
+ * @returns true if status ok, otherwise false
+ */
+export function isStatusOK(value: StatusVal) : bool {
+  if (!isStatus(value) || getStatusType(value) != statusOk) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -532,6 +544,15 @@ export function getStatusCode(status: StatusVal) : u32 {
     context.fail();
   }
   return getMajor(status);
+}
+
+/**
+ * Checks if the given host value represents a symbol value.
+ * @param val host value to check (Type: RawVal)
+ * @returns true if the host value represents a symbol value. otherwise false. 
+ */
+ export function isSymbol(val: RawVal): bool {
+  return hasTag(val, rawValTagSymbol);
 }
 
 /**
@@ -665,7 +686,7 @@ function getMinor(val:RawVal) : u32 {
 }
 
 function getMajor(val:RawVal) : u32 {
-  return (getBody(val) >> MINOR_MASK) as u32;
+  return (getBody(val) >> MINOR_BITS) as u32;
 }
 
 
@@ -767,9 +788,9 @@ declare function obj_to_u64(ojb:Unsigned64BitIntObject): u64;
 /// Convert an i64 to an object containing an i64.
 // @ts-ignore
 @external("i", "_")
-declare function obj_from_i64(v:i64): ObjectVal;
+declare function obj_from_i64(v:i64): Signed64BitIntObject;
 
 /// Convert an object containing an i64 to an i64.
 // @ts-ignore
 @external("i", "0")
-declare function obj_to_i64(ojb:ObjectVal): i64;
+declare function obj_to_i64(ojb:Signed64BitIntObject): i64;

@@ -3,14 +3,14 @@
     "debug": {
       "outFile": "build/debug.wasm",
       "textFile": "build/debug.wat",
-      "optimize": ["size", "speed"],
+      "optimize": ["size"],
       "converge": true,
       "debug": true
     },
     "release": {
       "outFile": "build/release.wasm",
       "textFile": "build/release.wat",
-      "optimize": ["size", "speed"],
+      "optimize": ["size"],
       "converge": true
     }
   },

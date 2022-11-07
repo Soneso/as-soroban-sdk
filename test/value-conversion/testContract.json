@@ -1,0 +1,38 @@
+{
+    "name": "val-test",
+    "version": "0.0.1",
+    "description": "eee",
+    "host_functions_version": 23,
+    "functions": [
+        {
+            "name" : "testI32",
+            "arguments": [],
+            "returns" : "val"
+        },
+        {
+            "name" : "testU32",
+            "arguments": [],
+            "returns" : "val"
+        },
+        {
+            "name" : "testStatic",
+            "arguments": [],
+            "returns" : "val"
+        },
+        {
+            "name" : "testObject",
+            "arguments": [],
+            "returns" : "val"
+        },
+        {
+            "name" : "testStatus",
+            "arguments": [],
+            "returns" : "val"
+        },
+        {
+            "name" : "testSymbol",
+            "arguments": [],
+            "returns" : "val"
+        }
+    ]
+}

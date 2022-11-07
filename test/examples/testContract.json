@@ -1,7 +1,7 @@
 {
-    "name": "as-soroban-sdk",
+    "name": "examples",
     "version": "0.0.1",
-    "description": "eee",
+    "description": "test examples",
     "host_functions_version": 23,
     "functions": [
         {
@@ -48,6 +48,11 @@
         },
         {
             "name" : "auth",
+            "arguments": [],
+            "returns" : "val"
+        },
+        {
+            "name" : "callctr2",
             "arguments": [],
             "returns" : "val"
         }
