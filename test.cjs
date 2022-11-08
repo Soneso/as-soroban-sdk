@@ -163,10 +163,10 @@ async function testEventsExample() {
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
-    let res = '#0: event: {"ext":"v0","contractId":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],"type":"contract","body":{"v0":{"topics":[{"symbol":[84,69,83,84]},{"symbol":[84,72,69]},{"symbol":[69,86,69,78,84,83]}],"data":{"object":{"vec":[{"u32":223},{"u32":222},{"u32":221}]}}}}}\n' +
-    '#1: event: {"ext":"v0","contractId":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],"type":"contract","body":{"v0":{"topics":[{"symbol":[83,84,65,84,85,83]}],"data":{"u32":1}}}}\n' +
-    '#2: event: {"ext":"v0","contractId":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],"type":"contract","body":{"v0":{"topics":[{"symbol":[83,84,65,84,85,83]}],"data":{"u32":2}}}}\n' +
-    '#3: event: {"ext":"v0","contractId":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],"type":"contract","body":{"v0":{"topics":[{"symbol":[83,84,65,84,85,83]}],"data":{"u32":3}}}}';
+    let res = '#0: event: {"ext":"v0","contractId":"0000000000000000000000000000000000000000000000000000000000000002","type":"contract","body":{"v0":{"topics":[{"symbol":"TEST"},{"symbol":"THE"},{"symbol":"EVENTS"}],"data":{"object":{"vec":[{"u32":223},{"u32":222},{"u32":221}]}}}}}\n' +
+    '#1: event: {"ext":"v0","contractId":"0000000000000000000000000000000000000000000000000000000000000002","type":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":1}}}}\n' +
+    '#2: event: {"ext":"v0","contractId":"0000000000000000000000000000000000000000000000000000000000000002","type":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":2}}}}\n' +
+    '#3: event: {"ext":"v0","contractId":"0000000000000000000000000000000000000000000000000000000000000002","type":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":3}}}}';
     assert.equal(stderr.trim(), res);
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -224,7 +224,8 @@ async function testCheckAgeExampleP2() {
     '\n' +
     'Debug events (newest first):\n' +
     '   0: "VM trapped with host error"\n' +
-    '   1: "failing with contract error status code"\n' +
+    `   1: "escalating error 'Status(ContractError(1))' to VM trap"\n` +
+    `   2: "failing with contract error status code 'Status(ContractError(1))'"\n` +
     '\n' +
     'Backtrace (newest first):\n' +
     '   0: backtrace::capture::Backtrace::new_unresolved\n' +
@@ -241,8 +242,7 @@ async function testCheckAgeExampleP2() {
     '  11: std::thread::local::LocalKey<T>::with\n' +
     '  12: tokio::park::thread::CachedParkThread::block_on\n' +
     '  13: tokio::runtime::scheduler::multi_thread::MultiThread::block_on\n' +
-    '  14: tokio::runtime::Runtime::block_on\n' +
-    '  15: soroban::main'
+    '  14: soroban::main'
     assert.equal(stderr.trim(), res);
     console.log(`OK`);
 }

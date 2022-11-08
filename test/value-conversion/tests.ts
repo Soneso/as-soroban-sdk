@@ -99,7 +99,7 @@ export function testObject(): val.RawVal {
     return val.fromFalse();
   }
 
-  // TODO AccountID
+  // TODO Public Key
 
   return val.fromTrue();
 }

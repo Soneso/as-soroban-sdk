@@ -16,7 +16,8 @@ export type StatusVal = RawVal;
 export type Unsigned64BitIntObject = ObjectVal;
 export type Signed64BitIntObject = ObjectVal;
 export type BigIntObject = ObjectVal;
-export type AccountIDObject = ObjectVal;
+export type HashObject = ObjectVal;
+export type PublicKeyObject = ObjectVal;
 
 type rawValTag = u8;
 
@@ -102,8 +103,8 @@ export const objTypeU64: objectType = 2;
 export const objTypeI64: objectType = 3;
 export const objTypeBytes: objectType = 4;
 export const objTypeBigInt: objectType = 5;
-export const objTypeContractCode: objectType = 6;
-export const objTypeAccountId: objectType = 7;
+export const objTypeHash: objectType = 6;
+export const objTypePublicKey: objectType = 7;
 
 
 /*******************
@@ -474,12 +475,12 @@ export function toI64(val: Signed64BitIntObject) : i64 {
 }
 
 /**
- * Checks if the given host value represents an account id object.
+ * Checks if the given host value represents a public key object.
  * @param val host value to check
- * @returns true if the host value represents a account id object. otherwise flase.
+ * @returns true if the host value represents a public key object. otherwise flase.
  */
- export function isAccountId(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeAccountId;
+ export function isPublicKey(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypePublicKey;
 }
 
 /**

@@ -1,7 +1,7 @@
 
 import { Bytes } from "./bytes";
 import { RawVal, BytesObject, Unsigned64BitIntObject, Signed64BitIntObject,
-     VectorObject, AccountIDObject, toU32, toU64, toI64, StatusVal, contractError, ObjectVal, fromSymbolStr } from "./value";
+     VectorObject, PublicKeyObject, toU32, toU64, toI64, StatusVal, contractError, ObjectVal, fromSymbolStr } from "./value";
 import { Vec } from "./vec";
 
 
@@ -43,12 +43,12 @@ export function logValue(value: RawVal): void {
 }
 
 /**
- * Returns the accountID `Object` of the account which invoked the
+ * Returns the public key `Object` of the account which invoked the
  * running contract. Traps if the running contract was not
  * invoked by an account.
- * @returns the invoking accountID as AccountIDObject
+ * @returns the invoking accountID as PublicKeyObject
  */
-export function getInvokingAccount(): AccountIDObject {
+export function getInvokingAccount(): PublicKeyObject {
     return get_invoking_account();
 }
 
@@ -242,9 +242,9 @@ declare function host_log_fmt_values(fmt: BytesObject, args: VectorObject): RawV
 declare function get_invoker_type(): u64;
 
 
-/// Get the AccountID object type of the account which invoked
+/// Get the PublicKey object of the account which invoked
 /// the running contract. Traps if the running contract was not
 /// invoked by an account.
 // @ts-ignore
 @external("x", "c")
-declare function get_invoking_account(): AccountIDObject;
+declare function get_invoking_account(): PublicKeyObject;
