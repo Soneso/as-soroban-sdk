@@ -13,6 +13,11 @@
             "name" : "vecs",
             "arguments": [],
             "returns" : "val"
+        },
+        {
+            "name" : "bytes",
+            "arguments": [],
+            "returns" : "val"
         }
     ]
 }

@@ -102,7 +102,6 @@ export class Bytes {
      * length `len`, into this `Bytes` object at offset `b_pos`. The `Bytes` object may
      * grow in size to accommodate the new bytes. 
      * Traps if the linear memory doesn't have enough bytes.
-     * Restruns the new Bytes object.
      * @param b_pos see description
      * @param lm_pos see description
      * @param len see description
@@ -126,7 +125,7 @@ export class Bytes {
      * Update the value at index `i` in the `Bytes` object. 
      * @param i the index to be updated
      * @param value the value to be updated (Type: RawVal)
-     * @returns void. Traps if the index is out of bound.
+     * @returns void. Traps if the index is out of bound. (e.g. if empty)
      */
     put(i:u32, value: RawVal) : void {
         this.obj = bytes_put(this.obj, fromU32(i), value);

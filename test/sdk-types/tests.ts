@@ -2,6 +2,7 @@ import * as val from "../../lib/value";
 import * as context from "../../lib/context";
 import { Map } from "../../lib/map";
 import { Vec } from "../../lib/vec";
+import { Bytes } from "../../lib/bytes";
 
 export function maps(): val.RawVal {
 
@@ -174,5 +175,82 @@ export function vecs(): val.RawVal {
     if(context.compare(vec2.getHostObject(), slice.getHostObject()) != 0) {
         return val.fromFalse();
     }
+    return val.fromTrue();
+}
+
+export function bytes(): val.RawVal {
+
+
+    let val1 = val.fromU32(12);
+    let sb = Bytes.serialize(val1);
+    let val2 = sb.deserialize();
+
+    if(val1 != val2) {
+        return val.fromFalse();
+    }
+
+
+    let c = Bytes.fromString("hello");
+    c.copyToLinearMemory(val.fromU32(0), val.fromU32(0), val.fromU32(5));
+    let d = Bytes.newFromLinearMemory(val.fromU32(0), val.fromU32(5));
+    if(context.compare(c.getHostObject(), d.getHostObject()) != 0) {
+        return val.fromFalse();
+    }
+    let e = new Bytes();
+    e.copyFromLinearMemory(val.fromU32(0), val.fromU32(0), val.fromU32(5));
+    if(context.compare(e.getHostObject(), d.getHostObject()) != 0) {
+        return val.fromFalse();
+    }
+
+    let b = new Bytes();
+    let t0 = val.fromU32(0);
+    let t1 = val.fromU32(1);
+    let t2 = val.fromU32(2);
+    let t3 = val.fromU32(3);
+    let t4 = val.fromU32(4);
+    let t5 = val.fromU32(5);
+    b.push(t0);
+    b.push(t1);
+    b.push(t2);
+    b.push(t3);
+    b.push(t4);
+    b.push(t5);
+    b.push(t2);
+
+    if(b.len() != 7) {
+        return val.fromFalse();
+    }
+    b.del(6);
+    b.pop();
+    if(b.len() != 5 || b.front() != t0 || b.back() != t4) {
+        return val.fromFalse();
+    }
+
+    b.insert(2, t5);
+    if(b.len() != 6 || b.get(2) != t5) {
+        return val.fromFalse();
+    }
+    b.del(2);
+
+    let b2 = new Bytes();
+    b2.push(t5);
+    b2.push(t2);
+
+    let b3 = b.append(b2);
+    if(b3.len() != 7 || b3.back() != t2) {
+        return val.fromFalse();
+    }
+
+    let b4 = b3.slice(0, 3);
+    let b5 = b.slice(0, 3);
+    if (context.compare(b4.getHostObject(), b5.getHostObject()) != 0) {
+        return val.fromFalse();
+    }
+
+    b4.put(1,t3);
+    if (b4.get(1) != t3) {
+        return val.fromFalse();
+    }
+
     return val.fromTrue();
 }
