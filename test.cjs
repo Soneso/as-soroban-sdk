@@ -304,6 +304,7 @@ async function testSdkTypes() {
     await testMaps();
     await testVectors();
     await testBytes();
+    await testBigInts();
     console.log(`test sdk types -> OK`);
 }
 
@@ -336,6 +337,19 @@ async function testVectors() {
 async function testBytes() {
     console.log(`test bytes ...`);
     const { error, stdout, stderr } = await exec(invokeSDKTypes + 'bytes');
+    if (error) {
+        assert.fail(`error: ${error.message}`);
+    }
+    if (stderr) {
+        assert.fail(`stderr: ${stderr}`);
+    }
+    assert.equal(stdout.trim(), "true");
+    console.log(`OK`);
+}
+
+async function testBigInts() {
+    console.log(`test big int ...`);
+    const { error, stdout, stderr } = await exec(invokeSDKTypes + 'bigInts');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }

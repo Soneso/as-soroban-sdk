@@ -315,8 +315,8 @@ export class BigInt {
     }
 
     /**
-     * Calculates the Greatest Common Divisor (GCD) of this BigInt and the value given by parameter. Returns the result as a new BigInt.
-     * @param value value to perform the gdc operation with this BigInt
+     * Calculates the Lowest Common Multiple (LCM) of this BigInt and the value given by parameter. Returns the result as a new BigInt.
+     * @param value value to perform the lcm operation with this BigInt
      * @returns the new BigInt as a result
      */
     lcm(value: BigInt): BigInt {

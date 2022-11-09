@@ -18,6 +18,11 @@
             "name" : "bytes",
             "arguments": [],
             "returns" : "val"
+        },
+        {
+            "name" : "bigInts",
+            "arguments": [],
+            "returns" : "val"
         }
     ]
 }
