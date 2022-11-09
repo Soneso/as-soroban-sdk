@@ -74,10 +74,10 @@ export function getCurrentContract(): BytesObject {
  * Compares to values as described here: https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md#comparison
  * @param val1 first value to compare
  * @param val2 second value to compare
- * @returns result? TBD (Type i64)
+ * @returns result  -1  if val1 < val2, 0  if val1 == val2, 1  if val1 > val2,
  */
 export function compare(val1: RawVal, val2: RawVal): i64 {
-    return toI64(obj_cmp(val1, val2));
+    return obj_cmp(val1, val2);
 }
 
 /**
@@ -178,7 +178,7 @@ declare function get_invoking_contract(): BytesObject;
 
 // @ts-ignore
 @external("x", "1")
-declare function obj_cmp(a: RawVal, b: RawVal): Signed64BitIntObject;
+declare function obj_cmp(a: RawVal, b: RawVal): i64;
 
 /// Records a contract event. `topics` is expected to be a `SCVec` with
 /// length <= 4 that CANNOT contain `Vec`, `Map`, or `Bytes` with length > 32

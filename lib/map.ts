@@ -17,7 +17,7 @@ export class Map {
     }
 
     /**
-     * Inserts a key/value mapping into the map
+     * Inserts a key/value mapping into the map (in front)
      * If the map already has a mapping for the given key, the previous value is overwritten.
      * @param key the key of the key/value mapping (type: RawVal)
      * @param value the value to put (type: RawVal)

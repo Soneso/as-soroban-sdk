@@ -1,8 +1,9 @@
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 var assert = require('assert');
-const invokeVC = 'soroban invoke --id 1 --wasm test/value-conversion/build/release.wasm --fn ';
-const invokeEX = 'soroban invoke --id 2 --wasm test/examples/build/release.wasm --fn ';
+const invokeValConversions = 'soroban invoke --id 1 --wasm test/value-conversion/build/release.wasm --fn ';
+const invokeExamples = 'soroban invoke --id 2 --wasm test/examples/build/release.wasm --fn ';
+const invokeSDKTypes = 'soroban invoke --id 3 --wasm test/sdk-types/build/release.wasm --fn ';
 
 async function startTest() {
 
@@ -12,6 +13,7 @@ async function startTest() {
     // execute the tests
     await testValueConversion();
     await testExamples();
+    await testSdkTypes();
 } 
 
 async function buildTests() {
@@ -39,7 +41,7 @@ async function testValueConversion() {
 
 async function testI32() {
     console.log(`test I32 ...`);
-    const { error, stdout, stderr } = await exec(invokeVC + 'testI32');
+    const { error, stdout, stderr } = await exec(invokeValConversions + 'testI32');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -52,7 +54,7 @@ async function testI32() {
 
 async function testU32() {
     console.log(`test U32 ...`);
-    const { error, stdout, stderr } = await exec(invokeVC + 'testU32');
+    const { error, stdout, stderr } = await exec(invokeValConversions + 'testU32');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -65,7 +67,7 @@ async function testU32() {
 
 async function testStatic() {
     console.log(`test Static ...`);
-    const { error, stdout, stderr } = await exec(invokeVC + 'testStatic');
+    const { error, stdout, stderr } = await exec(invokeValConversions + 'testStatic');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -78,7 +80,7 @@ async function testStatic() {
 
 async function testObject() {
     console.log(`test Object ...`);
-    const { error, stdout, stderr } = await exec(invokeVC + 'testObject');
+    const { error, stdout, stderr } = await exec(invokeValConversions + 'testObject');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -91,7 +93,7 @@ async function testObject() {
 
 async function testStatus() {
     console.log(`test Status ...`);
-    const { error, stdout, stderr } = await exec(invokeVC + 'testStatus');
+    const { error, stdout, stderr } = await exec(invokeValConversions + 'testStatus');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -104,7 +106,7 @@ async function testStatus() {
 
 async function testSymbol() {
     console.log(`test Symbol ...`);
-    const { error, stdout, stderr } = await exec(invokeVC + 'testSymbol');
+    const { error, stdout, stderr } = await exec(invokeValConversions + 'testSymbol');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -133,7 +135,7 @@ async function testExamples() {
 
 async function testAddExample() {
     console.log(`test add example ...`);
-    const { error, stdout, stderr } = await exec(invokeEX + 'add --arg 2 --arg 40');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'add --arg 2 --arg 40');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -146,7 +148,7 @@ async function testAddExample() {
 
 async function testHelloExample() {
     console.log(`test hello example ...`);
-    const { error, stdout, stderr } = await exec(invokeEX + 'hello --arg friend');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'hello --arg friend');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -159,7 +161,7 @@ async function testHelloExample() {
 
 async function testEventsExample() {
     console.log(`test events example ...`);
-    const { error, stdout, stderr } = await exec(invokeEX + 'eventTest');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'eventTest');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -174,7 +176,7 @@ async function testEventsExample() {
 
 async function testIncrementExample() {
     console.log(`test increment example ...`);
-    const { error, stdout, stderr } = await exec(invokeEX + 'increment');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'increment');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -188,7 +190,7 @@ async function testIncrementExample() {
 
 async function testLoggingExample() {
     console.log(`test logging example ...`);
-    const { error, stdout, stderr } = await exec(invokeEX + 'logging');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'logging');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -202,7 +204,7 @@ async function testLoggingExample() {
 
 async function testCheckAgeExampleP1() {
     console.log(`test check age example part 1...`);
-    const { error, stdout, stderr } = await exec(invokeEX + 'checkAge --arg 19');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'checkAge --arg 19');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -215,7 +217,7 @@ async function testCheckAgeExampleP1() {
 
 async function testCheckAgeExampleP2() {
     console.log(`test check age example part 2...`);
-    const { error, stdout, stderr } = await exec(invokeEX + 'checkAge --arg 10');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'checkAge --arg 10');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -260,7 +262,7 @@ async function deployExamplesTest() {
 
 async function testCallContractExample() {
     console.log(`test call contract example ...`);
-    const { error, stdout, stderr } = await exec(invokeEX + 'callctr');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'callctr');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -273,7 +275,7 @@ async function testCallContractExample() {
 
 async function testAuthExampleP1() {
     console.log(`test auth example part 1 ...`);
-    const { error, stdout, stderr } = await exec(invokeEX + 'auth --account GBX2MZM4HIUK4QQ4F37SIAAILKS2QAUSTYAM4IXMXTPND2L6TCV4FZAS');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'auth --account GBX2MZM4HIUK4QQ4F37SIAAILKS2QAUSTYAM4IXMXTPND2L6TCV4FZAS');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -286,7 +288,7 @@ async function testAuthExampleP1() {
 
 async function testAuthExampleP2() {
     console.log(`test auth example part 2 ...`);
-    const { error, stdout, stderr } = await exec(invokeEX + 'callctr2');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'callctr2');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -297,4 +299,36 @@ async function testAuthExampleP2() {
     console.log(`OK`);
 }
 
+async function testSdkTypes() {
+    console.log(`test sdk types ...`);
+    await testMaps();
+    await testVectors();
+    console.log(`test sdk types -> OK`);
+}
+
+async function testMaps() {
+    console.log(`test maps ...`);
+    const { error, stdout, stderr } = await exec(invokeSDKTypes + 'maps');
+    if (error) {
+        assert.fail(`error: ${error.message}`);
+    }
+    if (stderr) {
+        assert.fail(`stderr: ${stderr}`);
+    }
+    assert.equal(stdout.trim(), "true");
+    console.log(`OK`);
+}
+
+async function testVectors() {
+    console.log(`test vectors ...`);
+    const { error, stdout, stderr } = await exec(invokeSDKTypes + 'vecs');
+    if (error) {
+        assert.fail(`error: ${error.message}`);
+    }
+    if (stderr) {
+        assert.fail(`stderr: ${stderr}`);
+    }
+    assert.equal(stdout.trim(), "true");
+    console.log(`OK`);
+}
 startTest()

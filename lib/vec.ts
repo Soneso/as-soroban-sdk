@@ -26,7 +26,7 @@ export class Vec {
  
     /**
      * Inserts an element at index `i` within the vector, shifting all elements after it to the right.
-     * Traps if the index is out of bound.
+     * Traps if the index is out of bound. (e.g. if the vector is empty).
      * @param i the index to insert the element to
      * @param value the element to insert (Type:RawVal).
      * @returns void
