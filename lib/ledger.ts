@@ -97,26 +97,8 @@ declare function get_contract_data(k:RawVal): RawVal;
 @external("l", "2")
 declare function del_contract_data(k:RawVal): RawVal;
 
+/// Deploys a contract from the current contract. `wasm_hash` must be a hash of the contract code that has already 
+/// been installed on this network. `salt` is used to create a unique contract id.
 // @ts-ignore
 @external("l", "3")
-export declare function create_contract_from_ed25519(v:ObjectVal, salt:ObjectVal, key:ObjectVal, sig:ObjectVal): ObjectVal;
-
-// @ts-ignore
-@external("l", "4")
-export declare function create_contract_from_contract(v:ObjectVal, salt:ObjectVal): ObjectVal;
-
-// @ts-ignore
-@external("l", "5")
-export declare function create_token_from_ed25519(salt:ObjectVal, key:ObjectVal, sig:ObjectVal): ObjectVal;
-
-// @ts-ignore
-@external("l", "6")
-export declare function create_token_from_contract(salt:ObjectVal): ObjectVal;
-
-// @ts-ignore
-@external("l", "7")
-export declare function create_token_wrapper(asset:ObjectVal): ObjectVal;
-
-// @ts-ignore
-@external("l", "8")
-export declare function create_contract_from_source_account(v:ObjectVal, salt:ObjectVal): ObjectVal;
+export declare function create_contract_from_contract(wasm_hash:ObjectVal, salt:ObjectVal): ObjectVal;

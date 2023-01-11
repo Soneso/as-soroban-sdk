@@ -2,7 +2,7 @@
     "name": "sdk-types test",
     "version": "0.0.1",
     "description": "test sdk types",
-    "host_functions_version": 23,
+    "host_functions_version": 27,
     "functions": [
         {
             "name" : "maps",
@@ -16,11 +16,6 @@
         },
         {
             "name" : "bytes",
-            "arguments": [],
-            "returns" : "val"
-        },
-        {
-            "name" : "bigInts",
             "arguments": [],
             "returns" : "val"
         }

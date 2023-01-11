@@ -2,7 +2,6 @@ import * as val from "../../lib/value";
 import { Vec } from "../../lib/vec";
 import { Map } from "../../lib/map";
 import { Bytes } from "../../lib/bytes";
-import { BigInt } from "../../lib/bigint";
 
 export function testU32(): val.RawVal {
 
@@ -80,26 +79,25 @@ export function testObject(): val.RawVal {
     return val.fromFalse();
   }
 
+  const ULO128VAL = 18446744073709551610;
+  const UHI128VAL = 18446744073709551611;
+  let u128Object = val.fromU128Pieces(ULO128VAL, UHI128VAL);
+  if(!val.isObject(u128Object) || !val.isU128(u128Object) || val.toU128Low64(u128Object) != ULO128VAL || val.toU128High64(u128Object) != UHI128VAL || !val.hasObjectType(u128Object, val.objTypeU128)) {
+    return val.fromFalse();
+  }
+
+  const ILO128VAL = 18446744073709551610;
+  const IHI128VAL = 18446744073709551611;
+  let i128Object = val.fromI128Pieces(ILO128VAL, IHI128VAL);
+  if(!val.isObject(i128Object) || !val.isI128(i128Object) || val.toI128Low64(i128Object) != ILO128VAL || val.toI128High64(i128Object) != IHI128VAL || !val.hasObjectType(i128Object, val.objTypeI128)) {
+    return val.fromFalse();
+  }
+
   let bytes = Bytes.fromString("test");
   let bytesObject = bytes.getHostObject();
   if(!val.isObject(bytesObject) || !val.isBinary(bytesObject) || !val.hasObjectType(bytesObject, val.objTypeBytes)) {
     return val.fromFalse();
   }
-
-  let bigInt = BigInt.fromU64(12);
-  let bigIntObject = bigInt.getHostObject();
-  if(!val.isObject(bigIntObject) || !val.isBigInt(bigIntObject) || !val.hasObjectType(bigIntObject, val.objTypeBigInt) || val.getObjectType(bigIntObject) != val.objTypeBigInt) {
-    return val.fromFalse();
-  }
-  
-  let handle = val.getObjectHandle(bigIntObject);
-  let bigIntObject2 = val.fromObject(val.objTypeBigInt, handle);
-  let bigInt2 = new BigInt(bigIntObject2);
-  if (bigInt.toU64() != bigInt2.toU64()) {
-    return val.fromFalse();
-  }
-
-  // TODO Public Key
 
   return val.fromTrue();
 }

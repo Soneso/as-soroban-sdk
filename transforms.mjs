@@ -98,6 +98,12 @@ export class SdkTransform extends Transform {
       case "i64":
         typ = xdr.ScSpecTypeDef.scSpecTypeI64();
         break;
+      case "u128":
+        typ = xdr.ScSpecTypeDef.scSpecTypeU128();
+        break;
+      case "i128":
+        typ = xdr.ScSpecTypeDef.scSpecTypeI128();
+        break;
       case "bool":
         typ = xdr.ScSpecTypeDef.scSpecTypeBool();
         break;
@@ -113,11 +119,11 @@ export class SdkTransform extends Transform {
       case "bytes":
         typ = xdr.ScSpecTypeDef.scSpecTypeBytes();
         break;
-      case "bigint":
-        typ = xdr.ScSpecTypeDef.scSpecTypeBigInt();
-        break;
       case "invoker":
         typ = xdr.ScSpecTypeDef.scSpecTypeInvoker();
+        break;
+      case "accountId":
+        typ = xdr.ScSpecTypeDef.scSpecTypeAccountId();
         break;
       default:
         return false; // unsupported

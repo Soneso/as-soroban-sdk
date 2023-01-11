@@ -1,8 +1,8 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v0.0.6](https://img.shields.io/badge/v0.0.6-yellow.svg)
+![v0.0.7](https://img.shields.io/badge/v0.0.7-yellow.svg)
 
-This AS SDK is for writing contracts for [Soroban](https://soroban.stellar.org).
+This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
 **This repository contains code that is in very early development, incomplete, not tested, and not recommended for use. The API is unstable, experimental, and is receiving breaking changes frequently.**
 
@@ -10,7 +10,7 @@ This AS SDK is for writing contracts for [Soroban](https://soroban.stellar.org).
 
 ### 1. Setup a new project
 
-Set up a new AS project as described in the [AssemblyScript Book](https://www.assemblyscript.org/getting-started.html#setting-up-a-new-project)
+Set up a new AssemblyScript project as described in the [AssemblyScript Book](https://www.assemblyscript.org/getting-started.html#setting-up-a-new-project)
 
 ```shell
 $ mkdir hello
@@ -107,19 +107,16 @@ $ soroban invoke --wasm build/release.wasm --id 1 --fn hello --arg friend
 
 In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official [Soroban documentation](https://soroban.stellar.org), one can find the requirements for a Soroban SDK.
 
-This SDK **can** help you with:
+This assembly script Soroban SDK **can** help you with:
 - Value Conversions
 - Host functions
 - SDK Types
 - User Defined Errors
 - Meta Generation
 - Contract Spec Generation
-
-This SDK currently does **not** support:
-- User Defined Types
 - Testing
 
-As helping features for testing one can use **logging** to generate outputs during the execution of the contract in the sandbox (only sandbox - soroban-cli). The SDK also provided the possibility to **publish events**. 
+As helping features for testing one can use **logging** to generate outputs during the execution of the contract in the sandbox (only sandbox - soroban-cli). The assembly script Soroban SDK also provided the possibility to **publish events**. 
 
 ### Value Conversions
 
@@ -146,7 +143,7 @@ Schematically, the bit-assignment for `RawVal` looks like this:
 0x_NNNN_NNNN_NNNN_NNNf  - reserved
 ```
 
-The AS SDK can convert this values back and forth. For example converting primitives like i32:
+The AssemblyScript Soroban SDK can convert this values back and forth. For example converting primitives like i32:
 
 ```typescript
 import * as val from "as-soroban-sdk/lib/value";
@@ -240,7 +237,7 @@ See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
 
 Contracts must contain a WASM custom section with name ```contractenvmetav0``` and containing a serialized ```SCEnvMetaEntry```. The interface version stored within should match the version of the host functions supported.
 
-The AS Soroban SDK simplifies this by providing the possibility to enter the interface version number in the ```contract.json``` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
+The AssemblyScript Soroban SDK simplifies this by providing the possibility to enter the interface version number in the ```contract.json``` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
 
 
 ### Contract spec generation
@@ -316,7 +313,7 @@ See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
 
 ## Publishing events
 
-This SDK makes it easy to publish events from a contract. This can also be very useful for testing.
+This AssemblyScript Soroban SDK makes it easy to publish events from a contract. This can also be very useful for testing.
 
 ```typescript
 context.publishSimpleEvent("STATUS", val.fromU32(1));
@@ -348,7 +345,7 @@ They need to be attached to the ```.wasm``` module. Therefore we need the ```con
 
 The SDK parses the ```contract.json``` file when compiling the contract and converts it to the needed data structures to be added to the ```.wasm``` module. This is done by using an AssemblyScript transform (see: [transforms.mjs](https://github.com/Soneso/as-soroban-sdk/blob/main/transforms.mjs)). 
 
-Required fields are ```host_functions_version``` and the ```functions``` array in a ```contract.json``` file located in the root directory of your AS project.
+Required fields are ```host_functions_version``` and the ```functions``` array in a ```contract.json``` file located in the root directory of your assembly script project.
 
 Example:
 
@@ -357,7 +354,7 @@ Example:
     "name": "hello word",
     "version": "0.0.1",
     "description": "my first contract",
-    "host_functions_version": 23,
+    "host_functions_version": 27,
     "functions": [
         {
             "name" : "hello",
@@ -376,8 +373,7 @@ $ soroban version
 output at the time of writing:
 
 ``` shell
-soroban-cli 0.1.2 (1b5786d5f4b895e7ed70315efcb987d38426539c)
-soroban-env-interface-version: 23
+soroban-env interface version 27
 ```
 
 Additionally you must define the metadata for each function exported by your contract. In the upper example there is only one function named ```hello```.
@@ -395,7 +391,7 @@ You must define the name, the arguments and the return value of the function, so
 }
 ```
 
-Supported argument types are currently: ```val``` (any type of host value), ```u32```, ```i32```, ```u64```, ```i64```, ```bool```, ```symbol```, ```bitset```, ```status```, ```bytes```, ```bigint``` and ```invoker```. If your function has no arguments, you can pass an empty array.
+Supported argument types are currently: ```val``` (any type of host value), ```u32```, ```i32```, ```u64```, ```i64```, ```u128```, ```i128```,```bool```, ```symbol```, ```bitset```, ```status```, ```bytes```, ```invoker```, ```accountId```. If your function has no arguments, you can pass an empty array.
 
 Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static raw value. You can obtain it by using ```val.fromVoid()```. For this case you can also set ```"returns" : "val"``` in the contract.json.
 
@@ -416,3 +412,5 @@ You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-
 | [errors example](https://github.com/Soneso/as-soroban-examples/tree/main/errors)| Demonstrates how to define and generate errors in a contract that invokers of the contract can understand and handle.|
 | [events example](https://github.com/Soneso/as-soroban-examples/tree/main/contract_events)| Demonstrates how to publish events from a contract.|
 | [testing example](https://github.com/Soneso/as-soroban-examples/tree/main/testing)| Shows a simple way to test your contract.|
+
+More examples can be found in the [test cases](https://github.com/Soneso/as-soroban-sdk/tree/main/test)

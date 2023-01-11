@@ -2,7 +2,7 @@
     "name": "val-test",
     "version": "0.0.1",
     "description": "eee",
-    "host_functions_version": 23,
+    "host_functions_version": 27,
     "functions": [
         {
             "name" : "testI32",

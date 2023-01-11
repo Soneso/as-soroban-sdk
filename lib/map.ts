@@ -4,6 +4,7 @@ import { Vec } from "./vec";
 export class Map {
     obj: MapObject;
 
+    /// Constructs from a given MapObject, otherwise creates an empty new map.
     constructor(obj:MapObject = map_new()) {
       this.obj = obj;
     }
@@ -123,6 +124,7 @@ export class Map {
  * HOST FUNCTIONS *
  ******************/
 
+/// Create an empty new map.
 // @ts-ignore
 @external("m", "_")
 declare function map_new(): MapObject;

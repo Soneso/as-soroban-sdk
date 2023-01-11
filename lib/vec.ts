@@ -3,6 +3,7 @@ import { VectorObject, RawVal, fromVoid, fromU32, toU32 } from "./value";
 export class Vec {
     obj: VectorObject;
 
+    /// Constructs from a given VectorObject, otherwise creates an empty new vec.
     constructor(obj:VectorObject = vec_new(fromVoid())) {
       this.obj = obj;
     }

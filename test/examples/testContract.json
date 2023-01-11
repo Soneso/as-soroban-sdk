@@ -2,7 +2,7 @@
     "name": "examples",
     "version": "0.0.1",
     "description": "test examples",
-    "host_functions_version": 23,
+    "host_functions_version": 27,
     "functions": [
         {
             "name" : "hello",

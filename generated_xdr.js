@@ -1,4 +1,4 @@
-// Automatically generated on 2022-09-27T00:37:45+02:00
+// Automatically generated on 2023-01-10T18:46:35+01:00
 // DO NOT EDIT or your changes may be overwritten
 
 /* jshint maxstatements:2147483647  */
@@ -295,13 +295,15 @@ xdr.union("ScEnvMetaEntry", {
 //       SC_SPEC_TYPE_I32 = 2,
 //       SC_SPEC_TYPE_U64 = 3,
 //       SC_SPEC_TYPE_I64 = 4,
-//       SC_SPEC_TYPE_BOOL = 5,
-//       SC_SPEC_TYPE_SYMBOL = 6,
-//       SC_SPEC_TYPE_BITSET = 7,
-//       SC_SPEC_TYPE_STATUS = 8,
-//       SC_SPEC_TYPE_BYTES = 9,
-//       SC_SPEC_TYPE_BIG_INT = 10,
-//       SC_SPEC_TYPE_INVOKER = 11,
+//       SC_SPEC_TYPE_U128 = 5,
+//       SC_SPEC_TYPE_I128 = 6,
+//       SC_SPEC_TYPE_BOOL = 7,
+//       SC_SPEC_TYPE_SYMBOL = 8,
+//       SC_SPEC_TYPE_BITSET = 9,
+//       SC_SPEC_TYPE_STATUS = 10,
+//       SC_SPEC_TYPE_BYTES = 11,
+//       SC_SPEC_TYPE_INVOKER = 12,
+//       SC_SPEC_TYPE_ACCOUNT_ID = 13,
 //   
 //       // Types with parameters.
 //       SC_SPEC_TYPE_OPTION = 1000,
@@ -323,20 +325,30 @@ xdr.enum("ScSpecType", {
   scSpecTypeI32: 2,
   scSpecTypeU64: 3,
   scSpecTypeI64: 4,
-  scSpecTypeBool: 5,
-  scSpecTypeSymbol: 6,
-  scSpecTypeBitset: 7,
-  scSpecTypeStatus: 8,
-  scSpecTypeBytes: 9,
-  scSpecTypeBigInt: 10,
-  scSpecTypeInvoker: 11,
+  scSpecTypeU128: 5,
+  scSpecTypeI128: 6,
+  scSpecTypeBool: 7,
+  scSpecTypeSymbol: 8,
+  scSpecTypeBitset: 9,
+  scSpecTypeStatus: 10,
+  scSpecTypeBytes: 11,
+  scSpecTypeInvoker: 12,
+  scSpecTypeAccountId: 13,
+  scSpecTypeOption: 1000,
+  scSpecTypeResult: 1001,
+  scSpecTypeVec: 1002,
+  scSpecTypeSet: 1003,
+  scSpecTypeMap: 1004,
+  scSpecTypeTuple: 1005,
+  scSpecTypeBytesN: 1006,
+  scSpecTypeUdt: 2000,
 });
 
 // === xdr source ============================================================
 //
 //   struct SCSpecTypeOption
 //   {
-//       ScSpecTypeDef valueType;
+//       SCSpecTypeDef valueType;
 //   };
 //
 // ===========================================================================
@@ -348,8 +360,8 @@ xdr.struct("ScSpecTypeOption", [
 //
 //   struct SCSpecTypeResult
 //   {
-//       ScSpecTypeDef okType;
-//       ScSpecTypeDef errorType;
+//       SCSpecTypeDef okType;
+//       SCSpecTypeDef errorType;
 //   };
 //
 // ===========================================================================
@@ -362,7 +374,7 @@ xdr.struct("ScSpecTypeResult", [
 //
 //   struct SCSpecTypeVec
 //   {
-//       ScSpecTypeDef elementType;
+//       SCSpecTypeDef elementType;
 //   };
 //
 // ===========================================================================
@@ -374,8 +386,8 @@ xdr.struct("ScSpecTypeVec", [
 //
 //   struct SCSpecTypeMap
 //   {
-//       ScSpecTypeDef keyType;
-//       ScSpecTypeDef valueType;
+//       SCSpecTypeDef keyType;
+//       SCSpecTypeDef valueType;
 //   };
 //
 // ===========================================================================
@@ -388,7 +400,7 @@ xdr.struct("ScSpecTypeMap", [
 //
 //   struct SCSpecTypeSet
 //   {
-//       ScSpecTypeDef elementType;
+//       SCSpecTypeDef elementType;
 //   };
 //
 // ===========================================================================
@@ -400,7 +412,7 @@ xdr.struct("ScSpecTypeSet", [
 //
 //   struct SCSpecTypeTuple
 //   {
-//       ScSpecTypeDef valueTypes<12>;
+//       SCSpecTypeDef valueTypes<12>;
 //   };
 //
 // ===========================================================================
@@ -434,11 +446,13 @@ xdr.struct("ScSpecTypeUdt", [
 
 // === xdr source ============================================================
 //
-//   union ScSpecTypeDef switch (SCSpecType type)
+//   union SCSpecTypeDef switch (SCSpecType type)
 //   {
 //   case SC_SPEC_TYPE_VAL:
 //   case SC_SPEC_TYPE_U64:
 //   case SC_SPEC_TYPE_I64:
+//   case SC_SPEC_TYPE_U128:
+//   case SC_SPEC_TYPE_I128:
 //   case SC_SPEC_TYPE_U32:
 //   case SC_SPEC_TYPE_I32:
 //   case SC_SPEC_TYPE_BOOL:
@@ -446,8 +460,8 @@ xdr.struct("ScSpecTypeUdt", [
 //   case SC_SPEC_TYPE_BITSET:
 //   case SC_SPEC_TYPE_STATUS:
 //   case SC_SPEC_TYPE_BYTES:
-//   case SC_SPEC_TYPE_BIG_INT:
 //   case SC_SPEC_TYPE_INVOKER:
+//   case SC_SPEC_TYPE_ACCOUNT_ID:
 //       void;
 //   case SC_SPEC_TYPE_OPTION:
 //       SCSpecTypeOption option;
@@ -475,6 +489,8 @@ xdr.union("ScSpecTypeDef", {
     ["scSpecTypeVal", xdr.void()],
     ["scSpecTypeU64", xdr.void()],
     ["scSpecTypeI64", xdr.void()],
+    ["scSpecTypeU128", xdr.void()],
+    ["scSpecTypeI128", xdr.void()],
     ["scSpecTypeU32", xdr.void()],
     ["scSpecTypeI32", xdr.void()],
     ["scSpecTypeBool", xdr.void()],
@@ -482,11 +498,17 @@ xdr.union("ScSpecTypeDef", {
     ["scSpecTypeBitset", xdr.void()],
     ["scSpecTypeStatus", xdr.void()],
     ["scSpecTypeBytes", xdr.void()],
-    ["scSpecTypeBigInt", xdr.void()],
     ["scSpecTypeInvoker", xdr.void()],
+    ["scSpecTypeAccountId", xdr.void()],
+    ["scSpecTypeOption", xdr.lookup("ScSpecTypeOption")],
+    ["scSpecTypeResult", xdr.lookup("ScSpecTypeResult")],
+    ["scSpecTypeVec", xdr.lookup("ScSpecTypeVec")],
+    ["scSpecTypeMap", xdr.lookup("ScSpecTypeMap")],
+    ["scSpecTypeSet", xdr.lookup("ScSpecTypeSet")],
+    ["scSpecTypeTuple", xdr.lookup("ScSpecTypeTuple")],
+    ["scSpecTypeBytesN", xdr.lookup("ScSpecTypeBytesN")],
+    ["scSpecTypeUdt", xdr.lookup("ScSpecTypeUdt")],
   ],
-  arms: {
-  },
 });
 
 // === xdr source ============================================================
@@ -494,7 +516,7 @@ xdr.union("ScSpecTypeDef", {
 //   struct SCSpecUDTStructFieldV0
 //   {
 //       string name<30>;
-//       ScSpecTypeDef type;
+//       SCSpecTypeDef type;
 //   };
 //
 // ===========================================================================
@@ -524,7 +546,7 @@ xdr.struct("ScSpecUdtStructV0", [
 //   struct SCSpecUDTUnionCaseV0
 //   {
 //       string name<60>;
-//       ScSpecTypeDef *type;
+//       SCSpecTypeDef *type;
 //   };
 //
 // ===========================================================================
@@ -614,7 +636,7 @@ xdr.struct("ScSpecUdtErrorEnumV0", [
 //   struct SCSpecFunctionInputV0
 //   {
 //       string name<30>;
-//       ScSpecTypeDef type;
+//       SCSpecTypeDef type;
 //   };
 //
 // ===========================================================================
@@ -629,7 +651,7 @@ xdr.struct("ScSpecFunctionInputV0", [
 //   {
 //       SCSymbol name;
 //       SCSpecFunctionInputV0 inputs<10>;
-//       ScSpecTypeDef outputs<1>;
+//       SCSpecTypeDef outputs<1>;
 //   };
 //
 // ===========================================================================
@@ -1060,10 +1082,11 @@ xdr.union("ScVal", {
 //       SCO_MAP = 1,
 //       SCO_U64 = 2,
 //       SCO_I64 = 3,
-//       SCO_BYTES = 4,
-//       SCO_BIG_INT = 5,
-//       SCO_CONTRACT_CODE = 6,
-//       SCO_ACCOUNT_ID = 7
+//       SCO_U128 = 4,
+//       SCO_I128 = 5,
+//       SCO_BYTES = 6,
+//       SCO_CONTRACT_CODE = 7,
+//       SCO_ACCOUNT_ID = 8
 //   
 //       // TODO: add more
 //   };
@@ -1074,10 +1097,11 @@ xdr.enum("ScObjectType", {
   scoMap: 1,
   scoU64: 2,
   scoI64: 3,
-  scoBytes: 4,
-  scoBigInt: 5,
-  scoContractCode: 6,
-  scoAccountId: 7,
+  scoU128: 4,
+  scoI128: 5,
+  scoBytes: 6,
+  scoContractCode: 7,
+  scoAccountId: 8,
 });
 
 // === xdr source ============================================================
@@ -1117,56 +1141,15 @@ xdr.typedef("ScMap", xdr.varArray(xdr.lookup("ScMapEntry"), xdr.lookup("SCVAL_LI
 
 // === xdr source ============================================================
 //
-//   enum SCNumSign
-//   {
-//       NEGATIVE = -1,
-//       ZERO = 0,
-//       POSITIVE = 1
-//   };
-//
-// ===========================================================================
-xdr.enum("ScNumSign", {
-  negative: -1,
-  zero: 0,
-  positive: 1,
-});
-
-// === xdr source ============================================================
-//
-//   union SCBigInt switch (SCNumSign sign)
-//   {
-//   case ZERO:
-//       void;
-//   case POSITIVE:
-//   case NEGATIVE:
-//       opaque magnitude<256000>;
-//   };
-//
-// ===========================================================================
-xdr.union("ScBigInt", {
-  switchOn: xdr.lookup("ScNumSign"),
-  switchName: "sign",
-  switches: [
-    ["zero", xdr.void()],
-    ["positive", "magnitude"],
-    ["negative", "magnitude"],
-  ],
-  arms: {
-    magnitude: xdr.varOpaque(256000),
-  },
-});
-
-// === xdr source ============================================================
-//
 //   enum SCContractCodeType
 //   {
-//       SCCONTRACT_CODE_WASM = 0,
+//       SCCONTRACT_CODE_WASM_REF = 0,
 //       SCCONTRACT_CODE_TOKEN = 1
 //   };
 //
 // ===========================================================================
 xdr.enum("ScContractCodeType", {
-  sccontractCodeWasm: 0,
+  sccontractCodeWasmRef: 0,
   sccontractCodeToken: 1,
 });
 
@@ -1174,8 +1157,8 @@ xdr.enum("ScContractCodeType", {
 //
 //   union SCContractCode switch (SCContractCodeType type)
 //   {
-//   case SCCONTRACT_CODE_WASM:
-//       opaque wasm<SCVAL_LIMIT>;
+//   case SCCONTRACT_CODE_WASM_REF:
+//       Hash wasm_id;
 //   case SCCONTRACT_CODE_TOKEN:
 //       void;
 //   };
@@ -1185,13 +1168,29 @@ xdr.union("ScContractCode", {
   switchOn: xdr.lookup("ScContractCodeType"),
   switchName: "type",
   switches: [
-    ["sccontractCodeWasm", "wasm"],
+    ["sccontractCodeWasmRef", "wasmId"],
     ["sccontractCodeToken", xdr.void()],
   ],
   arms: {
-    wasm: xdr.varOpaque(256000),
+    wasmId: xdr.lookup("Hash"),
   },
 });
+
+// === xdr source ============================================================
+//
+//   struct Int128Parts {
+//       // Both signed and unsigned 128-bit ints
+//       // are transported in a pair of uint64s
+//       // to reduce the risk of sign-extension.
+//       uint64 lo;
+//       uint64 hi;
+//   };
+//
+// ===========================================================================
+xdr.struct("Int128Parts", [
+  ["lo", xdr.lookup("Uint64")],
+  ["hi", xdr.lookup("Uint64")],
+]);
 
 // === xdr source ============================================================
 //
@@ -1205,10 +1204,12 @@ xdr.union("ScContractCode", {
 //       uint64 u64;
 //   case SCO_I64:
 //       int64 i64;
+//   case SCO_U128:
+//       Int128Parts u128;
+//   case SCO_I128:
+//       Int128Parts i128;
 //   case SCO_BYTES:
 //       opaque bin<SCVAL_LIMIT>;
-//   case SCO_BIG_INT:
-//       SCBigInt bigInt;
 //   case SCO_CONTRACT_CODE:
 //       SCContractCode contractCode;
 //   case SCO_ACCOUNT_ID:
@@ -1224,8 +1225,9 @@ xdr.union("ScObject", {
     ["scoMap", "map"],
     ["scoU64", "u64"],
     ["scoI64", "i64"],
+    ["scoU128", "u128"],
+    ["scoI128", "i128"],
     ["scoBytes", "bin"],
-    ["scoBigInt", "bigInt"],
     ["scoContractCode", "contractCode"],
     ["scoAccountId", "accountId"],
   ],
@@ -1234,8 +1236,9 @@ xdr.union("ScObject", {
     map: xdr.lookup("ScMap"),
     u64: xdr.lookup("Uint64"),
     i64: xdr.lookup("Int64"),
+    u128: xdr.lookup("Int128Parts"),
+    i128: xdr.lookup("Int128Parts"),
     bin: xdr.varOpaque(256000),
-    bigInt: xdr.lookup("ScBigInt"),
     contractCode: xdr.lookup("ScContractCode"),
     accountId: xdr.lookup("AccountId"),
   },
@@ -1243,10 +1246,82 @@ xdr.union("ScObject", {
 
 // === xdr source ============================================================
 //
-//   typedef PublicKey AccountID;
+//   union StoredTransactionSet switch (int v)
+//   {
+//   case 0:
+//   	TransactionSet txSet;
+//   case 1:
+//   	GeneralizedTransactionSet generalizedTxSet;
+//   };
 //
 // ===========================================================================
-xdr.typedef("AccountId", xdr.lookup("PublicKey"));
+xdr.union("StoredTransactionSet", {
+  switchOn: xdr.int(),
+  switchName: "v",
+  switches: [
+    [0, "txSet"],
+    [1, "generalizedTxSet"],
+  ],
+  arms: {
+    txSet: xdr.lookup("TransactionSet"),
+    generalizedTxSet: xdr.lookup("GeneralizedTransactionSet"),
+  },
+});
+
+// === xdr source ============================================================
+//
+//   struct PersistedSCPStateV0
+//   {
+//   	SCPEnvelope scpEnvelopes<>;
+//   	SCPQuorumSet quorumSets<>;
+//   	StoredTransactionSet txSets<>;
+//   };
+//
+// ===========================================================================
+xdr.struct("PersistedScpStateV0", [
+  ["scpEnvelopes", xdr.varArray(xdr.lookup("ScpEnvelope"), 2147483647)],
+  ["quorumSets", xdr.varArray(xdr.lookup("ScpQuorumSet"), 2147483647)],
+  ["txSets", xdr.varArray(xdr.lookup("StoredTransactionSet"), 2147483647)],
+]);
+
+// === xdr source ============================================================
+//
+//   struct PersistedSCPStateV1
+//   {
+//   	// Tx sets are saved separately
+//   	SCPEnvelope scpEnvelopes<>;
+//   	SCPQuorumSet quorumSets<>;
+//   };
+//
+// ===========================================================================
+xdr.struct("PersistedScpStateV1", [
+  ["scpEnvelopes", xdr.varArray(xdr.lookup("ScpEnvelope"), 2147483647)],
+  ["quorumSets", xdr.varArray(xdr.lookup("ScpQuorumSet"), 2147483647)],
+]);
+
+// === xdr source ============================================================
+//
+//   union PersistedSCPState switch (int v)
+//   {
+//   case 0:
+//   	PersistedSCPStateV0 v0;
+//   case 1:
+//   	PersistedSCPStateV1 v1;
+//   };
+//
+// ===========================================================================
+xdr.union("PersistedScpState", {
+  switchOn: xdr.int(),
+  switchName: "v",
+  switches: [
+    [0, "v0"],
+    [1, "v1"],
+  ],
+  arms: {
+    v0: xdr.lookup("PersistedScpStateV0"),
+    v1: xdr.lookup("PersistedScpStateV1"),
+  },
+});
 
 // === xdr source ============================================================
 //
@@ -1479,7 +1554,8 @@ xdr.enum("ThresholdIndices", {
 //       CLAIMABLE_BALANCE = 4,
 //       LIQUIDITY_POOL = 5,
 //       CONTRACT_DATA = 6,
-//       CONFIG_SETTING = 7
+//       CONTRACT_CODE = 7,
+//       CONFIG_SETTING = 8
 //   };
 //
 // ===========================================================================
@@ -1491,7 +1567,8 @@ xdr.enum("LedgerEntryType", {
   claimableBalance: 4,
   liquidityPool: 5,
   contractData: 6,
-  configSetting: 7,
+  contractCode: 7,
+  configSetting: 8,
 });
 
 // === xdr source ============================================================
@@ -2501,6 +2578,22 @@ xdr.struct("ContractDataEntry", [
 
 // === xdr source ============================================================
 //
+//   struct ContractCodeEntry {
+//       ExtensionPoint ext;
+//   
+//       Hash hash;
+//       opaque code<SCVAL_LIMIT>;
+//   };
+//
+// ===========================================================================
+xdr.struct("ContractCodeEntry", [
+  ["ext", xdr.lookup("ExtensionPoint")],
+  ["hash", xdr.lookup("Hash")],
+  ["code", xdr.varOpaque(256000)],
+]);
+
+// === xdr source ============================================================
+//
 //   enum ConfigSettingType
 //   {
 //       CONFIG_SETTING_TYPE_UINT32 = 0
@@ -2641,6 +2734,8 @@ xdr.struct("LedgerEntryExtensionV1", [
 //           LiquidityPoolEntry liquidityPool;
 //       case CONTRACT_DATA:
 //           ContractDataEntry contractData;
+//       case CONTRACT_CODE:
+//           ContractCodeEntry contractCode;
 //       case CONFIG_SETTING:
 //           ConfigSettingEntry configSetting;
 //       }
@@ -2657,6 +2752,7 @@ xdr.union("LedgerEntryData", {
     ["claimableBalance", "claimableBalance"],
     ["liquidityPool", "liquidityPool"],
     ["contractData", "contractData"],
+    ["contractCode", "contractCode"],
     ["configSetting", "configSetting"],
   ],
   arms: {
@@ -2667,6 +2763,7 @@ xdr.union("LedgerEntryData", {
     claimableBalance: xdr.lookup("ClaimableBalanceEntry"),
     liquidityPool: xdr.lookup("LiquidityPoolEntry"),
     contractData: xdr.lookup("ContractDataEntry"),
+    contractCode: xdr.lookup("ContractCodeEntry"),
     configSetting: xdr.lookup("ConfigSettingEntry"),
   },
 });
@@ -2716,6 +2813,8 @@ xdr.union("LedgerEntryExt", {
 //           LiquidityPoolEntry liquidityPool;
 //       case CONTRACT_DATA:
 //           ContractDataEntry contractData;
+//       case CONTRACT_CODE:
+//           ContractCodeEntry contractCode;
 //       case CONFIG_SETTING:
 //           ConfigSettingEntry configSetting;
 //       }
@@ -2835,6 +2934,18 @@ xdr.struct("LedgerKeyContractData", [
 //
 //   struct
 //       {
+//           Hash hash;
+//       }
+//
+// ===========================================================================
+xdr.struct("LedgerKeyContractCode", [
+  ["hash", xdr.lookup("Hash")],
+]);
+
+// === xdr source ============================================================
+//
+//   struct
+//       {
 //           ConfigSettingID configSettingID;
 //       }
 //
@@ -2891,6 +3002,11 @@ xdr.struct("LedgerKeyConfigSetting", [
 //           Hash contractID;
 //           SCVal key;
 //       } contractData;
+//   case CONTRACT_CODE:
+//       struct
+//       {
+//           Hash hash;
+//       } contractCode;
 //   case CONFIG_SETTING:
 //       struct
 //       {
@@ -2910,6 +3026,7 @@ xdr.union("LedgerKey", {
     ["claimableBalance", "claimableBalance"],
     ["liquidityPool", "liquidityPool"],
     ["contractData", "contractData"],
+    ["contractCode", "contractCode"],
     ["configSetting", "configSetting"],
   ],
   arms: {
@@ -2920,6 +3037,7 @@ xdr.union("LedgerKey", {
     claimableBalance: xdr.lookup("LedgerKeyClaimableBalance"),
     liquidityPool: xdr.lookup("LedgerKeyLiquidityPool"),
     contractData: xdr.lookup("LedgerKeyContractData"),
+    contractCode: xdr.lookup("LedgerKeyContractCode"),
     configSetting: xdr.lookup("LedgerKeyConfigSetting"),
   },
 });
@@ -2939,7 +3057,8 @@ xdr.union("LedgerKey", {
 //       ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519 = 8,
 //       ENVELOPE_TYPE_CONTRACT_ID_FROM_CONTRACT = 9,
 //       ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET = 10,
-//       ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT = 11
+//       ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT = 11,
+//       ENVELOPE_TYPE_CREATE_CONTRACT_ARGS = 12
 //   };
 //
 // ===========================================================================
@@ -2956,6 +3075,7 @@ xdr.enum("EnvelopeType", {
   envelopeTypeContractIdFromContract: 9,
   envelopeTypeContractIdFromAsset: 10,
   envelopeTypeContractIdFromSourceAccount: 11,
+  envelopeTypeCreateContractArgs: 12,
 });
 
 // === xdr source ============================================================
@@ -3957,6 +4077,18 @@ xdr.struct("ContractEvent", [
 
 // === xdr source ============================================================
 //
+//   struct OperationEvents
+//   {
+//       ContractEvent events<>;
+//   };
+//
+// ===========================================================================
+xdr.struct("OperationEvents", [
+  ["events", xdr.varArray(xdr.lookup("ContractEvent"), 2147483647)],
+]);
+
+// === xdr source ============================================================
+//
 //   struct TransactionMetaV3
 //   {
 //       LedgerEntryChanges txChangesBefore; // tx level changes before operations
@@ -3964,8 +4096,8 @@ xdr.struct("ContractEvent", [
 //       OperationMeta operations<>;         // meta for each operation
 //       LedgerEntryChanges txChangesAfter;  // tx level changes after operations are
 //                                           // applied if any
-//       ContractEvent events<>;            // custom events populated by the
-//                                           // contracts themselves
+//       OperationEvents events<>;           // custom events populated by the
+//                                           // contracts themselves. One list per operation.
 //       TransactionResult txResult;
 //   
 //       Hash hashes[3];                     // stores sha256(txChangesBefore, operations, txChangesAfter),
@@ -3977,7 +4109,7 @@ xdr.struct("TransactionMetaV3", [
   ["txChangesBefore", xdr.lookup("LedgerEntryChanges")],
   ["operations", xdr.varArray(xdr.lookup("OperationMeta"), 2147483647)],
   ["txChangesAfter", xdr.lookup("LedgerEntryChanges")],
-  ["events", xdr.varArray(xdr.lookup("ContractEvent"), 2147483647)],
+  ["events", xdr.varArray(xdr.lookup("OperationEvents"), 2147483647)],
   ["txResult", xdr.lookup("TransactionResult")],
   ["hashes", xdr.array(xdr.lookup("Hash"), 3)],
 ]);
@@ -4573,6 +4705,26 @@ xdr.struct("TopologyResponseBody", [
 
 // === xdr source ============================================================
 //
+//   union SurveyResponseBody switch (SurveyMessageCommandType type)
+//   {
+//   case SURVEY_TOPOLOGY:
+//       TopologyResponseBody topologyResponseBody;
+//   };
+//
+// ===========================================================================
+xdr.union("SurveyResponseBody", {
+  switchOn: xdr.lookup("SurveyMessageCommandType"),
+  switchName: "type",
+  switches: [
+    ["surveyTopology", "topologyResponseBody"],
+  ],
+  arms: {
+    topologyResponseBody: xdr.lookup("TopologyResponseBody"),
+  },
+});
+
+// === xdr source ============================================================
+//
 //   const TX_ADVERT_VECTOR_MAX_SIZE = 1000;
 //
 // ===========================================================================
@@ -4625,26 +4777,6 @@ xdr.struct("FloodDemand", [
 
 // === xdr source ============================================================
 //
-//   union SurveyResponseBody switch (SurveyMessageCommandType type)
-//   {
-//   case SURVEY_TOPOLOGY:
-//       TopologyResponseBody topologyResponseBody;
-//   };
-//
-// ===========================================================================
-xdr.union("SurveyResponseBody", {
-  switchOn: xdr.lookup("SurveyMessageCommandType"),
-  switchName: "type",
-  switches: [
-    ["surveyTopology", "topologyResponseBody"],
-  ],
-  arms: {
-    topologyResponseBody: xdr.lookup("TopologyResponseBody"),
-  },
-});
-
-// === xdr source ============================================================
-//
 //   union StellarMessage switch (MessageType type)
 //   {
 //   case ERROR_MSG:
@@ -4690,9 +4822,9 @@ xdr.union("SurveyResponseBody", {
 //   
 //   // Pull mode
 //   case FLOOD_ADVERT:
-//       FloodAdvert floodAdvert;
+//        FloodAdvert floodAdvert;
 //   case FLOOD_DEMAND:
-//       FloodDemand floodDemand;
+//        FloodDemand floodDemand;
 //   };
 //
 // ===========================================================================
@@ -5399,18 +5531,151 @@ xdr.struct("LiquidityPoolWithdrawOp", [
 
 // === xdr source ============================================================
 //
-//   enum HostFunction
+//   enum HostFunctionType
 //   {
-//       HOST_FN_CALL = 0,
-//       HOST_FN_CREATE_CONTRACT_WITH_ED25519 = 1,
-//       HOST_FN_CREATE_CONTRACT_WITH_SOURCE_ACCOUNT = 2
+//       HOST_FUNCTION_TYPE_INVOKE_CONTRACT = 0,
+//       HOST_FUNCTION_TYPE_CREATE_CONTRACT = 1,
+//       HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE = 2
 //   };
 //
 // ===========================================================================
-xdr.enum("HostFunction", {
-  hostFnCall: 0,
-  hostFnCreateContractWithEd25519: 1,
-  hostFnCreateContractWithSourceAccount: 2,
+xdr.enum("HostFunctionType", {
+  hostFunctionTypeInvokeContract: 0,
+  hostFunctionTypeCreateContract: 1,
+  hostFunctionTypeInstallContractCode: 2,
+});
+
+// === xdr source ============================================================
+//
+//   enum ContractIDType
+//   {
+//       CONTRACT_ID_FROM_SOURCE_ACCOUNT = 0,
+//       CONTRACT_ID_FROM_ED25519_PUBLIC_KEY = 1,
+//       CONTRACT_ID_FROM_ASSET = 2
+//   };
+//
+// ===========================================================================
+xdr.enum("ContractIdType", {
+  contractIdFromSourceAccount: 0,
+  contractIdFromEd25519PublicKey: 1,
+  contractIdFromAsset: 2,
+});
+
+// === xdr source ============================================================
+//
+//   enum ContractIDPublicKeyType
+//   {
+//       CONTRACT_ID_PUBLIC_KEY_SOURCE_ACCOUNT = 0,
+//       CONTRACT_ID_PUBLIC_KEY_ED25519 = 1
+//   };
+//
+// ===========================================================================
+xdr.enum("ContractIdPublicKeyType", {
+  contractIdPublicKeySourceAccount: 0,
+  contractIdPublicKeyEd25519: 1,
+});
+
+// === xdr source ============================================================
+//
+//   struct InstallContractCodeArgs
+//   {
+//       opaque code<SCVAL_LIMIT>;
+//   };
+//
+// ===========================================================================
+xdr.struct("InstallContractCodeArgs", [
+  ["code", xdr.varOpaque(256000)],
+]);
+
+// === xdr source ============================================================
+//
+//   struct 
+//       {
+//           uint256 key;
+//           Signature signature;
+//           uint256 salt;
+//       }
+//
+// ===========================================================================
+xdr.struct("ContractIdFromEd25519PublicKey", [
+  ["key", xdr.lookup("Uint256")],
+  ["signature", xdr.lookup("Signature")],
+  ["salt", xdr.lookup("Uint256")],
+]);
+
+// === xdr source ============================================================
+//
+//   union ContractID switch (ContractIDType type)
+//   {
+//   case CONTRACT_ID_FROM_SOURCE_ACCOUNT:
+//       uint256 salt;
+//   case CONTRACT_ID_FROM_ED25519_PUBLIC_KEY:
+//       struct 
+//       {
+//           uint256 key;
+//           Signature signature;
+//           uint256 salt;
+//       } fromEd25519PublicKey;
+//   case CONTRACT_ID_FROM_ASSET:
+//       Asset asset;
+//   };
+//
+// ===========================================================================
+xdr.union("ContractId", {
+  switchOn: xdr.lookup("ContractIdType"),
+  switchName: "type",
+  switches: [
+    ["contractIdFromSourceAccount", "salt"],
+    ["contractIdFromEd25519PublicKey", "fromEd25519PublicKey"],
+    ["contractIdFromAsset", "asset"],
+  ],
+  arms: {
+    salt: xdr.lookup("Uint256"),
+    fromEd25519PublicKey: xdr.lookup("ContractIdFromEd25519PublicKey"),
+    asset: xdr.lookup("Asset"),
+  },
+});
+
+// === xdr source ============================================================
+//
+//   struct CreateContractArgs
+//   {
+//       ContractID contractID;
+//       SCContractCode source;
+//   };
+//
+// ===========================================================================
+xdr.struct("CreateContractArgs", [
+  ["contractId", xdr.lookup("ContractId")],
+  ["source", xdr.lookup("ScContractCode")],
+]);
+
+// === xdr source ============================================================
+//
+//   union HostFunction switch (HostFunctionType type)
+//   {
+//   case HOST_FUNCTION_TYPE_INVOKE_CONTRACT:
+//       SCVec invokeArgs;
+//   case HOST_FUNCTION_TYPE_CREATE_CONTRACT:
+//       CreateContractArgs createContractArgs;
+//   case HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE:
+//       InstallContractCodeArgs installContractCodeArgs;
+//   };
+//
+// ===========================================================================
+xdr.union("HostFunction", {
+  switchOn: xdr.lookup("HostFunctionType"),
+  switchName: "type",
+  switches: [
+    ["hostFunctionTypeInvokeContract", "invokeArgs"],
+    ["hostFunctionTypeCreateContract", "createContractArgs"],
+    ["hostFunctionTypeInstallContractCode", "installContractCodeArgs"],
+  ],
+  arms: {
+    invokeArgs: xdr.lookup("ScVec"),
+    createContractArgs: xdr.lookup("CreateContractArgs"),
+    installContractCodeArgs: xdr.lookup("InstallContractCodeArgs"),
+  },
 });
 
 // === xdr source ============================================================
@@ -5419,10 +5684,6 @@ xdr.enum("HostFunction", {
 //   {
 //       // The host function to invoke
 //       HostFunction function;
-//   
-//       // Parameters to the host function
-//       SCVec parameters;
-//   
 //       // The footprint for this invocation
 //       LedgerFootprint footprint;
 //   };
@@ -5430,7 +5691,6 @@ xdr.enum("HostFunction", {
 // ===========================================================================
 xdr.struct("InvokeHostFunctionOp", [
   ["function", xdr.lookup("HostFunction")],
-  ["parameters", xdr.lookup("ScVec")],
   ["footprint", xdr.lookup("LedgerFootprint")],
 ]);
 
@@ -5659,12 +5919,14 @@ xdr.struct("HashIdPreimageRevokeId", [
 //
 //   struct
 //       {
+//           Hash networkID;
 //           uint256 ed25519;
 //           uint256 salt;
 //       }
 //
 // ===========================================================================
 xdr.struct("HashIdPreimageEd25519ContractId", [
+  ["networkId", xdr.lookup("Hash")],
   ["ed25519", xdr.lookup("Uint256")],
   ["salt", xdr.lookup("Uint256")],
 ]);
@@ -5673,12 +5935,14 @@ xdr.struct("HashIdPreimageEd25519ContractId", [
 //
 //   struct
 //       {
+//           Hash networkID;
 //           Hash contractID;
 //           uint256 salt;
 //       }
 //
 // ===========================================================================
 xdr.struct("HashIdPreimageContractId", [
+  ["networkId", xdr.lookup("Hash")],
   ["contractId", xdr.lookup("Hash")],
   ["salt", xdr.lookup("Uint256")],
 ]);
@@ -5687,13 +5951,45 @@ xdr.struct("HashIdPreimageContractId", [
 //
 //   struct
 //       {
+//           Hash networkID;
+//           Asset asset;
+//       }
+//
+// ===========================================================================
+xdr.struct("HashIdPreimageFromAsset", [
+  ["networkId", xdr.lookup("Hash")],
+  ["asset", xdr.lookup("Asset")],
+]);
+
+// === xdr source ============================================================
+//
+//   struct
+//       {
+//           Hash networkID;
 //           AccountID sourceAccount;
 //           uint256 salt;
 //       }
 //
 // ===========================================================================
 xdr.struct("HashIdPreimageSourceAccountContractId", [
+  ["networkId", xdr.lookup("Hash")],
   ["sourceAccount", xdr.lookup("AccountId")],
+  ["salt", xdr.lookup("Uint256")],
+]);
+
+// === xdr source ============================================================
+//
+//   struct
+//       {
+//           Hash networkID;
+//           SCContractCode source;
+//           uint256 salt;
+//       }
+//
+// ===========================================================================
+xdr.struct("HashIdPreimageCreateContractArgs", [
+  ["networkId", xdr.lookup("Hash")],
+  ["source", xdr.lookup("ScContractCode")],
   ["salt", xdr.lookup("Uint256")],
 ]);
 
@@ -5720,23 +6016,37 @@ xdr.struct("HashIdPreimageSourceAccountContractId", [
 //   case ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519:
 //       struct
 //       {
+//           Hash networkID;
 //           uint256 ed25519;
 //           uint256 salt;
 //       } ed25519ContractID;
 //   case ENVELOPE_TYPE_CONTRACT_ID_FROM_CONTRACT:
 //       struct
 //       {
+//           Hash networkID;
 //           Hash contractID;
 //           uint256 salt;
 //       } contractID;
 //   case ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET:
-//       Asset fromAsset;
+//       struct
+//       {
+//           Hash networkID;
+//           Asset asset;
+//       } fromAsset;
 //   case ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT:
 //       struct
 //       {
+//           Hash networkID;
 //           AccountID sourceAccount;
 //           uint256 salt;
 //       } sourceAccountContractID;
+//   case ENVELOPE_TYPE_CREATE_CONTRACT_ARGS:
+//       struct
+//       {
+//           Hash networkID;
+//           SCContractCode source;
+//           uint256 salt;
+//       } createContractArgs;        
 //   };
 //
 // ===========================================================================
@@ -5750,14 +6060,16 @@ xdr.union("HashIdPreimage", {
     ["envelopeTypeContractIdFromContract", "contractId"],
     ["envelopeTypeContractIdFromAsset", "fromAsset"],
     ["envelopeTypeContractIdFromSourceAccount", "sourceAccountContractId"],
+    ["envelopeTypeCreateContractArgs", "createContractArgs"],
   ],
   arms: {
     operationId: xdr.lookup("HashIdPreimageOperationId"),
     revokeId: xdr.lookup("HashIdPreimageRevokeId"),
     ed25519ContractId: xdr.lookup("HashIdPreimageEd25519ContractId"),
     contractId: xdr.lookup("HashIdPreimageContractId"),
-    fromAsset: xdr.lookup("Asset"),
+    fromAsset: xdr.lookup("HashIdPreimageFromAsset"),
     sourceAccountContractId: xdr.lookup("HashIdPreimageSourceAccountContractId"),
+    createContractArgs: xdr.lookup("HashIdPreimageCreateContractArgs"),
   },
 });
 
@@ -8704,6 +9016,13 @@ xdr.typedef("NodeId", xdr.lookup("PublicKey"));
 
 // === xdr source ============================================================
 //
+//   typedef PublicKey AccountID;
+//
+// ===========================================================================
+xdr.typedef("AccountId", xdr.lookup("PublicKey"));
+
+// === xdr source ============================================================
+//
 //   struct Curve25519Secret
 //   {
 //       opaque key[32];
@@ -8751,5 +9070,4 @@ xdr.struct("HmacSha256Mac", [
 ]);
 
 });
-
 export default types;

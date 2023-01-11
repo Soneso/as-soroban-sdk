@@ -15,9 +15,10 @@ export type BytesObject = ObjectVal;
 export type StatusVal = RawVal;
 export type Unsigned64BitIntObject = ObjectVal;
 export type Signed64BitIntObject = ObjectVal;
-export type BigIntObject = ObjectVal;
-export type HashObject = ObjectVal;
-export type PublicKeyObject = ObjectVal;
+export type Unsigned128BitIntObject = ObjectVal;
+export type Signed128BitIntObject = ObjectVal;
+export type ContractCodeObject = ObjectVal;
+export type AccountIdObject = ObjectVal;
 
 type rawValTag = u8;
 
@@ -78,22 +79,25 @@ const rawValTagReserved: rawValTag = 7;
 const staticVoidBody: u32 = 0;
 const staticTrueBody: u32 = 1;
 const staticFalseBody: u32 = 2;
-const staticLedgerKeyContractCodeBody = 3;
+const staticLedgerKeyContractCodeBody: u32 = 3;
 
 /******************************************************************************************************
 * [Object] - rawValTag 3: an object reference given by a 28-bit type code followed by a 32-bit handle.*
 *******************************************************************************************************/
 
 /**
- * There are 2^28 (268,435,456) possible host object type codes, of which only the first 6 are defined in CAP-46:
- * Object type 0: a vector which contains a sequence of host values.
- * Object type 1: a map which is an ordered association from host values to host values.
- * Object type 2: an unsigned 64-bit integer.
- * Object type 3: an signed 64-bit integer.
- * Object type 4: a binary object containing unspecified bytes.
- * Object type 5: bigint
- * Object type 6: contract code
- * Object type 7: account ID
+//       // We have a few objects that represent non-stellar-specific concepts
+//       // like general-purpose maps, vectors, numbers, blobs.
+//   
+//       SCO_VEC = 0,
+//       SCO_MAP = 1,
+//       SCO_U64 = 2,
+//       SCO_I64 = 3,
+//       SCO_U128 = 4,
+//       SCO_I128 = 5,
+//       SCO_BYTES = 6,
+//       SCO_CONTRACT_CODE = 7,
+//       SCO_ACCOUNT_ID = 8
  */
 type objectType = u8;
 
@@ -101,11 +105,11 @@ export const objTypeVec: objectType = 0;
 export const objTypeMap: objectType = 1;
 export const objTypeU64: objectType = 2;
 export const objTypeI64: objectType = 3;
-export const objTypeBytes: objectType = 4;
-export const objTypeBigInt: objectType = 5;
-export const objTypeHash: objectType = 6;
-export const objTypePublicKey: objectType = 7;
-
+export const objTypeU128: objectType = 4;
+export const objTypeI128: objectType = 5;
+export const objTypeBytes: objectType = 6;
+export const objTypeContractCode: objectType = 7;
+export const objTypeAccountId: objectType = 8;
 
 /*******************
 * HELPER FUNCTIONS.*
@@ -439,6 +443,98 @@ export function toI64(val: Signed64BitIntObject) : i64 {
 }
 
 /**
+ * Checks if the given host value represents an object that contains an unsigned 128-bit integer.
+ * @param val host value to check
+ * @returns true if the host value represents an object that contains an unsigned 128-bit integer. otherwise flase.
+ */
+export function isU128(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeU128;
+}
+
+/**
+ * Creates an host value that represents an object containing an unsigned 128-bit integer.
+ * Convert the low and high 64-bit words of a u128 to an object containing a u128.
+ * @param lo low 64-bit words.
+ * @param lo high 64-bit words.
+ * @returns the created host value as Unsigned128BitIntObject
+ */
+export function fromU128Pieces(lo: u64, hi:u64) : Unsigned128BitIntObject {
+    return obj_from_u128_pieces(lo, hi);
+}
+
+/**
+ * Extract the low 64 bits from an object containing a u128.
+ * Traps if the host value doese not represent an object that conatains an unsigned 128-bit integer. To avoid, you can check it with isU128().
+ * @param val the host value (Type: Unsigned128BitIntObject) 
+ * @returns the extracted unsigned low 64 bits integer.
+ */
+export function toU128Low64(val: Unsigned128BitIntObject) : u64 {
+    if(!isU128(val)){
+      context.fail();
+    }
+    return obj_to_u128_lo64(val);
+}
+
+/**
+ * Extract the high 64 bits from an object containing a u128.
+ * Traps if the host value doese not represent an object that conatains an unsigned 128-bit integer. To avoid, you can check it with isU128().
+ * @param val the host value (Type: Unsigned128BitIntObject) 
+ * @returns the extracted unsigned high 64 bits integer.
+ */
+export function toU128High64(val: Unsigned128BitIntObject) : u64 {
+  if(!isU128(val)){
+    context.fail();
+  }
+  return obj_to_u128_hi64(val);
+}
+
+/**
+ * Checks if the given host value represents an object that contains a signed 128-bit integer.
+ * @param val host value to check
+ * @returns true if the host value represents an object that contains a signed 128-bit integer. otherwise flase.
+ */
+export function isI128(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeI128;
+}
+
+/**
+ * Creates an host value that represents an object containing a signed 128-bit integer.
+ * Convert the low and high 64-bit words of a i128 to an object containing a i128.
+ * @param lo low 64-bit words.
+ * @param lo high 64-bit words.
+ * @returns the created host value as Signed128BitIntObject
+ */
+export function fromI128Pieces(lo: u64, hi:u64) : Signed128BitIntObject {
+    return obj_from_i128_pieces(lo, hi);
+}
+
+/**
+ * Extract the low 64 bits from an object containing a i128.
+ * Traps if the host value doese not represent an object that conatains a signed 128-bit integer. To avoid, you can check it with isI128().
+ * @param val the host value (Type: Signed128BitIntObject) 
+ * @returns the extracted unsigned low 64 bits integer.
+ */
+export function toI128Low64(val: Signed128BitIntObject) : u64 {
+    if(!isI128(val)){
+      context.fail();
+    }
+    return obj_to_i128_lo64(val);
+}
+
+/**
+ * Extract the high 64 bits from an object containing a i128.
+ * Traps if the host value doese not represent an object that conatains a signed 128-bit integer. To avoid, you can check it with isI128().
+ * @param val the host value (Type: Signed128BitIntObject) 
+ * @returns the extracted unsigned high 64 bits integer.
+ */
+export function toI128High64(val: Signed128BitIntObject) : u64 {
+  if(!isI128(val)){
+    context.fail();
+  }
+  return obj_to_i128_hi64(val);
+}
+
+/**
  * Checks if the given host value represents an object that contains a vector.
  * @param val host value to check
  * @returns true if the host value represents an object that contains a vector. otherwise flase.
@@ -466,21 +562,21 @@ export function toI64(val: Signed64BitIntObject) : i64 {
 }
 
 /**
- * Checks if the given host value represents a bigint object.
+ * Checks if the given host value represents an object that contains contract code.
  * @param val host value to check
- * @returns true if the host value represents a bigint object. otherwise flase.
+ * @returns true if the host value represents an object that contains an contract code. otherwise flase.
  */
- export function isBigInt(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeBigInt;
+export function isContractCode(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeContractCode;
 }
 
 /**
- * Checks if the given host value represents a public key object.
+ * Checks if the given host value represents an object that contains an account id.
  * @param val host value to check
- * @returns true if the host value represents a public key object. otherwise flase.
+ * @returns true if the host value represents an object that contains an account id. otherwise flase.
  */
- export function isPublicKey(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypePublicKey;
+export function isAccountId(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeAccountId;
 }
 
 /**
@@ -545,6 +641,15 @@ export function getStatusCode(status: StatusVal) : u32 {
     context.fail();
   }
   return getMajor(status);
+}
+
+/**
+ * Checks if the given host value represents a bitset value.
+ * @param val host value to check (Type: RawVal)
+ * @returns true if the host value represents a bitset value. otherwise false. 
+ */
+export function isBitset(val: RawVal): bool {
+  return hasTag(val, rawValTagBitset);
 }
 
 /**
@@ -778,20 +883,50 @@ export const unknownErrXDR: unknownErrCode = 1;
 
 /// Convert an u64 to an object containing an u64.
 // @ts-ignore
-@external("u", "_")
+@external("i", "_")
 declare function obj_from_u64(v:u64): Unsigned64BitIntObject;
 
 /// Convert an object containing an u64 to an u64.
 // @ts-ignore
-@external("u", "0")
+@external("i", "0")
 declare function obj_to_u64(ojb:Unsigned64BitIntObject): u64;
 
 /// Convert an i64 to an object containing an i64.
 // @ts-ignore
-@external("i", "_")
+@external("i", "1")
 declare function obj_from_i64(v:i64): Signed64BitIntObject;
 
 /// Convert an object containing an i64 to an i64.
 // @ts-ignore
-@external("i", "0")
+@external("i", "2")
 declare function obj_to_i64(ojb:Signed64BitIntObject): i64;
+
+/// Convert the low and high 64-bit words of a u128 to an object containing a u128.
+// @ts-ignore
+@external("i", "5")
+declare function obj_from_u128_pieces(lo:u64, hi:u64): Unsigned128BitIntObject;
+
+/// Extract the low 64 bits from an object containing a u128.
+// @ts-ignore
+@external("i", "6")
+declare function obj_to_u128_lo64(obj:Unsigned128BitIntObject): u64;
+
+/// Extract the high 64 bits from an object containing a u128.
+// @ts-ignore
+@external("i", "7")
+declare function obj_to_u128_hi64(obj:Unsigned128BitIntObject): u64;
+
+/// Convert the lo and hi 64-bit words of an i128 to an object containing an i128.
+// @ts-ignore
+@external("i", "8")
+declare function obj_from_i128_pieces(lo:u64, hi:u64): Signed128BitIntObject;
+
+/// Extract the low 64 bits from an object containing an i128.
+// @ts-ignore
+@external("i", "9")
+declare function obj_to_i128_lo64(obj:Signed128BitIntObject): u64;
+
+/// Extract the high 64 bits from an object containing an i128.
+// @ts-ignore
+@external("i", "a")
+declare function obj_to_i128_hi64(obj:Signed128BitIntObject): u64;

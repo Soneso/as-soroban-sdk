@@ -1,7 +1,7 @@
 
 import { Bytes } from "./bytes";
-import { RawVal, BytesObject, Unsigned64BitIntObject, Signed64BitIntObject,
-     VectorObject, PublicKeyObject, toU32, toU64, toI64, StatusVal, contractError, ObjectVal, fromSymbolStr } from "./value";
+import { RawVal, BytesObject, Unsigned64BitIntObject,
+     VectorObject, AccountIdObject, toU32, toU64, StatusVal, contractError, fromSymbolStr } from "./value";
 import { Vec } from "./vec";
 
 
@@ -46,9 +46,9 @@ export function logValue(value: RawVal): void {
  * Returns the public key `Object` of the account which invoked the
  * running contract. Traps if the running contract was not
  * invoked by an account.
- * @returns the invoking accountID as PublicKeyObject
+ * @returns the invoking accountID as AccountIdObject
  */
-export function getInvokingAccount(): PublicKeyObject {
+export function getInvokingAccount(): AccountIdObject {
     return get_invoking_account();
 }
 
@@ -106,6 +106,14 @@ export function getLedgerTimestamp(): u64 {
  */
 export function getLedgerNetworkPassphrase(): BytesObject {
     return get_ledger_network_passphrase();
+}
+
+/**
+ * Return the network id (sha256 hash of network passphrase) of the current ledger as `Bytes`. The value is always 32 bytes in length.
+ * @returns Return the network id of the current ledger as `Bytes` (type:  BytesObject)
+ */
+export function getLedgerNetworkId(): BytesObject {
+    return get_ledger_network_id();
 }
 
 /**
@@ -182,10 +190,10 @@ declare function obj_cmp(a: RawVal, b: RawVal): i64;
 
 /// Records a contract event. `topics` is expected to be a `SCVec` with
 /// length <= 4 that CANNOT contain `Vec`, `Map`, or `Bytes` with length > 32
-/// Returns nothing on success, and panics on failure
+/// On success, returns an `SCStatus::Ok`
 // @ts-ignore
 @external("x", "2")
-declare function contract_event(topics: ObjectVal, data: RawVal): RawVal;
+declare function contract_event(topics: VectorObject, data: RawVal): StatusVal;
 
 /// Get the contractID `Bytes` of the contract which invoked the
 /// running contract. Traps if the running contract was not
@@ -241,10 +249,14 @@ declare function host_log_fmt_values(fmt: BytesObject, args: VectorObject): RawV
 @external("x", "b")
 declare function get_invoker_type(): u64;
 
-
-/// Get the PublicKey object of the account which invoked
+/// Get the AccountID object of the account which invoked
 /// the running contract. Traps if the running contract was not
 /// invoked by an account.
 // @ts-ignore
 @external("x", "c")
-declare function get_invoking_account(): PublicKeyObject;
+declare function get_invoking_account(): AccountIdObject;
+
+/// Return the network id (sha256 hash of network passphrase) of the current ledger as `Bytes`. The value is always 32 bytes in length.
+// @ts-ignore
+@external("x", "d")
+declare function get_ledger_network_id(): BytesObject;

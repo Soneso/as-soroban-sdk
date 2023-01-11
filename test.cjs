@@ -1,7 +1,7 @@
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 var assert = require('assert');
-const invokeValConversions = 'soroban invoke --id 1 --wasm test/value-conversion/build/release.wasm --fn ';
+const invokeValConversions = 'soroban invoke --id 4 --wasm test/value-conversion/build/release.wasm --fn ';
 const invokeExamples = 'soroban invoke --id 2 --wasm test/examples/build/release.wasm --fn ';
 const invokeSDKTypes = 'soroban invoke --id 3 --wasm test/sdk-types/build/release.wasm --fn ';
 
@@ -165,10 +165,10 @@ async function testEventsExample() {
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
-    let res = '#0: event: {"ext":"v0","contractId":"0000000000000000000000000000000000000000000000000000000000000002","type":"contract","body":{"v0":{"topics":[{"symbol":"TEST"},{"symbol":"THE"},{"symbol":"EVENTS"}],"data":{"object":{"vec":[{"u32":223},{"u32":222},{"u32":221}]}}}}}\n' +
-    '#1: event: {"ext":"v0","contractId":"0000000000000000000000000000000000000000000000000000000000000002","type":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":1}}}}\n' +
-    '#2: event: {"ext":"v0","contractId":"0000000000000000000000000000000000000000000000000000000000000002","type":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":2}}}}\n' +
-    '#3: event: {"ext":"v0","contractId":"0000000000000000000000000000000000000000000000000000000000000002","type":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":3}}}}';
+    let res = '#0: event: {"ext":"v0","contract_id":"0000000000000000000000000000000000000000000000000000000000000002","type_":"contract","body":{"v0":{"topics":[{"symbol":"TEST"},{"symbol":"THE"},{"symbol":"EVENTS"}],"data":{"object":{"vec":[{"u32":223},{"u32":222},{"u32":221}]}}}}}\n' +
+    '#1: event: {"ext":"v0","contract_id":"0000000000000000000000000000000000000000000000000000000000000002","type_":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":1}}}}\n' +
+    '#2: event: {"ext":"v0","contract_id":"0000000000000000000000000000000000000000000000000000000000000002","type_":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":2}}}}\n' +
+    '#3: event: {"ext":"v0","contract_id":"0000000000000000000000000000000000000000000000000000000000000002","type_":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":3}}}}';
     assert.equal(stderr.trim(), res);
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -196,7 +196,15 @@ async function testLoggingExample() {
     }
 
     let res = '#0: debug: Hello, today is a sunny day!\n' +
-    '#1: debug: We have I32(30) degrees Symbol(celsius)!';
+    '#1: debug: We have I32(30) degrees Symbol(celsius)!\n' +
+    'error: committing file .soroban/events.json: debug events unsupported: DebugEvent {\n' +
+    '    msg: Some(\n' +
+    '        "Hello, today is a sunny day!",\n' +
+    '    ),\n' +
+    '    args: [\n' +
+    '        ,\n' +
+    '    ],\n' +
+    '}';
     assert.equal(stderr.trim(), res);
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -235,16 +243,14 @@ async function testCheckAgeExampleP2() {
     '   2: soroban_env_host::host::Host::with_frame\n' +
     '   3: soroban_env_host::vm::Vm::invoke_function_raw\n' +
     '   4: soroban_env_host::host::Host::call_n\n' +
-    '   5: soroban_env_host::host::Host::with_frame\n' +
-    '   6: soroban_env_host::host::Host::invoke_function_raw\n' +
-    '   7: soroban_env_host::host::Host::invoke_function\n' +
-    '   8: soroban::invoke::Cmd::run_in_sandbox\n' +
-    '   9: soroban::run::{{closure}}\n' +
-    '  10: <core::future::from_generator::GenFuture<T> as core::future::future::Future>::poll\n' +
-    '  11: std::thread::local::LocalKey<T>::with\n' +
-    '  12: tokio::park::thread::CachedParkThread::block_on\n' +
-    '  13: tokio::runtime::scheduler::multi_thread::MultiThread::block_on\n' +
-    '  14: soroban::main'
+    '   5: soroban_env_host::host::Host::invoke_function\n' +
+    '   6: soroban::invoke::Cmd::run_in_sandbox\n' +
+    '   7: soroban::run::{{closure}}\n' +
+    '   8: <core::future::from_generator::GenFuture<T> as core::future::future::Future>::poll\n' +
+    '   9: tokio::runtime::park::CachedParkThread::block_on\n' +
+    '  10: tokio::runtime::scheduler::multi_thread::MultiThread::block_on\n' +
+    '  11: tokio::runtime::runtime::Runtime::block_on\n' +
+    '  12: soroban::main';
     assert.equal(stderr.trim(), res);
     console.log(`OK`);
 }
@@ -304,7 +310,6 @@ async function testSdkTypes() {
     await testMaps();
     await testVectors();
     await testBytes();
-    await testBigInts();
     console.log(`test sdk types -> OK`);
 }
 
@@ -337,19 +342,6 @@ async function testVectors() {
 async function testBytes() {
     console.log(`test bytes ...`);
     const { error, stdout, stderr } = await exec(invokeSDKTypes + 'bytes');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testBigInts() {
-    console.log(`test big int ...`);
-    const { error, stdout, stderr } = await exec(invokeSDKTypes + 'bigInts');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
