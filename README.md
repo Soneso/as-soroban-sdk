@@ -52,7 +52,7 @@ Next you need to add a ```contract.json``` file to the project. It must contain 
     "name": "hello word",
     "version": "0.0.1",
     "description": "my first contract",
-    "host_functions_version": 23,
+    "host_functions_version": 27,
     "functions": [
         {
             "name" : "hello",
@@ -177,7 +177,7 @@ if (val.getStatusType(rawVal) == val.statusOk) {
 
 ### Host functions
 
-The host functions defined in [env.rs](https://github.com/stellar/rs-soroban-env/blob/main/soroban-env-common/src/env.rs) are functions callable from within the WASM Guest environment. The SDK makes them available to contracts to call in a wrapped form so that contracts have a nicer interface.
+The host functions defined in [env.json](https://github.com/stellar/rs-soroban-env/blob/main/soroban-env-common/env.json) are functions callable from within the WASM Guest environment. The SDK makes them available to contracts to call in a wrapped form so that contracts have a nicer interface and less abstraction.
 
 For example:
 
@@ -249,7 +249,7 @@ The AS Soroban SDK simplifies this by providing the possibility to enter the fun
 
 ### User Defined Types
 
-User defined types are currently only partially supported by this SDK. Currently it support only simple enums.
+Currently the SDK support only simple enums from scratch.
 
 For example:
 
@@ -278,6 +278,8 @@ export function checkAge(age: RawVal): RawVal {
   return fromSymbolStr("OK");
 }
 ```
+
+However, one can create own user defined types with ease by translating them into Maps or Vectors using the SDK.
 
 ## Testing
 
