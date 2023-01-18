@@ -63,7 +63,7 @@ Next you need to add a ```contract.json``` file to the project. It must contain 
 }
 ```
 
-Finally, edit the ```asconfig.json``` file of your project. Replace it's content with the following:
+Finally, edit the ```asconfig.json``` file of your project. Replace its content with the following:
 
 ```json
 {
@@ -122,7 +122,7 @@ As helping features for testing one can use **logging** to generate outputs duri
 
 When calling a contract function the host will only pass ```u64``` raw values. The raw values can encode different types of values (e.g. ```i32```, ```u32```, ```symbol```, ```bitset```, etc.) or ```object handles```. Please read more details about them in [CAP-46](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md#host-value-type).
 
-The SDK can encode and decode this values.
+The SDK can encode and decode these values.
 
 
 ```RawVals``` divide up the space of 64 bits according to a 2-level tagging scheme. The first tag is a bit in the least-significant position, indicating whether the `RawVal` is a plain ```u63``` 63-bit unsigned integer, or some more-structured value with a second-level tag in the next most significant 3 bits. The 63-bit unsigned integer case can also be thought of as handling the complete range of non-negative signed 64-bit integers.
@@ -143,7 +143,7 @@ Schematically, the bit-assignment for `RawVal` looks like this:
 0x_NNNN_NNNN_NNNN_NNNf  - reserved
 ```
 
-The AssemblyScript Soroban SDK can convert this values back and forth. For example converting primitives like i32:
+The AssemblyScript Soroban SDK can convert these values back and forth. For example converting primitives like i32:
 
 ```typescript
 import * as val from "as-soroban-sdk/lib/value";
@@ -249,7 +249,7 @@ The AS Soroban SDK simplifies this by providing the possibility to enter the fun
 
 ### User Defined Types
 
-Currently the SDK support only simple enums from scratch.
+Currently the SDK supports only simple enums from scratch.
 
 For example:
 
