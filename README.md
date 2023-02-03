@@ -103,6 +103,13 @@ Run your contract:
 $ soroban invoke --wasm build/release.wasm --id 1 --fn hello --arg friend
 ```
 
+You can also use one of our Stellar SDKs to deploy and invoke contracts:
+
+- [Stellar iOS SDK](https://github.com/Soneso/stellar-ios-mac-sdk/blob/master/soroban.md)
+- [Stellar Flutter SDK](https://github.com/Soneso/stellar_flutter_sdk/blob/master/soroban.md)
+- [Stellar PHP SDK](https://github.com/Soneso/stellar-php-sdk/blob/main/soroban.md)
+
+
 ## Features and limitations
 
 In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official [Soroban documentation](https://soroban.stellar.org), one can find the requirements for a Soroban SDK.
