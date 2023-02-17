@@ -94,7 +94,7 @@ You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` fol
 To run the contract, you must first install the official soroban cli as described here: [stellar soroban cli](https://github.com/stellar/soroban-cli).
 
 ```shell
-$ cargo install --locked soroban-cli
+$ cargo install --locked --version 0.6.0 soroban-cli
 ```
 
 Run your contract:
@@ -361,9 +361,9 @@ Example:
 ```json
 {
     "name": "hello word",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "my first contract",
-    "host_functions_version": 27,
+    "host_functions_version": 29,
     "functions": [
         {
             "name" : "hello",
@@ -417,7 +417,7 @@ You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-
 | [increment example](https://github.com/Soneso/as-soroban-examples/tree/main/increment)| Demonstrates how to write a simple contract that stores data, with a single function that increments an internal counter and returns the value.| 
 | [logging example](https://github.com/Soneso/as-soroban-examples/tree/main/logging)| Demonstrates how to log for the purpose of debugging.|
 | [cross contract call example](https://github.com/Soneso/as-soroban-examples/tree/main/cross_contract)| Demonstrates how to call a contract from another contract.|
-| [auth example](https://github.com/Soneso/as-soroban-examples/tree/main/auth)| Demonstrates how to tell who has invoked a contract, and verify that a contract has been invoked by an account or contract.|
+| [auth example](https://github.com/Soneso/as-soroban-examples/tree/main/auth)| Demonstrates how to implement authentication and authorization using the [Soroban Host-managed auth framework](https://soroban.stellar.org/docs/learn/authorization).|
 | [errors example](https://github.com/Soneso/as-soroban-examples/tree/main/errors)| Demonstrates how to define and generate errors in a contract that invokers of the contract can understand and handle.|
 | [events example](https://github.com/Soneso/as-soroban-examples/tree/main/contract_events)| Demonstrates how to publish events from a contract.|
 | [testing example](https://github.com/Soneso/as-soroban-examples/tree/main/testing)| Shows a simple way to test your contract.|
