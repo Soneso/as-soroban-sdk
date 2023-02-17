@@ -1,7 +1,7 @@
 
 import { Bytes } from "./bytes";
 import { RawVal, BytesObject, Unsigned64BitIntObject,
-     VectorObject, AccountIdObject, toU32, toU64, StatusVal, contractError, fromSymbolStr } from "./value";
+     VectorObject, toU32, toU64, StatusVal, contractError, fromSymbolStr, AddressObject } from "./value";
 import { Vec } from "./vec";
 
 
@@ -43,13 +43,12 @@ export function logValue(value: RawVal): void {
 }
 
 /**
- * Returns the public key `Object` of the account which invoked the
- * running contract. Traps if the running contract was not
- * invoked by an account.
- * @returns the invoking accountID as AccountIdObject
+ * Returns the address `Object` which invoked the
+ * running contract.
+ * @returns the invoking address as AddressObject
  */
-export function getInvokingAccount(): AccountIdObject {
-    return get_invoking_account();
+export function getCurrentContractAddress(): AddressObject {
+    return get_current_contract_address();
 }
 
 /**
@@ -66,8 +65,8 @@ export function getInvokingContract(): BytesObject {
 * Returns the current contractID `Bytes` of the running contract.
 * @returns current contractID `Bytes` of the running contract  (Type: BytesObject)
 */
-export function getCurrentContract(): BytesObject {
-    return get_current_contract();
+export function getCurrentContractID(): BytesObject {
+    return get_current_contract_id();
 }
 
 /**
@@ -98,14 +97,6 @@ export function getLedgerVersion(): u32 {
 
 export function getLedgerTimestamp(): u64 {
     return toU64(get_ledger_timestamp());
-}
-
-/**
- * Return the network passphrase of the current ledger as `Bytes`.
- * @returns Return the network passphrase of the current ledger as `Bytes` (type:  BytesObject)
- */
-export function getLedgerNetworkPassphrase(): BytesObject {
-    return get_ledger_network_passphrase();
 }
 
 /**
@@ -195,12 +186,11 @@ declare function obj_cmp(a: RawVal, b: RawVal): i64;
 @external("x", "2")
 declare function contract_event(topics: VectorObject, data: RawVal): StatusVal;
 
-/// Get the contractID `Bytes` of the contract which invoked the
-/// running contract. Traps if the running contract was not
-/// invoked by a contract.
+/// Gets the 32-byte identifer of the current contract.
+/// Traps if the running contract was notinvoked by a contract.
 // @ts-ignore
 @external("x", "3")
-declare function get_current_contract(): BytesObject;
+declare function get_current_contract_id(): BytesObject;
 
 /// Return the protocol version of the current ledger as a u32.
 // @ts-ignore
@@ -217,46 +207,39 @@ declare function get_ledger_sequence(): RawVal;
 @external("x", "6")
 declare function get_ledger_timestamp(): Unsigned64BitIntObject;
 
-/// Return the network passphrase of the current ledger as `Bytes`.
-// @ts-ignore
-@external("x", "7")
-declare function get_ledger_network_passphrase(): BytesObject;
-
 /// Returns the full call stack from the first contract call
 /// to the current one as a vector of vectors, where the inside
 /// vector contains the contract id as Hash, and a function as
 /// a Symbol.
 // @ts-ignore
-@external("x", "8")
+@external("x", "7")
 declare function get_current_call_stack(): VectorObject;
 
 /// Causes the currently executing contract to fail immediately
 /// with a provided status code, which must be of error-type
 /// `ScStatusType::ContractError`. Does not actually return.
 // @ts-ignore
-@external("x", "9")
+@external("x", "8")
 declare function fail_with_status(status: StatusVal): RawVal;
 
 // Record a debug event. Fmt must be a Bytes. Args must be a
 // Vec. Void is returned.
 // @ts-ignore
-@external("x", "a")
+@external("x", "9")
 declare function host_log_fmt_values(fmt: BytesObject, args: VectorObject): RawVal;
 
 /// Get whether the contract invocation is from an account or
 /// another contract. Returns 0 for account, 1 for contract.
 // @ts-ignore
-@external("x", "b")
+@external("x", "a")
 declare function get_invoker_type(): u64;
-
-/// Get the AccountID object of the account which invoked
-/// the running contract. Traps if the running contract was not
-/// invoked by an account.
-// @ts-ignore
-@external("x", "c")
-declare function get_invoking_account(): AccountIdObject;
 
 /// Return the network id (sha256 hash of network passphrase) of the current ledger as `Bytes`. The value is always 32 bytes in length.
 // @ts-ignore
-@external("x", "d")
+@external("x", "c")
 declare function get_ledger_network_id(): BytesObject;
+
+/// Get the Address object for the current contract.
+// @ts-ignore
+@external("x", "d")
+declare function get_current_contract_address(): AddressObject;

@@ -1,6 +1,6 @@
 import { ObjectVal, RawVal, toBool, fromSymbolStr} from "./value";
 
-//TODO: improve (see: directly exposed host functions below)
+//TODO: add more wrapper functions (see: directly exposed host functions below)
 
 
 /**

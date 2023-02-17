@@ -1,6 +1,6 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v0.0.7](https://img.shields.io/badge/v0.0.7-yellow.svg)
+![v0.1.0](https://img.shields.io/badge/v0.1.0-yellow.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
@@ -52,12 +52,12 @@ Next you need to add a ```contract.json``` file to the project. It must contain 
     "name": "hello word",
     "version": "0.0.1",
     "description": "my first contract",
-    "host_functions_version": 27,
+    "host_functions_version": 29,
     "functions": [
         {
             "name" : "hello",
             "arguments": [{"name": "to", "type": "symbol"}],
-            "returns" : "val"
+            "returns" : "vec[symbol]"
         }
     ]
 }
@@ -100,7 +100,7 @@ $ cargo install --locked soroban-cli
 Run your contract:
 
 ```shell
-$ soroban invoke --wasm build/release.wasm --id 1 --fn hello --arg friend
+$ soroban contract invoke --wasm build/release.wasm --id 1 --fn hello -- --to friend
 ```
 
 You can also use one of our Stellar SDKs to deploy and invoke contracts:
@@ -199,7 +199,7 @@ function putDataFor(symbolKey: string, value: RawVal) : void
 
 ### SDK Types
 
-Following types are supported by this SDK: `Map`, `Vec`, `Bytes`, `BigInt`.
+Following types are supported by this SDK: `Map`, `Vec`, `Bytes`.
 
 For example work with a vector:
 
@@ -368,7 +368,7 @@ Example:
         {
             "name" : "hello",
             "arguments": [{"name": "to", "type": "symbol"}],
-            "returns" : "val"
+            "returns" : "vec[symbol]"
         }
     ]
 }
@@ -382,7 +382,7 @@ $ soroban version
 output at the time of writing:
 
 ``` shell
-soroban-env interface version 27
+soroban-env interface version 29
 ```
 
 Additionally you must define the metadata for each function exported by your contract. In the upper example there is only one function named ```hello```.
@@ -394,15 +394,15 @@ You must define the name, the arguments and the return value of the function, so
         {
             "name" : "hello",
             "arguments": [{"name": "to", "type": "symbol"}],
-            "returns" : "val"
+            "returns" : "vec[symbol]"
         }
     ]
 }
 ```
 
-Supported argument types are currently: ```val``` (any type of host value), ```u32```, ```i32```, ```u64```, ```i64```, ```u128```, ```i128```,```bool```, ```symbol```, ```bitset```, ```status```, ```bytes```, ```invoker```, ```accountId```. If your function has no arguments, you can pass an empty array.
+Supported argument types are currently: `val` (any type of host value), `u32`, `i32`, `u64`, `i64`, `u128`, `i128`,`bool`, `symbol`, `bitset`, `status`, `bytes`, `invoker`, `address`, `option[valueType]`, `result[okType, errorType]`, `vec[elementType]`, `map[keyType, valueType]`, `set[elementType]` ,`bytesN[size]`. If your function has no arguments, you can pass an empty array.
 
-Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static raw value. You can obtain it by using ```val.fromVoid()```. For this case you can also set ```"returns" : "val"``` in the contract.json.
+Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static raw value. You can obtain it by using ```val.fromVoid()```. For this case you can also set ```"returns" : "status"``` or  ```"returns" : "val"``` in the contract.json.
 
 See also [Meta Generation](https://soroban.stellar.org/docs/SDKs/byo#meta-generation) and [Contract Spec Generation](https://soroban.stellar.org/docs/SDKs/byo#contract-spec-generation)
 

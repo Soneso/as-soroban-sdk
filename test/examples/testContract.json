@@ -1,15 +1,15 @@
 {
     "name": "examples",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "test examples",
-    "host_functions_version": 27,
+    "host_functions_version": 29,
     "functions": [
         {
             "name" : "hello",
             "arguments": [
                 {"name": "to", "type": "symbol"}
             ],
-            "returns" : "val"
+            "returns" : "vec[symbol]"
         },
         {
             "name" : "add",
@@ -39,22 +39,30 @@
             "arguments": [
                 {"name": "age", "type": "i32"}
             ],
-            "returns" : "i32"
+            "returns" : "symbol"
         },
         {
             "name" : "eventTest",
             "arguments": [],
-            "returns" : "val"
+            "returns" : "status"
         },
         {
             "name" : "auth",
-            "arguments": [],
-            "returns" : "val"
+            "arguments": [{"name": "user", "type": "address"}],
+            "returns" : "map[address, u32]"
+        },
+        {
+            "name" : "authArgs",
+            "arguments": [
+                {"name": "user", "type": "address"},
+                {"name": "value", "type": "u32"}
+            ],
+            "returns" : "map[address, u32]"
         },
         {
             "name" : "callctr2",
-            "arguments": [],
-            "returns" : "val"
+            "arguments": [{"name": "user", "type": "address"}],
+            "returns" : "map[address, u32]"
         }
     ]
 }

@@ -1,9 +1,11 @@
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 var assert = require('assert');
-const invokeValConversions = 'soroban invoke --id 4 --wasm test/value-conversion/build/release.wasm --fn ';
-const invokeExamples = 'soroban invoke --id 2 --wasm test/examples/build/release.wasm --fn ';
-const invokeSDKTypes = 'soroban invoke --id 3 --wasm test/sdk-types/build/release.wasm --fn ';
+const invokeValConversions = 'soroban contract invoke --id 4 --wasm test/value-conversion/build/release.wasm --fn ';
+const invokeExamples = 'soroban contract invoke --id 2 --wasm test/examples/build/release.wasm --fn ';
+const invokeSDKTypes = 'soroban contract invoke --id 3 --wasm test/sdk-types/build/release.wasm --fn ';
+const createIdentity1 = 'soroban config identity generate acc1 && soroban config identity address acc1';
+const createIdentity2 = 'soroban config identity generate acc2 && soroban config identity address acc2';
 
 async function startTest() {
 
@@ -113,7 +115,7 @@ async function testSymbol() {
     if (stderr) {
         assert.fail(`stderr: ${stderr}`);
     }
-    assert.equal(stdout.trim(), "test_123");
+    assert.equal(stdout.trim(), '"test_123"');
     console.log(`OK`);
 }
 
@@ -128,14 +130,19 @@ async function testExamples() {
     await testCheckAgeExampleP2();
     await deployExamplesTest()
     await testCallContractExample();
-    await testAuthExampleP1();
-    await testAuthExampleP2();
+    let acc1 = await setUpIdentity1();
+    await testAuthExampleP1(acc1);
+    await testAuthExampleP1(acc1);
+    await testAuthExampleArgs(acc1);
+    await testAuthExampleArgs(acc1);
+    let acc2 = await setUpIdentity2();
+    await testAuthExampleP2(acc2);
     console.log(`test examples -> OK`);
 }
 
 async function testAddExample() {
     console.log(`test add example ...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'add --arg 2 --arg 40');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'add -- --a 2 --b 40');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -148,7 +155,7 @@ async function testAddExample() {
 
 async function testHelloExample() {
     console.log(`test hello example ...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'hello --arg friend');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'hello -- --to friend');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -212,20 +219,20 @@ async function testLoggingExample() {
 
 async function testCheckAgeExampleP1() {
     console.log(`test check age example part 1...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'checkAge --arg 19');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'checkAge -- --age 19');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
         assert.fail(`stderr: ${stderr}`);
     }
-    assert.equal(stdout.trim(), 'OK');
+    assert.equal(stdout.trim(), '"OK"');
     console.log(`OK`);
 }
 
 async function testCheckAgeExampleP2() {
     console.log(`test check age example part 2...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'checkAge --arg 10');
+    const { error, stdout, stderr } = await exec(invokeExamples + 'checkAge -- --age 10');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -234,19 +241,19 @@ async function testCheckAgeExampleP2() {
     '\n' +
     'Debug events (newest first):\n' +
     '   0: "VM trapped with host error"\n' +
-    `   1: "escalating error 'Status(ContractError(1))' to VM trap"\n` +
-    `   2: "failing with contract error status code 'Status(ContractError(1))'"\n` +
+    `   1: "escalating error '' to VM trap"\n` +
+    `   2: "failing with contract error status code ''"\n` +
     '\n' +
     'Backtrace (newest first):\n' +
     '   0: backtrace::capture::Backtrace::new_unresolved\n' +
     '   1: soroban_env_host::host::err_helper::<impl soroban_env_host::host::Host>::err\n' +
     '   2: soroban_env_host::host::Host::with_frame\n' +
     '   3: soroban_env_host::vm::Vm::invoke_function_raw\n' +
-    '   4: soroban_env_host::host::Host::call_n\n' +
+    '   4: soroban_env_host::host::Host::call_n_internal\n' +
     '   5: soroban_env_host::host::Host::invoke_function\n' +
-    '   6: soroban::invoke::Cmd::run_in_sandbox\n' +
-    '   7: soroban::run::{{closure}}\n' +
-    '   8: <core::future::from_generator::GenFuture<T> as core::future::future::Future>::poll\n' +
+    '   6: soroban::contract::invoke::Cmd::run_in_sandbox\n' +
+    '   7: soroban::contract::SubCmd::run::{{closure}}\n' +
+    '   8: soroban::run::{{closure}}\n' +
     '   9: tokio::runtime::park::CachedParkThread::block_on\n' +
     '  10: tokio::runtime::scheduler::multi_thread::MultiThread::block_on\n' +
     '  11: tokio::runtime::runtime::Runtime::block_on\n' +
@@ -256,7 +263,7 @@ async function testCheckAgeExampleP2() {
 }
 
 async function deployExamplesTest() {
-    const { error, stdout, stderr } = await exec('soroban deploy --id c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674 --wasm test/examples/build/release.wasm');
+    const { error, stdout, stderr } = await exec('soroban contract deploy --id c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674 --wasm test/examples/build/release.wasm');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -279,29 +286,70 @@ async function testCallContractExample() {
     console.log(`OK`);
 }
 
-async function testAuthExampleP1() {
-    console.log(`test auth example part 1 ...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'auth --account GBX2MZM4HIUK4QQ4F37SIAAILKS2QAUSTYAM4IXMXTPND2L6TCV4FZAS');
+async function setUpIdentity1() {
+    console.log(`setup identity 1 ...`);
+    const { error, stdout, stderr } = await exec(createIdentity1);
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
         assert.fail(`stderr: ${stderr}`);
     }
-    assert(stdout.startsWith('["GBX2MZM4HIUK4QQ4F37SIAAILKS2QAUSTYAM4IXMXTPND2L6TCV4FZAS",'));
+    let acc1 = stdout.trim();
+    return acc1;
+}
+
+async function testAuthExampleP1(acc) {
+    console.log(`test auth example part 1 ...`);
+    
+    const { error, stdout, stderr } = await exec(invokeExamples + 'auth --account ' + acc + ' -- --user ' + acc);
+    if (error) {
+        assert.fail(`error: ${error.message}`);
+    }
+    if (stderr) {
+        assert.fail(`stderr: ${stderr}`);
+    }
+    assert(stdout.indexOf(acc) != -1);
     console.log(`OK`);
 }
 
-async function testAuthExampleP2() {
-    console.log(`test auth example part 2 ...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'callctr2');
+async function testAuthExampleArgs(acc) {
+    console.log(`test auth args example ...`);
+    
+    const { error, stdout, stderr } = await exec(invokeExamples + 'authArgs --account ' + acc + ' -- --user ' + acc + ' --value 3');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
         assert.fail(`stderr: ${stderr}`);
     }
-    assert(stdout.startsWith('[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],'));
+    assert(stdout.indexOf(acc) != -1);
+    console.log(`OK`);
+}
+
+async function setUpIdentity2() {
+    console.log(`setup identity 2 ...`);
+    const { error, stdout, stderr } = await exec(createIdentity2);
+    if (error) {
+        assert.fail(`error: ${error.message}`);
+    }
+    if (stderr) {
+        assert.fail(`stderr: ${stderr}`);
+    }
+    let acc2 = stdout.trim();
+    return acc2;
+}
+
+async function testAuthExampleP2(acc) {
+    console.log(`test auth example part 2 ...`);
+    const { error, stdout, stderr } = await exec(invokeExamples + 'callctr2 --account ' + acc + ' -- --user ' + acc);
+    if (error) {
+        assert.fail(`error: ${error.message}`);
+    }
+    if (stderr) {
+        assert.fail(`stderr: ${stderr}`);
+    }
+    assert(stdout.indexOf(acc) != -1);
     console.log(`OK`);
 }
 

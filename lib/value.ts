@@ -18,7 +18,7 @@ export type Signed64BitIntObject = ObjectVal;
 export type Unsigned128BitIntObject = ObjectVal;
 export type Signed128BitIntObject = ObjectVal;
 export type ContractCodeObject = ObjectVal;
-export type AccountIdObject = ObjectVal;
+export type AddressObject = ObjectVal;
 
 type rawValTag = u8;
 
@@ -97,7 +97,8 @@ const staticLedgerKeyContractCodeBody: u32 = 3;
 //       SCO_I128 = 5,
 //       SCO_BYTES = 6,
 //       SCO_CONTRACT_CODE = 7,
-//       SCO_ACCOUNT_ID = 8
+//       SCO_ADDRESS = 8,
+//       SCO_NONCE_KEY = 9
  */
 type objectType = u8;
 
@@ -109,7 +110,8 @@ export const objTypeU128: objectType = 4;
 export const objTypeI128: objectType = 5;
 export const objTypeBytes: objectType = 6;
 export const objTypeContractCode: objectType = 7;
-export const objTypeAccountId: objectType = 8;
+export const objTypeAddress: objectType = 8;
+export const objTypeNonceKey: objectType = 9;
 
 /*******************
 * HELPER FUNCTIONS.*
@@ -571,12 +573,21 @@ export function isContractCode(val:RawVal) : bool {
 }
 
 /**
- * Checks if the given host value represents an object that contains an account id.
+ * Checks if the given host value represents an object that contains an address.
  * @param val host value to check
- * @returns true if the host value represents an object that contains an account id. otherwise flase.
+ * @returns true if the host value represents an object that contains an address. otherwise flase.
  */
-export function isAccountId(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeAccountId;
+export function isAddress(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeAddress;
+}
+
+/**
+ * Checks if the given host value represents an object that contains a nonce key.
+ * @param val host value to check
+ * @returns true if the host value represents an object that contains a nonce key. otherwise flase.
+ */
+export function isNonceKey(val:RawVal) : bool {
+  return isObject(val) && getObjectType(val) == objTypeNonceKey;
 }
 
 /**
@@ -809,6 +820,7 @@ export const statusStorageErr: statusType = 5;
 export const statusContextErr: statusType = 6;
 export const statusVMErr: statusType = 7;
 export const statusContractErr: statusType = 8;
+export const statusHostAuthErr: statusType = 9;
 
 export type hostValErrCode = u32;
 export const hostValUnknownErr: hostValErrCode = 0;
@@ -847,6 +859,12 @@ export const hostStorageReadWriteAccessToReadonlyEntry: hostStorageErrCode = 2;
 export const hostStorageAccessToUnknownEntry: hostStorageErrCode = 3;
 export const hostStorageMissingKeyInGet: hostStorageErrCode = 4;
 export const hostStorageGetOnDeletedKey: hostStorageErrCode = 5;
+
+export type hostAuthErrCode = u32;
+export const hostAuthUnknownErr: hostAuthErrCode = 0;
+export const hostAuthNonceErr: hostAuthErrCode = 1;
+export const hostAuthDuplicateAuthorization: hostAuthErrCode = 2;
+export const hostAuthNotAuthorited: hostAuthErrCode = 3;
 
 export type hostContextErrCode = u32;
 export const hostContextUnknownErr: hostContextErrCode = 0;

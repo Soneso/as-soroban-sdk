@@ -3,7 +3,7 @@ import { Vec } from "../../lib/vec";
 import { Map } from "../../lib/map";
 import { Bytes } from "../../lib/bytes";
 
-export function testU32(): val.RawVal {
+export function testU32(): val.StatusVal {
 
   const U32VAL = 12;
   let au32 = val.fromU32(U32VAL);
@@ -13,7 +13,7 @@ export function testU32(): val.RawVal {
   return val.fromTrue();
 }
 
-export function testI32(): val.RawVal {
+export function testI32(): val.StatusVal {
 
     const I32VAL = -112;
     let ai32 = val.fromI32(I32VAL);
@@ -23,7 +23,7 @@ export function testI32(): val.RawVal {
     return val.fromTrue();
 }
 
-export function testStatic(): val.RawVal {
+export function testStatic(): val.StatusVal {
 
   let aVoid = val.fromVoid();
   if(!val.isStatic(aVoid) || !val.isVoid(aVoid)) {
@@ -53,7 +53,7 @@ export function testStatic(): val.RawVal {
   return val.fromTrue();
 }
 
-export function testObject(): val.RawVal {
+export function testObject(): val.StatusVal {
 
   let vec = new Vec();
   let vecObject = vec.getHostObject();
@@ -102,7 +102,7 @@ export function testObject(): val.RawVal {
   return val.fromTrue();
 }
 
-export function testStatus(): val.RawVal {
+export function testStatus(): val.StatusVal {
 
   const errCode = 33;
   let contractErr = val.contractError(errCode);
@@ -123,7 +123,7 @@ export function testStatus(): val.RawVal {
   return val.fromTrue();
 }
 
-export function testSymbol(): val.RawVal {
+export function testSymbol(): val.SymbolVal {
 
   let symbol = val.fromSymbolStr("test_123")
   if(!val.isSymbol(symbol)) {

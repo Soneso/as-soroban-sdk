@@ -1,8 +1,10 @@
 import * as val from "../../lib/value";
 import * as ledger from "../../lib/ledger";
 import { Vec } from "../../lib/vec";
+import { Map } from "../../lib/map";
 import * as context from '../../lib/context';
 import * as contract from "../../lib/contract";
+import * as address from '../../lib/address';
 
 export function hello(to: val.SymbolVal): val.VectorObject {
 
@@ -114,27 +116,53 @@ export function callctr(): val.RawVal {
 
 }
 
-export function auth(): val.RawVal {
+export function auth(user: val.AddressObject): val.MapObject {
 
-  let key = context.getInvokerType() == 0 ? context.getInvokingAccount() : context.getInvokingContract();
+  address.requireAuth(user);
+  
+  let key = user;
   var counter = 0;
   if (ledger.hasData(key)) {
-    let dataObj = ledger.getData(key);
-    counter = val.toU32(dataObj);
+    let dataVal = ledger.getData(key);
+    counter = val.toU32(dataVal);
   }
   counter += 1;
-  let counterObj = val.fromU32(counter);
-  ledger.putData(key, counterObj);
+  let counterVal = val.fromU32(counter);
+  ledger.putData(key, counterVal);
 
-  let vec = new Vec();
-  vec.pushFront(key);
-  vec.pushBack(counterObj);
-  return vec.getHostObject();
+  let map = new Map();
+  map.put(key, counterVal);
+  return map.getHostObject();
+
 }
 
-export function callctr2(): val.RawVal {
+export function authArgs(user: val.AddressObject, value: val.RawVal): val.MapObject {
+
+  let argsVec = new Vec();
+  argsVec.pushFront(value);
+
+  address.requireAuthForArgs(user, argsVec);
+  
+  let key = user;
+  var counter = 0;
+  if (ledger.hasData(key)) {
+    let dataVal = ledger.getData(key);
+    counter = val.toU32(dataVal);
+  }
+  counter += val.toU32(value);
+  let counterVal = val.fromU32(counter);
+  ledger.putData(key, counterVal);
+
+  let map = new Map();
+  map.put(key, counterVal);
+  return map.getHostObject();
+
+}
+
+export function callctr2(user: val.AddressObject): val.MapObject {
 
   let args = new Vec();
+  args.pushFront(user);
   return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "auth", args.getHostObject());
 
 }

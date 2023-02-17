@@ -1,7 +1,7 @@
 import { RawVal } from "./value";
 import { ObjectVal } from "./value";
 
-// TODO: improve
+// TODO: add wrapper functions
 
 /*****************************************
 * hash - Functions concerned with hashes *

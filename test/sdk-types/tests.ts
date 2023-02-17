@@ -4,7 +4,7 @@ import { Map } from "../../lib/map";
 import { Vec } from "../../lib/vec";
 import { Bytes } from "../../lib/bytes";
 
-export function maps(): val.RawVal {
+export function maps(): val.StatusVal {
 
   let map = new Map();
 
@@ -76,7 +76,7 @@ export function maps(): val.RawVal {
   return val.fromTrue();
 }
 
-export function vecs(): val.RawVal {
+export function vecs(): val.StatusVal {
 
     let vec = new Vec();
     let val1 = val.fromU32(12);
@@ -178,7 +178,7 @@ export function vecs(): val.RawVal {
     return val.fromTrue();
 }
 
-export function bytes(): val.RawVal {
+export function bytes(): val.StatusVal {
 
 
     let val1 = val.fromU32(12);

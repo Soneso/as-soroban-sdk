@@ -1,6 +1,6 @@
 {
   "name": "as-soroban-sdk",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "AssemblyScript SDK for writing contracts for Soroban.",
   "main": "index.js",
   "types": "./types/index.d.ts",
