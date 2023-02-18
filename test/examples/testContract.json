@@ -63,6 +63,16 @@
             "name" : "callctr2",
             "arguments": [{"name": "user", "type": "address"}],
             "returns" : "map[address, u32]"
+        },
+        {
+            "name" : "deploy",
+            "arguments": [
+                {"name": "wasm_hash", "type": "bytesN[32]"},
+                {"name": "salt", "type": "bytesN[32]"},
+                {"name": "fn_name", "type": "symbol"},
+                {"name": "args", "type": "vec[i32]"}
+            ],
+            "returns" : "i32"
         }
     ]
 }

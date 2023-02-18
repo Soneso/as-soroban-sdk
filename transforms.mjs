@@ -354,13 +354,8 @@ export class SdkTransform extends Transform {
       if (sB == -1 || eB == -1) {
         return false;
       }
-      let elemTypeStr = argumentTypeStr.substring(sB + 1, eB);
-      let elementType = SdkTransform.getSpecType(elemTypeStr, xdr);
-      if (!elementType) {
-        return false;
-      }
       let sizeStr = argumentTypeStr.substring(sB + 1, eB);
-      let size = xdr.Uint32(parseInt(sizeStr.trim()));
+      let size = parseInt(sizeStr.trim());
       let setType = new xdr.ScSpecTypeBytesN({n:size});
       typ.set('scSpecTypeBytesN', setType);
       return typ;

@@ -51,6 +51,28 @@ export class Bytes {
     }
 
     /**
+     * Creates a new Bytes object on the host from the given wasm hash.
+     * If the wasm hash is shorter than 32 bytes, it fills the needed bytes with 0.
+     * @param wasmHash wasm hash as hex string
+     * @returns the new Bytes object created.
+     */
+    static fromWasmHash(wasmHash: string) : Bytes {
+        let result = Bytes.fromHexString(wasmHash);
+        let len = result.len();
+        if (len == 32) {
+            return result;
+        }
+        var fill = 32 - len;
+        var filled = new Bytes();
+        while(fill > 0) {
+            filled.push(fromU32(0));
+            fill -= 1;
+        }
+        filled = filled.append(result);
+        return filled;
+    }
+
+    /**
      * Creates a new Bytes object on the host from the given hex string.
      * @param hex the hex string to create the bytes object from
      * @returns the new Bytes object created.

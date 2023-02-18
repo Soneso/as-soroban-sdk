@@ -3,6 +3,7 @@ const exec = util.promisify(require('child_process').exec);
 var assert = require('assert');
 const invokeValConversions = 'soroban contract invoke --id 4 --wasm test/value-conversion/build/release.wasm --fn ';
 const invokeExamples = 'soroban contract invoke --id 2 --wasm test/examples/build/release.wasm --fn ';
+const installExamples = 'soroban contract install --wasm test/examples/build/release.wasm';
 const invokeSDKTypes = 'soroban contract invoke --id 3 --wasm test/sdk-types/build/release.wasm --fn ';
 const createIdentity1 = 'soroban config identity generate acc1 && soroban config identity address acc1';
 const createIdentity2 = 'soroban config identity generate acc2 && soroban config identity address acc2';
@@ -137,6 +138,8 @@ async function testExamples() {
     await testAuthExampleArgs(acc1);
     let acc2 = await setUpIdentity2();
     await testAuthExampleP2(acc2);
+    let wasmHash = await installExamplesContract();
+    await testDeployContract(wasmHash);
     console.log(`test examples -> OK`);
 }
 
@@ -350,6 +353,32 @@ async function testAuthExampleP2(acc) {
         assert.fail(`stderr: ${stderr}`);
     }
     assert(stdout.indexOf(acc) != -1);
+    console.log(`OK`);
+}
+
+async function installExamplesContract() {
+    console.log(`install ecamples contract ...`);
+    const { error, stdout, stderr } = await exec(installExamples);
+    if (error) {
+        assert.fail(`error: ${error.message}`);
+    }
+    if (stderr) {
+        assert.fail(`stderr: ${stderr}`);
+    }
+    let wasmHash = stdout.trim();
+    return wasmHash;
+}
+
+async function testDeployContract(wasmHash) {
+    console.log(`test deploy example ...`);
+    const { error, stdout, stderr } = await exec(invokeExamples + 'deploy -- --wasm_hash ' + wasmHash + ' --salt 0000000000000000000000000000000000000000000000000000000000000000 --fn_name add --args [4,3]');
+    if (error) {
+        assert.fail(`error: ${error.message}`);
+    }
+    if (stderr) {
+        assert.fail(`stderr: ${stderr}`);
+    }
+    assert.equal(stdout.trim(), "7");
     console.log(`OK`);
 }
 

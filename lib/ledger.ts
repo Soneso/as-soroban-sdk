@@ -1,4 +1,4 @@
-import { ObjectVal, RawVal, toBool, fromSymbolStr} from "./value";
+import { ObjectVal, RawVal, toBool, fromSymbolStr, BytesObject} from "./value";
 
 //TODO: add more wrapper functions (see: directly exposed host functions below)
 
@@ -77,6 +77,16 @@ export function hasData(key: RawVal): bool {
     del_contract_data(key);
 }
 
+/**
+ * Deploys an installed contract.
+ * @param wasmHash BytesObject containing the wasm hash of the installed contract to be deployed.
+ * @param salt BytesObject containing the salt needed for the new contractID
+ * @returns the new contractID as BytesObject.
+ */
+export function deployContract(wasmHash: BytesObject, salt:BytesObject) : BytesObject {
+    return create_contract_from_contract(wasmHash, salt);
+}
+
 /******************
  * HOST FUNCTIONS *
  ******************/
@@ -101,4 +111,4 @@ declare function del_contract_data(k:RawVal): RawVal;
 /// been installed on this network. `salt` is used to create a unique contract id.
 // @ts-ignore
 @external("l", "3")
-export declare function create_contract_from_contract(wasm_hash:ObjectVal, salt:ObjectVal): ObjectVal;
+export declare function create_contract_from_contract(wasm_hash:BytesObject, salt:BytesObject): BytesObject;

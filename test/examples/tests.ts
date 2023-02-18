@@ -166,3 +166,10 @@ export function callctr2(user: val.AddressObject): val.MapObject {
   return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "auth", args.getHostObject());
 
 }
+
+export function deploy(wasm_hash: val.BytesObject, salt: val.BytesObject, 
+  fn_name: val.SymbolVal, args:val.VectorObject): val.RawVal {
+
+  let id = ledger.deployContract(wasm_hash, salt);
+  return contract.callContract(id, fn_name, args);
+}
