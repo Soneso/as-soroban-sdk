@@ -3,7 +3,7 @@ import { Vec } from "../../lib/vec";
 import { Map } from "../../lib/map";
 import { Bytes } from "../../lib/bytes";
 
-export function testU32(): val.StatusVal {
+export function testU32(): val.RawVal {
 
   const U32VAL = 12;
   let au32 = val.fromU32(U32VAL);
@@ -13,7 +13,7 @@ export function testU32(): val.StatusVal {
   return val.fromTrue();
 }
 
-export function testI32(): val.StatusVal {
+export function testI32(): val.RawVal {
 
     const I32VAL = -112;
     let ai32 = val.fromI32(I32VAL);
@@ -23,7 +23,7 @@ export function testI32(): val.StatusVal {
     return val.fromTrue();
 }
 
-export function testStatic(): val.StatusVal {
+export function testStatic(): val.RawVal {
 
   let aVoid = val.fromVoid();
   if(!val.isStatic(aVoid) || !val.isVoid(aVoid)) {
@@ -53,7 +53,7 @@ export function testStatic(): val.StatusVal {
   return val.fromTrue();
 }
 
-export function testObject(): val.StatusVal {
+export function testObject(): val.RawVal {
 
   let vec = new Vec();
   let vecObject = vec.getHostObject();
@@ -102,7 +102,7 @@ export function testObject(): val.StatusVal {
   return val.fromTrue();
 }
 
-export function testStatus(): val.StatusVal {
+export function testStatus(): val.RawVal {
 
   const errCode = 33;
   let contractErr = val.contractError(errCode);

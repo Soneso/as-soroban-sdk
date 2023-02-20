@@ -7,27 +7,27 @@
         {
             "name" : "testI32",
             "arguments": [],
-            "returns" : "status"
+            "returns" : "val"
         },
         {
             "name" : "testU32",
             "arguments": [],
-            "returns" : "status"
+            "returns" : "val"
         },
         {
             "name" : "testStatic",
             "arguments": [],
-            "returns" : "status"
+            "returns" : "val"
         },
         {
             "name" : "testObject",
             "arguments": [],
-            "returns" : "status"
+            "returns" : "val"
         },
         {
             "name" : "testStatus",
             "arguments": [],
-            "returns" : "status"
+            "returns" : "val"
         },
         {
             "name" : "testSymbol",

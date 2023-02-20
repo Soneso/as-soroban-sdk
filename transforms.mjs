@@ -197,15 +197,21 @@ export class SdkTransform extends Transform {
       if (valid) {
         let functionReturn = item.returns;
         let returnTypes = [];
-        let returnTyp = SdkTransform.getSpecType(functionReturn, xdr);
-        if (returnTyp) {
-          returnTypes.push(returnTyp);
+        if (functionReturn === undefined || functionReturn === "void") {
+          valid = true
+        } else {
+          let returnTyp = SdkTransform.getSpecType(functionReturn, xdr);
+          if (returnTyp) {
+            returnTypes.push(returnTyp);
+          } else {
+            console.error("Unsupported return type: " + functionReturn);
+            valid = false;
+          }
+        }
+        if (valid) {
           let funcV0 = new xdr.ScSpecFunctionV0({doc:'', name: functionName, inputs: args, outputs: returnTypes});
           let funcEntry = xdr.ScSpecEntry.scSpecEntryFunctionV0(funcV0);
           functions.push(funcEntry.toXDR());
-        } else {
-          console.error("Unsupported return type: " + functionReturn);
-          valid = false;
         }
       }
     });
@@ -222,7 +228,9 @@ export class SdkTransform extends Transform {
     var typ = xdr.ScSpecTypeDef.scSpecTypeVal();
     switch(argumentTypeStr) {
       case "val":
-        return xdr.ScSpecTypeDef.scSpecTypeVal();
+        return typ;
+      case "void":
+        return typ;
       case "u32":
         return xdr.ScSpecTypeDef.scSpecTypeU32();
       case "i32":

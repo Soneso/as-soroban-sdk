@@ -10,6 +10,8 @@ const createIdentity2 = 'soroban config identity generate acc2 && soroban config
 
 async function startTest() {
 
+    await clean();
+
     // build the contract.
     await buildTests();
 
@@ -18,6 +20,11 @@ async function startTest() {
     await testExamples();
     await testSdkTypes();
 } 
+
+async function clean() {
+    const { error, stdout, stderr } = await exec('rm -rf .soroban');
+    console.log(stdout);
+}
 
 async function buildTests() {
     const { error, stdout, stderr } = await exec('npm run asbuild:tests');
@@ -40,7 +47,6 @@ async function testValueConversion() {
     await testSymbol();
     console.log(`test value conversions -> OK`);
 }
-
 
 async function testI32() {
     console.log(`test I32 ...`);
