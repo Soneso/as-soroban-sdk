@@ -20,7 +20,7 @@ export function requireAuth(address: AddressObject): StatusVal {
  * current contract function with the provided arguments.
  * Traps if the invocation hasn't been authorized.
  * @param address to be checked as AddressObject
- * @param args vector containing the args as symbols
+ * @param args vector containing the args
  * @returns void if authorized
  */
 export function requireAuthForArgs(address: AddressObject, args:Vec): StatusVal {
