@@ -2,155 +2,309 @@ import * as context from "./context";
 
 export type RawVal = u64;
 
-/// Wrapper for a [RawVal] that is tagged with [Tag::Object], interpreting the
-/// [RawVal]'s body as a pair of a 28-bit object-type code and a 32-bit handle
-/// to a host object of the object-type. The object-type codes correspond to the
-/// enumerated cases of [ScObject], and the handle values are dynamically
-/// assigned by the host as new objects are allocated during execution.
-export type ObjectVal = RawVal;
-export type SymbolVal = RawVal;
-export type VectorObject = ObjectVal;
-export type MapObject = ObjectVal;
-export type BytesObject = ObjectVal;
-export type StatusVal = RawVal;
-export type Unsigned64BitIntObject = ObjectVal;
-export type Signed64BitIntObject = ObjectVal;
-export type Unsigned128BitIntObject = ObjectVal;
-export type Signed128BitIntObject = ObjectVal;
-export type ContractCodeObject = ObjectVal;
-export type AddressObject = ObjectVal;
+/// Define types for better code readability
 
+// Values
+export type BoolVal = RawVal;
+export type FalseVal = BoolVal;
+export type TrueVal = BoolVal;
+export type VoidVal = RawVal;
+export type StatusVal = RawVal;
+export type U32Val = RawVal;
+export type I32Val = RawVal;
+export type U64SmallVal = RawVal;
+export type I64SmallVal = RawVal;
+export type TimepointSmallVal = RawVal;
+export type DurationSmallVal = RawVal;
+export type U128SmallVal = RawVal;
+export type I128SmallVal = RawVal;
+export type U256SmallVal = RawVal;
+export type I256SmallVal = RawVal;
+export type Symbol = RawVal;
+export type SmallSymbolVal = Symbol;
+export type LedgerKeyContractExecutableVal = RawVal;
+
+// Objects
+export type ObjectVal = RawVal;
+export type U64Object = ObjectVal;
+export type I64Object = ObjectVal;
+export type TimepointObject = RawVal;
+export type DurationObject = RawVal;
+export type U128Object = ObjectVal;
+export type I128Object = ObjectVal;
+export type U256Object = ObjectVal;
+export type I256Object = ObjectVal;
+export type BytesObject = ObjectVal;
+export type StringObject = ObjectVal;
+export type SymbolObject = Symbol;
+export type VecObject = ObjectVal;
+export type MapObject = ObjectVal;
+export type ContractExecutableObject = ObjectVal;
+export type AddressObject = ObjectVal;
+export type LedgerKeyNonceObject = ObjectVal;
+
+// Tags
 type rawValTag = u8;
 
-/// A 64-bit value encoding a bit-packed disjoint union between several
-/// different types (numbers, booleans, symbols, object handles, etc.)
-///
-/// RawVals divide up the space of 64 bits according to a 2-level tagging
-/// scheme. The first tag is a bit in the least-significant position, indicating
-/// whether the `RawVal` is a plain "u63" 63-bit unsigned integer, or some
-/// more-structured value with a second-level tag in the next most significant 3
-/// bits. The 63-bit unsigned integer case can also be thought of as handling
-/// the complete range of non-negative signed 64-bit integers.
-///
-/// The remaining 3 bit tags are assigned to cases enumerated in [Tag], of
-/// which 7 are defined and one is currently reserved.
-///
-/// Schematically, the bit-assignment for `RawVal` looks like this:
-///
-/// ```text
-///    0x_NNNN_NNNN_NNNN_NNNX  - u63, for any even X
-///    0x_0000_000N_NNNN_NNN1  - u32
-///    0x_0000_000N_NNNN_NNN3  - i32
-///    0x_NNNN_NNNN_NNNN_NNN5  - static: void, true, false, ...
-///    0x_IIII_IIII_TTTT_TTT7  - object: 32-bit index I, 28-bit type code T
-///    0x_NNNN_NNNN_NNNN_NNN9  - symbol: up to 10 6-bit identifier characters
-///    0x_NNNN_NNNN_NNNN_NNNb  - bitset: up to 60 bits
-///    0x_CCCC_CCCC_TTTT_TTTd  - status: 32-bit code C, 28-bit type code T
-///    0x_NNNN_NNNN_NNNN_NNNf  - reserved
-/// ```
+// We fix a maximum of 128 value types in the system for two reasons: we want to
+// keep the codes relatively small (<= 8 bits) when bit-packing values into a
+// u64 at the environment interface level, so that we keep many bits for
+// payloads (small strings, small numeric values, object handles); and then we
+// actually want to go one step further and ensure (for code-size) that our
+// codes fit in a single ULEB128-code byte, which means we can only use 7 bits.
+//
+// We also reserve several type codes from this space because we want to _reuse_
+// the SCValType codes at the environment interface level (or at least not
+// exceed its number-space) but there are more types at that level, assigned to
+// optimizations/special case representations of values abstract at this level.
+
+
+/// Code values for the 8 `tag` bits in the bit-packed representation
+/// of [RawVal]. These don't coincide with tag numbers in the SCVal XDR
+/// but cover all those cases as well as some optimized refinements for
+/// special cases (boolean true and false, small-value forms).
+
+/// Tag for a [RawVal] that encodes [bool] `false`.
+const rawValTagFalse: rawValTag = 0;
+
+/// Tag for a [RawVal] that encodes [bool] `true`.
+const rawValTagTrue: rawValTag = 1;
+
+/// Tag for a [RawVal] that is empty/absent (eg. void, null, nil, undefined, None)
+const rawValTagVoid: rawValTag = 2;
+
+/// Tag for a [RawVal] that is contains an error code.
+const rawValTagStatus: rawValTag = 3;
 
 /// Tag for a [RawVal] that contains a [u32] number.
-const rawValTagU32: rawValTag = 0;
+const rawValTagU32: rawValTag = 4;
 
 /// Tag for a [RawVal] that contains an [i32] number.
-const rawValTagI32: rawValTag = 1;
+const rawValTagI32: rawValTag = 5;
 
-/// Tag for a [RawVal] that contains a "static" value like `true`, `false`, `void`; see [Static].
-const rawValTagStatic: rawValTag = 2;
+/// Tag for a [RawVal] that contains a [u64] small enough to fit in 56 bits.
+const rawValTagU64Small: rawValTag = 6;
 
-/// Tag for a [RawVal] that contains a host object handle; see [Object].
-const rawValTagObject: rawValTag = 3;
+/// Tag for a [RawVal] that contains an [i64] small enough to fit in 56 bits.
+const rawValTagI64Small: rawValTag = 7;
 
-/// Tag for a [RawVal] that contains a symbol; see [Symbol].
-const rawValTagSymbol: rawValTag = 4;
+/// Tag for a [RawVal] that contains a [u64] timepoint small enough to fit
+/// in 56 bits.
+const rawValTagTimepointSmall: rawValTag = 8;
 
-/// Tag for a [RawVal] that contains a small bitset; see [BitSet].
-const rawValTagBitset: rawValTag = 5;
+/// Tag for a [RawVal] that contains a [u64] duration small enough to fit
+/// in 56 bits.
+const rawValTagDurationSmall: rawValTag = 9;
 
-/// Tag for a [RawVal] that contains a status code; see [Status].
-const rawValTagStatus: rawValTag = 6;
+/// Tag for a [RawVal] that contains a [u128] small enough to fit in 56 bits.
+const rawValTagU128Small: rawValTag = 10;
 
-/// Tag for a [RawVal] that is reserved for future use.
-const rawValTagReserved: rawValTag = 7;
+/// Tag for a [RawVal] that contains a [i128] small enough to fit in 56 bits.
+const rawValTagI128Small: rawValTag = 11;
 
-/*******************************************************************************************************************
-* [Static] - rawValTag 2: a static set of 60-bit values, of which the first 3 are void (0), true (1) and false (2).*
-********************************************************************************************************************/
-const staticVoidBody: u32 = 0;
-const staticTrueBody: u32 = 1;
-const staticFalseBody: u32 = 2;
-const staticLedgerKeyContractCodeBody: u32 = 3;
+/// Tag for a [RawVal] that contains a [u256] small enough to fit in 56 bits.
+const rawValTagU256Small: rawValTag = 12;
 
-/******************************************************************************************************
-* [Object] - rawValTag 3: an object reference given by a 28-bit type code followed by a 32-bit handle.*
-*******************************************************************************************************/
+/// Tag for a [RawVal] that contains a [i256] small enough to fit in 56 bits.
+const rawValTagI256Small: rawValTag = 13;
 
-/**
-//       // We have a few objects that represent non-stellar-specific concepts
-//       // like general-purpose maps, vectors, numbers, blobs.
-//   
-//       SCO_VEC = 0,
-//       SCO_MAP = 1,
-//       SCO_U64 = 2,
-//       SCO_I64 = 3,
-//       SCO_U128 = 4,
-//       SCO_I128 = 5,
-//       SCO_BYTES = 6,
-//       SCO_CONTRACT_CODE = 7,
-//       SCO_ADDRESS = 8,
-//       SCO_NONCE_KEY = 9
- */
-type objectType = u8;
+/// Tag for a [RawVal] that contains up to 9 character symbols.
+const rawValTagSmallSymbol: rawValTag = 14;
+    
+/// Tag for a [RawVal] that corresponds to
+/// [stellar_xdr::ScVal::LedgerKeyContractExecutable]
+const rawValTagLedgerKeyContractExecutable: rawValTag = 15;
 
-export const objTypeVec: objectType = 0;
-export const objTypeMap: objectType = 1;
-export const objTypeU64: objectType = 2;
-export const objTypeI64: objectType = 3;
-export const objTypeU128: objectType = 4;
-export const objTypeI128: objectType = 5;
-export const objTypeBytes: objectType = 6;
-export const objTypeContractCode: objectType = 7;
-export const objTypeAddress: objectType = 8;
-export const objTypeNonceKey: objectType = 9;
+/// Code delimiting the upper boundary of "small" types.
+const rawValTagSmallCodeUpperBound: rawValTag = 16;
+
+/// Tag reserved to indicate boundary between tags for "small" types with
+/// their payload packed into the remaining 56 bits of the [RawVal] and
+/// "object" types that are stored as host objects and referenced by
+/// [Object] handle.
+const rawValTagObjectCodeLowerBound: rawValTag = 63;
+
+/// Tag for a [RawVal] that refers to a host-side [u64] number.
+const rawValTagU64Object: rawValTag = 64;
+
+/// Tag for a [RawVal] that refers to a host-side [i64] number.
+const rawValTagI64Object: rawValTag = 65;
+
+/// Tag for a [RawVal] that refers to a host-side [u64] number encoding a
+/// time-point (a count of seconds since the Unix epoch, Jan 1 1970 UTC).
+const rawValTagTimepointObject: rawValTag = 66;
+
+/// Tag for a [RawVal] that refers to a host-side [i64] number encoding a
+/// duration (a count of seconds).
+const rawValTagDurationObject: rawValTag = 67;
+
+/// Tag for a [RawVal] that refers to a host-side [u128] number.
+const rawValTagU128Object: rawValTag = 68;
+
+/// Tag for a [RawVal] that refers to a host-side [u128] number.
+const rawValTagI128Object: rawValTag = 69;
+
+/// Tag for a [RawVal] that refers to a host-side [u256] number.
+const rawValTagU256Object: rawValTag = 70;
+
+/// Tag for a [RawVal] that refers to a host-side [i256] number.
+const rawValTagI256Object: rawValTag = 71;
+
+/// Tag for a [RawVal] that refers to a host-side bytes object.
+const rawValTagBytesObject: rawValTag = 72;
+
+/// Tag for a [RawVal] that refers to a host-side string object.
+const rawValTagStringObject: rawValTag = 74;
+
+/// Tag for a [RawVal] that refers to a host-side symbol object.
+const rawValTagSymbolObject: rawValTag = 75;
+
+/// Tag for a [RawVal] that refers to a host-side vector object.
+const rawValTagVecObject: rawValTag = 77;
+
+/// Tag for a [RawVal] that refers to a host-side map object.
+const rawValTagMapObject: rawValTag = 78;
+
+/// Tag for a [RawVal] that refers to a host-side contract executable object.
+const rawValTagContractExecutableObject: rawValTag = 79;
+
+/// Tag for a [RawVal] that refers to a host-side address object.
+const rawValTagAddressObject: rawValTag = 80;
+
+/// Tag for a [RawVal] that corresponds to
+/// [stellar_xdr::ScVal::LedgerKeyNonce] and refers to a host-side
+/// address object that specifies which address it's the nonce for.
+const rawValTagLedgerKeyNonceObject: rawValTag = 81;
+
+const rawValTagObjectCodeUpperBound: rawValTag = 82;
+
+const rawValTagBad: rawValTag = 0x7f;
+
 
 /*******************
 * HELPER FUNCTIONS.*
 ********************/
 
+// Booleans
+
 /**
- * Checks if the given value of type RawVal represents a positive signed 64-bit integer.
- * @param val the value to be checked (type: RawVal) 
- * @returns true if the given value represents a positive signed 64-bit integer. otherwise false 
+ * Checks if a host value represents a boolean. 
+ * @param val the host value to check.
+ * @returns true if boolean, otherwise false.
  */
-export function isU63(val: RawVal): bool {
-  return (val & 1) == 0;
+export function isBool(val: RawVal): bool {
+  return hasTag(val, rawValTagFalse) || hasTag(val, rawValTagTrue);
 }
 
 /**
- * Extracts the positive signed 64-bit integer from a given host value.
- * Traps if the host value doese not contain a positive signed 64-bit integer. To avoid, you can check it with isU63().
- * @param val the host value (Type: RawVal)
- * @returns the contained positive signed 64-bit integer.
+ * Checks if a host value represents "true". 
+ * @param val the host value to check.
+ * @returns true if boolean of "true", otherwise false.
  */
-export function toU63(val: RawVal): u64 {
-  if(!isU63(val)) {
-    context.fail();
-  }
-  return val >> 1;
+export function isTrue(val: RawVal): bool {
+  return hasTag(val, rawValTagTrue);
 }
 
 /**
- * Creates a host value from a given positive signed 64-bit integer.
- * @param i the positive signed 64-bit integer
- * @returns the created host value (Type: RawVal)
+ * Checks if a host value represents "false". 
+ * @param val the host value to check.
+ * @returns true if boolean of "false", otherwise false.
  */
-export function fromU63(i: u64): RawVal {
-  if((i >> 63) != 0) {
+export function isFalse(val: RawVal): bool {
+  return hasTag(val, rawValTagFalse);
+}
+
+/**
+ * Extracts the value from a given host value that represents a boolean value.
+ * Traps if the host value doese not represent a boolean value. To avoid, you can check it with isBool().
+ * @param val the host value to extract the boolean from.
+ * @returns true if the host value represents true. Otherwise returns false.
+ */
+export function toBool(val: RawVal): bool {
+  if(!isBool(val)) {
     context.fail();
   }
-  const v = (i << 1) as RawVal;
-  return v;
+  return hasTag(val, rawValTagTrue);
 }
+
+/**
+ * Creates a host value that represents a value of the given bool.
+ * @param b the bool to set. 
+ * @returns the created host value (Type: TrueVal or FalseVal)
+ */
+export function fromBool(b: bool): RawVal {
+  return b ? fromTrue() : fromFalse();
+}
+
+/**
+ * Creates a host value that represents a value of "true".
+ * @returns the created host value (Type: TrueVal)
+ */
+export function fromTrue(): TrueVal {
+  return fromBodyAndTag(0, rawValTagTrue);
+}
+
+/**
+ * Creates a host value that represents a value of "false".
+ * @returns the created host value (Type: FalseVal)
+ */
+export function fromFalse(): FalseVal {
+  return fromBodyAndTag(0, rawValTagFalse);
+}
+
+// Void
+
+/**
+ * Checks if a host value that represents "void". 
+ * @param val the host value to check.
+ * @returns true if "void", otherwise false.
+ */
+export function isVoid(val: RawVal): bool {
+  return hasTag(val, rawValTagVoid);
+}
+
+/**
+ * Creates a host value that represents "void".
+ * @returns the created host value (Type: VoidVal)
+ */
+export function fromVoid(): VoidVal {
+  return fromBodyAndTag(0, rawValTagVoid);
+}
+
+// U32
+
+/**
+ * Checks if the given host value represents a 32-bit unsigned integer.
+ * @param val host value to check (Type: RawVal).
+ * @returns true if the host value represents a 32-bit unsigned integer. Otherwise false.
+ */
+export function isU32(val: RawVal): bool {
+  return hasTag(val, rawValTagU32);
+}
+
+/**
+ * Extracts the 32-bit unsigned integer from a host value that represents a 32-bit unsigned integer.
+ * Traps if the host value doese not represent a 32-bit unsigned integer. To avoid, you can check it with isU32().
+ * @param v the host value to extract the 32-bit unsigned integer from.
+ * @returns the extracted 32-bit unsigned integer.
+ */
+export function toU32(v: U32Val): u32 {
+  if (!isU32(v)) {
+    context.fail();
+  }
+  return getMajor(v) as u32;
+}
+
+/**
+ * Creates a host value that represents a 32-bit unsigned integer.
+ * @param u the 32-bit unsigned integer to be included into the host value.
+ * @returns the created host value (Type: U32Val).
+ */
+export function fromU32(u: u32): U32Val {
+  return fromMajorMinorAndTag(u, 0, rawValTagU32);
+}
+
+// I32
 
 /**
  * Checks if the given host value represents a 32-bit signed integer.
@@ -164,293 +318,529 @@ export function isI32(val: RawVal): bool {
 /**
  * Extracts the 32-bit signed integer from a host value that represents a 32-bit signed integer.
  * Traps if the host value doese not represent a 32-bit signed integer. To avoid, you can check it with isI32().
- * @param v the host value to extract the 32-bit signed integer from
+ * @param v the host value to extract the 32-bit signed integer from.
  * @returns the extracted 32-bit signed integer.
  */
-export function toI32(v: RawVal): i32 {
+export function toI32(v: I32Val): i32 {
   if(!isI32(v)) {
     context.fail();
   }
-  return getBody(v) as i32;
+  return getMajor(v) as i32;
 }
 
 /**
  * Creates a host value that represents a 32-bit signed integer.
- * @param i the 32-bit signed integer to be included into the host value
- * @returns the created host value (Type: RawVal)
+ * @param i the 32-bit signed integer to be included into the host value.
+ * @returns the created host value (Type: I32Val).
  */
-export function fromI32(i: i32): RawVal {
-  return addTagToBody(rawValTagI32, i as u32 as u64);
+export function fromI32(i: i32): I32Val {
+  return fromMajorMinorAndTag(i, 0, rawValTagI32);
 }
 
+// U64 small enough to fit in 56 bits.
+
 /**
- * Checks if the given host value represents a 32-bit unsigned integer.
+ * Checks if the given host value represents an u64 small enough to fit in 56 bits.
  * @param val host value to check (Type: RawVal) 
- * @returns true if the host value represents a 32-bit unsigned integer. otherwise false.
+ * @returns true if the host value represents an u64 small enough to fit in 56 bits. Otherwise false.
  */
-export function isU32(val: RawVal): bool {
-  return hasTag(val, rawValTagU32);
+export function isU64Small(val: RawVal): bool {
+  return hasTag(val, rawValTagU64Small);
 }
 
 /**
- * Extracts the 32-bit unsigned integer from a host value that represents a 32-bit unsigned integer.
- * Traps if the host value doese not represent a 32-bit unsigned integer. To avoid, you can check it with isU32().
- * @param v the host value to extract the 32-bit unsigned integer from
- * @returns the extracted 32-bit unsigned integer.
+ * Extracts the u64 from a host value that represents an u64 small enough to fit in 56 bits.
+ * Traps if the host value doese not represent an u64 small enough to fit in 56 bits. To avoid, you can check it with isU64Small().
+ * @param v the host value to extract the u64 from
+ * @returns the extracted u64.
  */
-export function toU32(v: RawVal): u32 {
-  if (!isU32(v)) {
+export function toU64Small(v: U64SmallVal): u64 {
+  if(!isU64Small(v)) {
     context.fail();
   }
-  return getBody(v) as u32;
+  return getBody(v) as u64;
 }
 
 /**
- * Creates a host value that represents a 32-bit unsigned integer.
- * @param i the 32-bit unsigned integer to be included into the host value
- * @returns the created host value (Type: RawVal)
+ * Creates a host value that represents an u64 small enough to fit in 56 bits.
+ * @param u the small enough u64 to be included into the host value
+ * @returns the created host value (Type: U64SmallVal)
  */
-export function fromU32(i: u32): RawVal {
-  return addTagToBody(rawValTagU32, i as u64);
+export function fromU64Small(u: u64): U64SmallVal {
+  return fromBodyAndTag(u, rawValTagU64Small);
 }
 
+/// I64 small enough to fit in 56 bits.
+
 /**
- * Checks if the given host value represents a static value.
+ * Checks if the given host value represents an i64 small enough to fit in 56 bits.
  * @param val host value to check (Type: RawVal) 
- * @returns true if the host value represents a static value. otherwise false.
+ * @returns true if the host value represents an i64 small enough to fit in 56 bits. otherwise false.
  */
-export function isStatic(val: RawVal): bool {
-  return hasTag(val, rawValTagStatic);
+export function isI64Small(val: RawVal): bool {
+  return hasTag(val, rawValTagI64Small);
 }
 
 /**
- * Checks if a host value that represents a static value and has the value of "void". 
- * @param val the host value to check.
- * @returns true if static with value "void", otherwise false.
+ * Extracts the i64 from a host value that represents an i64 small enough to fit in 56 bits.
+ * Traps if the host value doese not represent an i64 small enough to fit in 56 bits. To avoid, you can check it with isI64Small().
+ * @param v the host value to extract the i64 from
+ * @returns the extracted i64.
  */
-export function isVoid(val: RawVal): bool {
-  return isStatic(val) && getBody(val) == staticVoidBody;
-}
-
-/**
- * Creates a host value that represents a static value of "void".
- * @returns the created host value (Type: RawVal)
- */
-export function fromVoid(): RawVal {
-  return addTagToBody(rawValTagStatic, staticVoidBody);
-}
-
-/**
- * Checks if a host value represents a static value and contains a boolean. 
- * @param val the host value to check.
- * @returns true if boolean, otherwise false.
- */
-export function isBool(val: RawVal): bool {
-  return isStatic(val) &&
-    (getBody(val) == staticTrueBody || getBody(val) == staticFalseBody);
-}
-
-/**
- * Checks if a host value represents a static value and holds the value of "true". 
- * @param val the host value to check.
- * @returns true if boolean of "true", otherwise false.
- */
-export function isTrue(val: RawVal): bool {
-  return isStatic(val) && getBody(val) == staticTrueBody;
-}
-
-/**
- * Checks if a host value represents a static value and holds the value of "false". 
- * @param val the host value to check.
- * @returns true if boolean of "false", otherwise false.
- */
-export function isFalse(val: RawVal): bool {
-  return isStatic(val) && getBody(val) == staticFalseBody;
-}
-
-/**
- * Extracts the boolean value from a given host value that represents a static value.
- * Traps if the host value doese not represent a static value. To avoid, you can check it with isStatic() or isBool().
- * @param val the host value to extract the boolean from
- * @returns true if the host value represents the static value of true. otherwise returns false (e.g. for false, void, ledgerkey...)
- */
-export function toBool(val: RawVal): bool {
-  if(!isBool(val)) {
+export function toI64Small(v: I64SmallVal): i64 {
+  if(!isI64Small(v)) {
     context.fail();
   }
-  return getBody(val) == staticTrueBody;
+  return getSignedBody(v);
 }
 
 /**
- * Creates a host value that represents a static value of the given bool.
- * @param b the bool to set. 
+ * Creates a host value that represents an i64 small enough to fit in 56 bits.
+ * @param i the small enough i64 to be included into the host value
+ * @returns the created host value (Type: I64SmallVal)
+ */
+export function fromI64Small(i: i64): I64SmallVal {
+  return fromBodyAndTag(i, rawValTagI64Small);
+}
+
+/// Timepoint small enough to fit in 56 bits.
+
+/**
+ * Checks if the given host value represents a timepoint (u64) small enough to fit in 56 bits.
+ * @param val host value to check (Type: RawVal) 
+ * @returns true if the host value represents a timepoint (u64) small enough to fit in 56 bits. otherwise false.
+ */
+export function isTimepointSmall(val: RawVal): bool {
+  return hasTag(val, rawValTagTimepointSmall);
+}
+
+/**
+ * Extracts the timepoint (u64) from a host value that represents a timepoint small enough to fit in 56 bits.
+ * Traps if the host value doese not represent a timepoint (u64) small enough to fit in 56 bits. To avoid, you can check it with isTimepointSmall().
+ * @param v the host value to extract the u64 from
+ * @returns the extracted u64.
+ */
+export function toTimepointSmall(v: TimepointSmallVal): u64 {
+  if(!isTimepointSmall(v)) {
+    context.fail();
+  }
+  return getBody(v);
+}
+
+/**
+ * Creates a host value that represents a timepoint (u64) small enough to fit in 56 bits.
+ * @param t the small enough timepoint (u64) to be included into the host value
  * @returns the created host value (Type: RawVal)
  */
-export function fromBool(b: bool): RawVal {
-  return addTagToBody(rawValTagStatic, b ? staticTrueBody : staticFalseBody);
+export function fromTimepointSmall(t: u64): TimepointSmallVal {
+  return fromBodyAndTag(t, rawValTagTimepointSmall);
 }
 
+/// Duration small enough to fit in 56 bits.
+
 /**
- * Creates a host value that represents a static value of "true".
- * @returns the created host value (Type: RawVal)
+ * Checks if the given host value represents a duration (u64) small enough to fit in 56 bits.
+ * @param val host value to check (Type: RawVal).
+ * @returns true if the host value represents a duration (u64) small enough to fit in 56 bits. Otherwise false.
  */
-export function fromTrue(): RawVal {
-  return addTagToBody(rawValTagStatic, staticTrueBody);
+export function isDurationSmall(val: RawVal): bool {
+  return hasTag(val, rawValTagDurationSmall);
 }
 
 /**
- * Creates a host value that represents a static value of "false".
- * @returns the created host value (Type: RawVal)
+ * Extracts the duration (u64) from a host value that represents a duration small enough to fit in 56 bits.
+ * Traps if the host value doese not represent a duration (u64) small enough to fit in 56 bits. To avoid, you can check it with isDurationSmall().
+ * @param v the host value to extract the u64 from.
+ * @returns the extracted u64.
  */
-export function fromFalse(): RawVal {
-  return addTagToBody(rawValTagStatic, staticFalseBody);
+export function toDurationSmall(v: DurationSmallVal): u64 {
+  if(!isDurationSmall(v)) {
+    context.fail();
+  }
+  return getBody(v);
 }
 
 /**
- * Checks if the given host value represenst a static value of "LedgerKeyContractCode"
- * @param val the host value to check (type: RawVal)
- * @returns true if the given host value represenst a static value of "LedgerKeyContractCode". otherwise false
+ * Creates a host value that represents a duration (u64) small enough to fit in 56 bits.
+ * @param t the small enough duration (u64) to be included into the host value.
+ * @returns the created host value (Type: DurationSmallVal).
+ */
+export function fromDurationSmall(t: u64): DurationSmallVal {
+  return fromBodyAndTag(t, rawValTagDurationSmall);
+}
+
+/// U128 small enough to fit in 56 bits.
+
+/**
+ * Checks if the given host value represents an u128 small enough to fit in 56 bits.
+ * @param val host value to check (Type: RawVal).
+ * @returns true if the host value represents an u128 small enough to fit in 56 bits. Otherwise false.
+ */
+export function isU128Small(val: RawVal): bool {
+  return hasTag(val, rawValTagU128Small);
+}
+
+/**
+ * Extracts the u128 from a host value that represents an u128 small enough to fit in 56 bits.
+ * Traps if the host value doese not represent an u128 small enough to fit in 56 bits. To avoid, you can check it with isU128Small().
+ * @param v the host value to extract the u128 from.
+ * @returns the extracted u128 as u64.
+ */
+export function toU128Small(v: U128SmallVal): u64 {
+  if(!isU128Small(v)) {
+    context.fail();
+  }
+  return getBody(v) as u64;
+}
+
+/**
+ * Creates a host value that represents an u128 small enough to fit in 56 bits.
+ * @param u the small enough u128 (as u64) to be included into the host value.
+ * @returns the created host value (Type: U128SmallVal).
+ */
+export function fromU128Small(u: u64): U128SmallVal {
+  return fromBodyAndTag(u, rawValTagU128Small);
+}
+
+/// I128 small enough to fit in 56 bits.
+
+/**
+ * Checks if the given host value represents an i128 small enough to fit in 56 bits.
+ * @param val host value to check (Type: RawVal).
+ * @returns true if the host value represents an i128 small enough to fit in 56 bits. Otherwise false.
+ */
+export function isI128Small(val: RawVal): bool {
+  return hasTag(val, rawValTagI128Small);
+}
+
+/**
+ * Extracts the i128 from a host value that represents an i128 small enough to fit in 56 bits.
+ * Traps if the host value doese not represent an i128 small enough to fit in 56 bits. To avoid, you can check it with isI128Small().
+ * @param v the host value to extract the i128 from.
+ * @returns the extracted i128 (as i64).
+ */
+export function toI128Small(v: I128SmallVal): i64 {
+  if(!isI128Small(v)) {
+    context.fail();
+  }
+  return getSignedBody(v);
+}
+
+/**
+ * Creates a host value that represents an i128 small enough to fit in 56 bits.
+ * @param i the small enough i128 to be included into the host value.
+ * @returns the created host value (Type: I128SmallVal).
+ */
+export function fromI128Small(i: i64): I128SmallVal {
+  return fromBodyAndTag(i, rawValTagI128Small);
+}
+
+/// U256 small enough to fit in 56 bits.
+
+/**
+ * Checks if the given host value represents an u256 small enough to fit in 56 bits.
+ * @param val host value to check (Type: RawVal).
+ * @returns true if the host value represents an u256 small enough to fit in 56 bits. Otherwise false.
+ */
+export function isU256Small(val: RawVal): bool {
+  return hasTag(val, rawValTagU256Small);
+}
+
+/**
+ * Extracts the u256 from a host value that represents an u256 small enough to fit in 56 bits.
+ * Traps if the host value doese not represent an u256 small enough to fit in 56 bits. To avoid, you can check it with isU128Small().
+ * @param v the host value to extract the u256 from.
+ * @returns the extracted u256 as u64.
+ */
+export function toU256Small(v: U256SmallVal): u64 {
+  if(!isU256Small(v)) {
+    context.fail();
+  }
+  return getBody(v) as u64;
+}
+
+/**
+ * Creates a host value that represents an u256 small enough to fit in 56 bits.
+ * @param u the small enough u256 (as u64) to be included into the host value.
+ * @returns the created host value (Type: U256SmallVal).
+ */
+export function fromU256Small(u: u64): U256SmallVal {
+  return fromBodyAndTag(u, rawValTagU256Small);
+}
+
+/// I256 small enough to fit in 56 bits.
+
+/**
+ * Checks if the given host value represents an i256 small enough to fit in 56 bits.
+ * @param val host value to check (Type: RawVal). 
+ * @returns true if the host value represents an i256 small enough to fit in 56 bits. otherwise false.
+ */
+export function isI256Small(val: RawVal): bool {
+  return hasTag(val, rawValTagI256Small);
+}
+
+/**
+ * Extracts the i256 from a host value that represents an i256 small enough to fit in 56 bits.
+ * Traps if the host value doese not represent an i256 small enough to fit in 56 bits. To avoid, you can check it with isI256Small().
+ * @param v the host value to extract the i256 from.
+ * @returns the extracted i256 (as i64).
+ */
+export function toI256Small(v: I256SmallVal): i64 {
+  if(!isI256Small(v)) {
+    context.fail();
+  }
+  return getSignedBody(v);
+}
+
+/**
+ * Creates a host value that represents an i256 small enough to fit in 56 bits.
+ * @param i the small enough i256 to be included into the host value.
+ * @returns the created host value (Type: I256SmallVal).
+ */
+export function fromI256Small(i: i64): I256SmallVal {
+  return fromBodyAndTag(i, rawValTagI256Small);
+}
+
+/// SmallSymbolVal -> up to 9 character symbols.
+
+/**
+ * Checks if the given host value represents a small symbol value.
+ * @param val host value to check (Type: RawVal).
+ * @returns true if the host value represents a small symbol value. otherwise false. 
+ */
+export function isSmallSymbol(val: RawVal): bool {
+  return hasTag(val, rawValTagSmallSymbol);
+}
+
+/**
+ * Creates a SmallSymbolVal from the given string.
+ * @param str the string to create the SmallSymbolVal from. max 9 characters. [_0-9A-Za-z]
+ * @returns the created SmallSymbolVal.
+ */
+export function fromSmallSymbolStr(str: string) : SmallSymbolVal {
+  if (str.length > 9) {
+    context.fail();
+  }
+
+  var accum: u64 = 0;
+  let codeBits:u8 = 6;
+  for (var i=0; i < str.length; i++) {
+    let charcode = str.charCodeAt(i);
+    if (charcode >= 48 && charcode <= 122){
+      let cu8 = charcode as u8;
+      accum <<= codeBits;
+      var v:u64 = 0;
+      if (cu8 == 95) { // "_"
+        v = 1;
+      } else if (cu8 >= 48 && cu8 <= 57) { // 0..9
+        v = 2 + ((cu8 as u64) - 48);
+      } else if (cu8 >= 65 && cu8 <= 90) { // A..Z
+        v = 12 + ((cu8 as u64) - 65);
+      } else if (cu8 >= 97 && cu8 <= 122) { // a..z
+        v = 38 + ((cu8 as u64) - 97);
+      } else {
+        context.fail(); // bad char.
+      }
+      accum |= v;
+    } else {
+      context.fail(); // bad char.
+    }
+  }
+  
+  return fromBodyAndTag(accum, rawValTagSmallSymbol);
+}
+
+/**
+ * Extracts the string from a SmallSymbolVal. Traps if the given value is not a SmallSymbolVal. To avoid, one can check with isSmallSymbol().
+ * @param symbol the SmallSymbolVal to extract the string from.
+ * @returns the extracted string.
+ */
+export function smallSymbolToString(symbol: SmallSymbolVal) : string {
+    if (!isSmallSymbol(symbol)) {
+      context.fail();
+    }
+    var result:string = "";
+    let codeBits:u8 = 6;
+    var val:u64 = 0;
+    var body = getBody(symbol);
+    for (var i=0; i < 10; i++) {
+      val = body & 63;
+      body = body >> codeBits;
+      if (val == 1) {
+        val = 95;
+      } else if (val > 1 && val < 12) {
+        val += 46;
+      } else if (val > 11 && val < 38) {
+        val += 53;
+      } else if (val > 37 && val < 64) {
+        val += 59;
+      } else if (val == 0) {
+        break;
+      } else {
+        context.fail(); // Bad val.
+      }
+      //context.log(fromI32(val as i32));
+      // TODO - gives Status(VmError(Instantiation))
+      //result = String.fromCharCode(val as i32) + result;
+    }
+    return result;
+}
+
+// LedgerKeyContractExecutable
+
+/**
+ * Checks if the given host value represenst a LedgerKeyContractExecutable.
+ * @param val the host value to check (type: RawVal).
+ * @returns true if the given host value represenst a LedgerKeyContractExecutable otherwise false.
  */
 export function isLedgerKeyContractCode(val: RawVal): bool {
-  return isStatic(val) && getBody(val) == staticLedgerKeyContractCodeBody;
+  return hasTag(val, rawValTagLedgerKeyContractExecutable);
 }
 
 /**
- * Creates a host value that represents a static value of "LedgerKeyContractCode".
- * @returns the created host value (Type: RawVal)
+ * Creates a host value that represents a value of "LedgerKeyContractExecutable".
+ * @returns the created host value (Type: LedgerKeyContractExecutableVal).
  */
-export function fromLedgerKeyContractCode(): RawVal {
-  return addTagToBody(rawValTagStatic, staticLedgerKeyContractCodeBody);
+export function fromLedgerKeyContractCode(): LedgerKeyContractExecutableVal {
+  return fromBodyAndTag(0, rawValTagLedgerKeyContractExecutable);
 }
+
+
+// objects
 
 /**
  * Checks if the given host value represents an object. 
  * @param val the host value to check. 
- * @returns true if represents an object. otherwise false
+ * @returns true if represents an object. Otherwise false.
  */
 export function isObject(val: RawVal): bool {
-  return hasTag(val, rawValTagObject);
-}
-
-/**
- * Checks if the given host value that represents an object has the given object type.
- * Traps if the host value doese not represent an object. To avoid you can check it with isObject().
- * @param val host value to check 
- * @param objType object type to check
- * @returns true if the host value represents an object with the given type. otherwise false.
- */
-export function hasObjectType(val: RawVal, objType: objectType): bool {
-  if(!isObject(val)){
-    context.fail();
-  }
-  return getObjectType(val) == objType;
-}
-
-/**
- * Returns the object type of a host value that represents an object. 
- * Traps if the host value doese not represent an object. To avoid you can check it with isObject().
- * @param val host value to get the type for. 
- * @returns the type of the object represented by the host value.
- */
-export function getObjectType(val: ObjectVal): objectType {
-  if(!isObject(val)){
-    context.fail();
-  }
-  return getBody(val) as objectType;
+  let tag = getTagU8(val);
+  return tag > (rawValTagObjectCodeLowerBound as u8) && tag < (rawValTagObjectCodeUpperBound as u8);
 }
 
 /**
  * Returns the object handle of a host value that represents an object.
  * Traps if the host value doese not represent an object. To avoid you can check it with isObject().
  * @param val host value to get the handle for. 
- * @returns the handle of the object from the host value that represents the object
+ * @returns the handle of the object from the host value that represents the object.
  */
-export function getObjectHandle(val: ObjectVal): u32 {
+export function getObjectHandle(val: ObjectVal): u64 {
   if(!isObject(val)){
     context.fail();
   }
-  return (getBody(val) >> 8) as u32;
+  return getBody(val);
 }
 
 /**
  * Creates a host value that represents an object.
- * @param objType the type of the object to be represented.
+ * @param objTag the raw value tag of the object to be represented.
  * @param handle the handle of the object to be represented. 
  * @returns the host value created.
  */
-export function fromObject(objType: objectType, handle: u32): ObjectVal {
-  return addTagToBody(rawValTagObject, ((handle as u64) << 8) | objType);
+export function fromObject(objTag: rawValTag, handle: u64): ObjectVal {
+  return fromBodyAndTag(handle, objTag);
 }
+
+// U64Object
 
 /**
  * Checks if the given host value represents an object that contains an unsigned 64-bit integer.
- * @param val host value to check
- * @returns true if the host value represents an object that contains an unsigned 64-bit integer. otherwise flase.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains an unsigned 64-bit integer. Otherwise false.
  */
 export function isU64(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeU64;
+  return hasTag(val, rawValTagU64Object);
 }
 
 /**
  * Creates an host value that represents an object containing an unsigned 64-bit integer.
  * @param val the unsigned 64-bit integer value to include.
- * @returns the created host value as Unsigned64BitIntObject
+ * @returns the created host value as U64Object.
  */
-export function fromU64(val: u64) : Unsigned64BitIntObject {
+export function fromU64(val: u64) : U64Object {
     return obj_from_u64(val);
 }
 
 /**
  * Extracts the unsigned 64-bit integer from a host value that represents an object containing an unsigned 64-bit integer.
  * Traps if the host value doese not represent an object that conatains an unsigned 64-bit integer. To avoid, you can check it with isU64().
- * @param val the host value (Type: Unsigned64BitIntObject) 
+ * @param val the host value (Type: U64Object).
  * @returns the extracted unsigned 64-bit integer.
  */
-export function toU64(val: Unsigned64BitIntObject) : u64 {
+export function toU64(val: U64Object) : u64 {
     if(!isU64(val)){
       context.fail();
     }
     return obj_to_u64(val);
 }
 
+// I64Object
+
 /**
  * Checks if the given host value represents an object that contains a signed 64-bit integer.
- * @param val host value to check
- * @returns true if the host value represents an object that contains a signed 64-bit integer. otherwise flase.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains a signed 64-bit integer. Otherwise false.
  */
  export function isI64(val: RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeI64;
+  return hasTag(val, rawValTagI64Object);
 }
 
 /**
  * Creates an host value that represents an object containing a signed 64-bit integer.
  * @param v the signed 64-bit integer value to include.
- * @returns the created host value as Signed64BitIntObject
+ * @returns the created host value as I64Object.
  */
-export function fromI64(v:i64) : Signed64BitIntObject {
+export function fromI64(v:i64) : I64Object {
   return obj_from_i64(v);
 }
 
 /**
  * Extracts the signed 64-bit integer from a host value that represents an object containing a signed 64-bit integer.
  * Traps if the host value doese not represent an object that conatains a signed 64-bit integer. To avoid, you can check it with isI64().
- * @param val the host value (Type: Signed64BitIntObject) 
+ * @param val the host value (Type: I64Object).
  * @returns the extracted signed 64-bit integer.
  */
-export function toI64(val: Signed64BitIntObject) : i64 {
+export function toI64(val: I64Object) : i64 {
   if(!isI64(val)){
     context.fail();
   }
   return obj_to_i64(val);
 }
 
+
+// TimepointObject refers to a host-side [u64] number encoding a
+// time-point (a count of seconds since the Unix epoch, Jan 1 1970 UTC).
+
+/**
+ * Checks if the given host value represents an object that contains a timepoint.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains a timepoint. otherwise false.
+ */
+export function isTimepoint(val: RawVal) : bool {
+  return hasTag(val, rawValTagTimepointObject);
+}
+
+/// DurationObject refers to a host-side [i64] number encoding a
+/// duration (a count of seconds).
+
+/**
+ * Checks if the given host value represents an object that contains a duration.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains a duration. Otherwise false.
+ */
+export function isDuration(val: RawVal) : bool {
+  return hasTag(val, rawValTagDurationObject);
+}
+
+// U128
+
 /**
  * Checks if the given host value represents an object that contains an unsigned 128-bit integer.
- * @param val host value to check
- * @returns true if the host value represents an object that contains an unsigned 128-bit integer. otherwise flase.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains an unsigned 128-bit integer. Otherwise false.
  */
-export function isU128(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeU128;
+export function isU128(val: RawVal) : bool {
+  return hasTag(val, rawValTagU128Object);
 }
 
 /**
@@ -458,19 +848,19 @@ export function isU128(val:RawVal) : bool {
  * Convert the low and high 64-bit words of a u128 to an object containing a u128.
  * @param lo low 64-bit words.
  * @param lo high 64-bit words.
- * @returns the created host value as Unsigned128BitIntObject
+ * @returns the created host value as U128Object
  */
-export function fromU128Pieces(lo: u64, hi:u64) : Unsigned128BitIntObject {
+export function fromU128Pieces(lo: u64, hi:u64) : U128Object {
     return obj_from_u128_pieces(lo, hi);
 }
 
 /**
  * Extract the low 64 bits from an object containing a u128.
  * Traps if the host value doese not represent an object that conatains an unsigned 128-bit integer. To avoid, you can check it with isU128().
- * @param val the host value (Type: Unsigned128BitIntObject) 
+ * @param val the host value (Type: U128Object) 
  * @returns the extracted unsigned low 64 bits integer.
  */
-export function toU128Low64(val: Unsigned128BitIntObject) : u64 {
+export function toU128Low64(val: U128Object) : u64 {
     if(!isU128(val)){
       context.fail();
     }
@@ -480,23 +870,25 @@ export function toU128Low64(val: Unsigned128BitIntObject) : u64 {
 /**
  * Extract the high 64 bits from an object containing a u128.
  * Traps if the host value doese not represent an object that conatains an unsigned 128-bit integer. To avoid, you can check it with isU128().
- * @param val the host value (Type: Unsigned128BitIntObject) 
+ * @param val the host value (Type: U128Object) 
  * @returns the extracted unsigned high 64 bits integer.
  */
-export function toU128High64(val: Unsigned128BitIntObject) : u64 {
+export function toU128High64(val: U128Object) : u64 {
   if(!isU128(val)){
     context.fail();
   }
   return obj_to_u128_hi64(val);
 }
 
+/// I128
+
 /**
  * Checks if the given host value represents an object that contains a signed 128-bit integer.
- * @param val host value to check
- * @returns true if the host value represents an object that contains a signed 128-bit integer. otherwise flase.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains a signed 128-bit integer. Otherwise false.
  */
 export function isI128(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeI128;
+  return hasTag(val, rawValTagI128Object);
 }
 
 /**
@@ -504,19 +896,19 @@ export function isI128(val:RawVal) : bool {
  * Convert the low and high 64-bit words of a i128 to an object containing a i128.
  * @param lo low 64-bit words.
  * @param lo high 64-bit words.
- * @returns the created host value as Signed128BitIntObject
+ * @returns the created host value as I128Object.
  */
-export function fromI128Pieces(lo: u64, hi:u64) : Signed128BitIntObject {
+export function fromI128Pieces(lo: u64, hi:u64) : I128Object {
     return obj_from_i128_pieces(lo, hi);
 }
 
 /**
  * Extract the low 64 bits from an object containing a i128.
  * Traps if the host value doese not represent an object that conatains a signed 128-bit integer. To avoid, you can check it with isI128().
- * @param val the host value (Type: Signed128BitIntObject) 
+ * @param val the host value (Type: I128Object).
  * @returns the extracted unsigned low 64 bits integer.
  */
-export function toI128Low64(val: Signed128BitIntObject) : u64 {
+export function toI128Low64(val: I128Object) : u64 {
     if(!isI128(val)){
       context.fail();
     }
@@ -526,68 +918,124 @@ export function toI128Low64(val: Signed128BitIntObject) : u64 {
 /**
  * Extract the high 64 bits from an object containing a i128.
  * Traps if the host value doese not represent an object that conatains a signed 128-bit integer. To avoid, you can check it with isI128().
- * @param val the host value (Type: Signed128BitIntObject) 
+ * @param val the host value (Type: I128Object).
  * @returns the extracted unsigned high 64 bits integer.
  */
-export function toI128High64(val: Signed128BitIntObject) : u64 {
+export function toI128High64(val: I128Object) : u64 {
   if(!isI128(val)){
     context.fail();
   }
   return obj_to_i128_hi64(val);
 }
 
+
+// U256
+
+/**
+ * Checks if the given host value represents an object that contains an u256 integer.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains an u256 integer. Otherwise false.
+ */
+export function isU256(val: RawVal) : bool {
+  return hasTag(val, rawValTagU256Object);
+}
+
+
+// I256
+
+/**
+ * Checks if the given host value represents an object that contains an i256 integer.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains an i256 integer. Otherwise false.
+ */
+export function isI256(val: RawVal) : bool {
+  return hasTag(val, rawValTagI256Object);
+}
+
+// BytesObject
+
+/**
+ * Checks if the given host value represents an object that contains unspecified bytes (BytesObject).
+ * @param val host value to check
+ * @returns true if the host value represents a BytesObject. otherwise false.
+ */
+export function isBytesObject(val: RawVal) : bool {
+  return hasTag(val, rawValTagBytesObject);
+}
+
+
+// StringObject
+
+/**
+ * Checks if the given host value represents an object that contains a string (StringObject).
+ * @param val host value to check.
+ * @returns true if the host value represents a StringObject. Otherwise false.
+ */
+export function isStringObject(val: RawVal) : bool {
+  return hasTag(val, rawValTagStringObject);
+}
+
+// SymbolObject
+
+/**
+ * Checks if the given host value represents an object that contains a symbol string (SymbolObject).
+ * @param val host value to check.
+ * @returns true if the host value represents a SymbolObject. Otherwise false.
+ */
+export function isSymbolObject(val: RawVal) : bool {
+  return hasTag(val, rawValTagSymbolObject);
+}
+
+// VecObject
+
 /**
  * Checks if the given host value represents an object that contains a vector.
- * @param val host value to check
- * @returns true if the host value represents an object that contains a vector. otherwise flase.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains a vector. Otherwise false.
  */
- export function isVector(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeVec;
+ export function isVecObject(val: RawVal) : bool {
+  return hasTag(val, rawValTagVecObject);
 }
+
+
+// MapObject
 
 /**
  * Checks if the given host value represents an object that contains a map.
- * @param val host value to check
- * @returns true if the host value represents an object that contains a map. otherwise flase.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains a map. Otherwise false.
  */
- export function isMap(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeMap;
+ export function isMapObject(val: RawVal) : bool {
+  return hasTag(val, rawValTagMapObject);
 }
 
-/**
- * Checks if the given host value represents an object that contains unspecified bytes (binary object).
- * @param val host value to check
- * @returns true if the host value represents a binary object. otherwise flase.
- */
- export function isBinary(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeBytes;
-}
+// ContractExecutableObject
 
 /**
- * Checks if the given host value represents an object that contains contract code.
- * @param val host value to check
- * @returns true if the host value represents an object that contains an contract code. otherwise flase.
+ * Checks if the given host value represents an object that contains contract executable code.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains an contract executable code. Otherwise false.
  */
-export function isContractCode(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeContractCode;
+export function isContractExecutableObject(val: RawVal) : bool {
+  return hasTag(val, rawValTagContractExecutableObject);
 }
 
 /**
  * Checks if the given host value represents an object that contains an address.
- * @param val host value to check
- * @returns true if the host value represents an object that contains an address. otherwise flase.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains an address. Otherwise false.
  */
-export function isAddress(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeAddress;
+export function isAddressObject(val: RawVal) : bool {
+  return hasTag(val, rawValTagAddressObject);
 }
 
 /**
  * Checks if the given host value represents an object that contains a nonce key.
- * @param val host value to check
- * @returns true if the host value represents an object that contains a nonce key. otherwise flase.
+ * @param val host value to check.
+ * @returns true if the host value represents an object that contains a nonce key. Otherwise false.
  */
-export function isNonceKey(val:RawVal) : bool {
-  return isObject(val) && getObjectType(val) == objTypeNonceKey;
+export function isLedgerKeyNonceObject(val: RawVal) : bool {
+  return hasTag(val, rawValTagLedgerKeyNonceObject);
 }
 
 /**
@@ -654,104 +1102,28 @@ export function getStatusCode(status: StatusVal) : u32 {
   return getMajor(status);
 }
 
-/**
- * Checks if the given host value represents a bitset value.
- * @param val host value to check (Type: RawVal)
- * @returns true if the host value represents a bitset value. otherwise false. 
- */
-export function isBitset(val: RawVal): bool {
-  return hasTag(val, rawValTagBitset);
-}
-
-/**
- * Checks if the given host value represents a symbol value.
- * @param val host value to check (Type: RawVal)
- * @returns true if the host value represents a symbol value. otherwise false. 
- */
- export function isSymbol(val: RawVal): bool {
-  return hasTag(val, rawValTagSymbol);
-}
-
-/**
- * Creates a SymbolVal from the given string.
- * @param str the string to create the SymbolVal from. max 10 characters. [_0-9A-Za-z]
- * @returns the created SymbolVal
- */
-export function fromSymbolStr(str: string) : SymbolVal {
-  if (str.length > 10) {
-    context.fail();
-  }
-
-  var accum: u64 = 0;
-  let codeBits:u8 = 6;
-  for (var i=0; i < str.length; i++) {
-    let charcode = str.charCodeAt(i);
-    if (charcode >= 48 && charcode <= 122){
-      let cu8 = charcode as u8;
-      accum <<= codeBits;
-      var v:u64 = 0;
-      if (cu8 == 95) { // "_"
-        v = 1;
-      } else if (cu8 >= 48 && cu8 <= 57) { // 0..9
-        v = 2 + ((cu8 as u64) - 48);
-      } else if (cu8 >= 65 && cu8 <= 90) { // A..Z
-        v = 12 + ((cu8 as u64) - 65);
-      } else if (cu8 >= 97 && cu8 <= 122) { // a..z
-        v = 38 + ((cu8 as u64) - 97);
-      } else {
-        context.fail(); // bad char.
-      }
-      accum |= v;
-    } else {
-      context.fail(); // bad char.
-    }
-    
-  }
-  return addTagToBody(rawValTagSymbol, accum);
-}
-
-export function toString(symbol: SymbolVal) : string {
-    if (!hasTag(symbol, rawValTagSymbol)) {
-      context.fail();
-    }
-    var result:string = "";
-    let codeBits:u8 = 6;
-    var val:u64 = 0;
-    var body = getBody(symbol);
-    for (var i=0; i < 10; i++) {
-      val = body & 63;
-      body = body >> codeBits;
-      if (val == 1) {
-        val = 95;
-      } else if (val > 1 && val < 12) {
-        val += 46;
-      } else if (val > 11 && val < 38) {
-        val += 53;
-      } else if (val > 37 && val < 64) {
-        val += 59;
-      } else if (val == 0) {
-        break;
-      } else {
-        context.fail(); // Bad val.
-      }
-      //context.log(fromI32(val as i32));
-      // TODO - gives Status(VmError(Instantiation))
-      //result = String.fromCharCode(val as i32) + result;
-    }
-    return result;
-}
-
 /***********
  * HELPERS *
  ***********/
+const WORD_BITS: usize = 64;
+const TAG_BITS: usize = 8;
+const ONE: u64 = 1;
+const TAG_MASK: u64 = (ONE << TAG_BITS) - 1;
+const BODY_BITS: usize = WORD_BITS - TAG_BITS;
+
+const MAJOR_BITS: u32 = 32;
+const MINOR_BITS: u32 = 24;
+
+const MAJOR_MASK: u64 = (ONE << MAJOR_BITS) - 1;
+const MINOR_MASK: u64 = (ONE << MINOR_BITS) - 1;
 
 /**
  * returns the tag of the host value. 
  * @param val the value to get the tag for.
  * @returns the tag
  */
-function getTag(val: RawVal): rawValTag {
-    return ((val >> 1) & 7) as rawValTag;
+function getTagU8(val: RawVal): u8 {
+  return (val & TAG_MASK) as u8;
 }
 
 /**
@@ -761,7 +1133,7 @@ function getTag(val: RawVal): rawValTag {
  * @returns true if the value has the given tag set
  */
 function hasTag(val: RawVal, tag: rawValTag): bool {
-    return !isU63(val) && getTag(val) == tag;
+    return getTagU8(val) == tag as u8;
 }
 
 /**
@@ -770,32 +1142,27 @@ function hasTag(val: RawVal, tag: rawValTag): bool {
  * @returns the body of the host value.
  */
 function getBody(val: RawVal): u64 {
-    return val >> 4;
+    return val >> TAG_BITS;
+}
+
+function getSignedBody(val: RawVal): i64 {
+  return (val as i64 ) >> TAG_BITS;
 }
 
 /**
  * Adds a given tag to a host value body. 
+ * @param body the body of the host value.
  * @param tag the tag to add
- * @param body the body of the host value
  * @returns the resulting host value.
  */
-function addTagToBody(tag: rawValTag, body: u64): RawVal {
-    if (!(body < (1 << 60) && tag < 8)) {
-      context.fail();
-    }
-    return (body << 4) | ((tag << 1) as u64) | 1;
-    
+function fromBodyAndTag(body: u64, tag: rawValTag): RawVal {
+  return ((body << TAG_BITS) | (tag as u64))
 }
 
-const MINOR_BITS: u32 = 28;
-const MAJOR_BITS: u32 = 32;
-const MAJOR_MASK: u64 = ((1 as u64) << MAJOR_BITS) - 1;
-const MINOR_MASK: u64 = ((1 as u64) << MINOR_BITS) - 1;
-
 function fromMajorMinorAndTag(major: u32, minor: u32, tag:rawValTag) : RawVal {
-   let maj = major as u64;
-   let min = minor as u64;
-   return addTagToBody(tag, maj << MINOR_BITS | min);
+   let maj:u64 = major as u64;
+   let min:u64 = minor as u64;
+   return fromBodyAndTag((maj << MINOR_BITS) | min,tag);
 }
 
 function getMinor(val:RawVal) : u32 {
@@ -902,49 +1269,49 @@ export const unknownErrXDR: unknownErrCode = 1;
 /// Convert an u64 to an object containing an u64.
 // @ts-ignore
 @external("i", "_")
-declare function obj_from_u64(v:u64): Unsigned64BitIntObject;
+declare function obj_from_u64(v:u64): U64Object;
 
 /// Convert an object containing an u64 to an u64.
 // @ts-ignore
 @external("i", "0")
-declare function obj_to_u64(ojb:Unsigned64BitIntObject): u64;
+declare function obj_to_u64(ojb:U64Object): u64;
 
 /// Convert an i64 to an object containing an i64.
 // @ts-ignore
 @external("i", "1")
-declare function obj_from_i64(v:i64): Signed64BitIntObject;
+declare function obj_from_i64(v:i64): I64Object;
 
 /// Convert an object containing an i64 to an i64.
 // @ts-ignore
 @external("i", "2")
-declare function obj_to_i64(ojb:Signed64BitIntObject): i64;
+declare function obj_to_i64(ojb:I64Object): i64;
 
 /// Convert the low and high 64-bit words of a u128 to an object containing a u128.
 // @ts-ignore
 @external("i", "5")
-declare function obj_from_u128_pieces(lo:u64, hi:u64): Unsigned128BitIntObject;
+declare function obj_from_u128_pieces(lo:u64, hi:u64): U128Object;
 
 /// Extract the low 64 bits from an object containing a u128.
 // @ts-ignore
 @external("i", "6")
-declare function obj_to_u128_lo64(obj:Unsigned128BitIntObject): u64;
+declare function obj_to_u128_lo64(obj:U128Object): u64;
 
 /// Extract the high 64 bits from an object containing a u128.
 // @ts-ignore
 @external("i", "7")
-declare function obj_to_u128_hi64(obj:Unsigned128BitIntObject): u64;
+declare function obj_to_u128_hi64(obj:U128Object): u64;
 
 /// Convert the lo and hi 64-bit words of an i128 to an object containing an i128.
 // @ts-ignore
 @external("i", "8")
-declare function obj_from_i128_pieces(lo:u64, hi:u64): Signed128BitIntObject;
+declare function obj_from_i128_pieces(lo:u64, hi:u64): I128Object;
 
 /// Extract the low 64 bits from an object containing an i128.
 // @ts-ignore
 @external("i", "9")
-declare function obj_to_i128_lo64(obj:Signed128BitIntObject): u64;
+declare function obj_to_i128_lo64(obj:I128Object): u64;
 
 /// Extract the high 64 bits from an object containing an i128.
 // @ts-ignore
 @external("i", "a")
-declare function obj_to_i128_hi64(obj:Signed128BitIntObject): u64;
+declare function obj_to_i128_hi64(obj:I128Object): u64;

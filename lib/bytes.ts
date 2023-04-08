@@ -1,4 +1,4 @@
-import { BytesObject, RawVal, fromU32, toU32 } from "./value";
+import { BytesObject, RawVal, U32Val, fromU32, toU32 } from "./value";
 
 export class Bytes {
     obj: BytesObject;
@@ -23,7 +23,7 @@ export class Bytes {
     static fromString(str: string) : Bytes {
         let result = new Bytes();
         for (var i=0; i < str.length; i++) {
-          result.push(fromU32(str.charCodeAt(i)));
+          result.push(str.charCodeAt(i));
         }
         return result;
     }
@@ -43,7 +43,7 @@ export class Bytes {
         var fill = 32 - len;
         var filled = new Bytes();
         while(fill > 0) {
-            filled.push(fromU32(0));
+            filled.push(0);
             fill -= 1;
         }
         filled = filled.append(result);
@@ -65,7 +65,7 @@ export class Bytes {
         var fill = 32 - len;
         var filled = new Bytes();
         while(fill > 0) {
-            filled.push(fromU32(0));
+            filled.push(0);
             fill -= 1;
         }
         filled = filled.append(result);
@@ -84,7 +84,7 @@ export class Bytes {
             let temp_high = Bytes.charToInt(hex.charCodeAt(i*2));
             let temp_low = Bytes.charToInt(hex.charCodeAt(i*2+1));
             let app = Bytes.appendNumbers(temp_high, temp_low);
-            result.push(fromU32(app as u32));
+            result.push(app as u32);
         }
         return result;
     }
@@ -110,13 +110,12 @@ export class Bytes {
      * Copies a slice of bytes from this `Bytes` object specified at offset `b_pos` with
      * length `len` into the linear memory at position `lm_pos`.
      * Traps if either this `Bytes` object or the linear memory doesn't have enough bytes.
-     * @param b_pos see decription
-     * @param lm_pos see decription
-     * @param len see decription
-     * @returns the slice of bytes as RawVal.
+     * @param b_pos see decription (u32)
+     * @param lm_pos see decription (u32)
+     * @param len see decription (u32)
      */
-    copyToLinearMemory(b_pos:RawVal, lm_pos:RawVal, len:RawVal): RawVal {
-        return bytes_copy_to_linear_memory(this.obj, b_pos, lm_pos, len);
+    copyToLinearMemory(b_pos:u32, lm_pos:u32, len:u32): void {
+        bytes_copy_to_linear_memory(this.obj, fromU32(b_pos), fromU32(lm_pos), fromU32(len));
     }
 
     /**
@@ -124,13 +123,13 @@ export class Bytes {
      * length `len`, into this `Bytes` object at offset `b_pos`. The `Bytes` object may
      * grow in size to accommodate the new bytes. 
      * Traps if the linear memory doesn't have enough bytes.
-     * @param b_pos see description
-     * @param lm_pos see description
-     * @param len see description
+     * @param b_pos see description (u32)
+     * @param lm_pos see description (u32)
+     * @param len see description (u32)
      * @returns void
      */
-    copyFromLinearMemory(b_pos:RawVal, lm_pos:RawVal, len:RawVal): void {
-        this.obj = bytes_copy_from_linear_memory(this.obj, b_pos, lm_pos, len);
+    copyFromLinearMemory(b_pos:u32, lm_pos:u32, len:u32): void {
+        this.obj = bytes_copy_from_linear_memory(this.obj, fromU32(b_pos), fromU32(lm_pos), fromU32(len));
     }
 
     /**
@@ -139,8 +138,8 @@ export class Bytes {
      * @param len  see desctiption
      * @returns the new Bytes object.
      */
-    static newFromLinearMemory(lm_pos:RawVal, len:RawVal): Bytes {
-        return new Bytes(bytes_new_from_linear_memory(lm_pos, len));
+    static newFromLinearMemory(lm_pos:u32, len:u32): Bytes {
+        return new Bytes(bytes_new_from_linear_memory(fromU32(lm_pos), fromU32(len)));
     }
 
     /**
@@ -149,17 +148,17 @@ export class Bytes {
      * @param value the value to be updated (Type: RawVal)
      * @returns void. Traps if the index is out of bound. (e.g. if empty)
      */
-    put(i:u32, value: RawVal) : void {
-        this.obj = bytes_put(this.obj, fromU32(i), value);
+    put(i:u32, value: u32) : void {
+        this.obj = bytes_put(this.obj, fromU32(i), fromU32(value));
     }
 
     /**
      * Returns the element at index `i` of the `Bytes` object. Traps if the index is out of bound.
      * @param i the index
-     * @returns the value (Type: RawVal). Traps if the index is out of bound.
+     * @returns the value (u32). Traps if the index is out of bound.
      */
-    get(i:u32) : RawVal {
-        return bytes_get(this.obj, fromU32(i));
+    get(i:u32) : u32 {
+        return toU32(bytes_get(this.obj, fromU32(i)));
     }
 
     /**
@@ -181,11 +180,11 @@ export class Bytes {
 
     /**
      * Appends an element to the back of the `Bytes` object.
-     * @param value the value to append (Type: RawVal)
+     * @param value the value to append (Type: u32)
      * @returns void.
      */
-    push(value: RawVal) : void {
-        this.obj = bytes_push(this.obj, value);
+    push(value: u32) : void {
+        this.obj = bytes_push(this.obj, fromU32(value));
     }
 
     /**
@@ -198,29 +197,29 @@ export class Bytes {
 
     /**
      * Return the first element in the `Bytes` object. Traps if the `Bytes` is empty
-     * @returns the first element in the `Bytes` object.
+     * @returns the first element in the `Bytes` object (u32).
      */
-    front(): RawVal {
-        return bytes_front(this.obj);
+    front(): u32 {
+        return toU32(bytes_front(this.obj));
     }
 
     /**
      * Return the last element in the `Bytes` object. Traps if the `Bytes` is empty
-     * @returns the last element in the `Bytes` object.
+     * @returns the last element in the `Bytes` object (u32).
      */
-    back(): RawVal {
-        return bytes_back(this.obj);
+    back(): u32 {
+        return toU32(bytes_back(this.obj));
     }
 
     /**
      * Inserts an element at index `i` within the `Bytes` object, shifting all elements after it to the right.
      * Traps if the index is out of bound.
      * @param i the index to insert the element to
-     * @param value the element to insert (Type:RawVal).
+     * @param value the element to insert (u32).
      * @returns void
      */
-    insert(i: u32, value: RawVal) : void {
-        this.obj = bytes_insert(this.obj, fromU32(i), value);
+    insert(i: u32, value: u32) : void {
+        this.obj = bytes_insert(this.obj, fromU32(i), fromU32(value));
     }
 
     /**
@@ -296,7 +295,7 @@ declare function deserialize_from_bytes(b:BytesObject): RawVal;
 /// Traps if either the `Bytes` object or the linear memory doesn't have enough bytes.
 // @ts-ignore
 @external("b", "1")
-declare function bytes_copy_to_linear_memory(b:BytesObject, b_pos:RawVal, lm_pos:RawVal, len:RawVal): RawVal;
+declare function bytes_copy_to_linear_memory(b:BytesObject, b_pos:U32Val, lm_pos:U32Val, len:U32Val): RawVal;
 
 /// Copies a segment of the linear memory specified at position `lm_pos` with
 /// length `len`, into a `Bytes` object at offset `b_pos`. The `Bytes` object may
@@ -304,12 +303,12 @@ declare function bytes_copy_to_linear_memory(b:BytesObject, b_pos:RawVal, lm_pos
 /// Traps if the linear memory doesn't have enough bytes.
 // @ts-ignore
 @external("b", "2")
-declare function bytes_copy_from_linear_memory(b:BytesObject, b_pos:RawVal, lm_pos:RawVal, len:RawVal): BytesObject;
+declare function bytes_copy_from_linear_memory(b:BytesObject, b_pos:U32Val, lm_pos:U32Val, len:U32Val): BytesObject;
 
 /// Constructs a new `Bytes` object initialized with bytes copied from a linear memory slice specified at position `lm_pos` with length `len`.
 // @ts-ignore
 @external("b", "3")
-declare function bytes_new_from_linear_memory(lm_pos:RawVal, len:RawVal): BytesObject;
+declare function bytes_new_from_linear_memory(lm_pos:U32Val, len:U32Val): BytesObject;
 
 // --------------------------------------------------------
 // These functions below ($3-$F) mirror vector operations +
@@ -324,23 +323,23 @@ declare function bytes_new(): BytesObject;
 /// Trap if the index is out of bounds.
 // @ts-ignore
 @external("b", "5")
-declare function bytes_put(v:BytesObject, i:RawVal, u:RawVal): BytesObject;
+declare function bytes_put(v:BytesObject, i:U32Val, u:U32Val): BytesObject;
 
 /// Returns the element at index `i` of the `Bytes` object. Traps if the index is out of bound.
 // @ts-ignore
 @external("b", "6")
-declare function bytes_get(b:BytesObject, i:RawVal): RawVal;
+declare function bytes_get(b:BytesObject, i:U32Val): U32Val;
 
 /// Delete an element in a `Bytes` object at index `i`, shifting all elements after it to the left.
 /// Return the new `Bytes`. Traps if the index is out of bound.
 // @ts-ignore
 @external("b", "7")
-declare function bytes_del(v:BytesObject, i:RawVal): BytesObject;
+declare function bytes_del(v:BytesObject, i:U32Val): BytesObject;
 
 /// Returns length of the `Bytes` object.
 // @ts-ignore
 @external("b", "8")
-declare function bytes_len(v:BytesObject): RawVal;
+declare function bytes_len(v:BytesObject): U32Val;
 
 /// Appends an element to the back of the `Bytes` object.
 // @ts-ignore
@@ -356,18 +355,18 @@ declare function bytes_pop(b:BytesObject): BytesObject;
 /// Return the first element in the `Bytes` object. Traps if the `Bytes` is empty
 // @ts-ignore
 @external("b", "B")
-declare function bytes_front(b:BytesObject): RawVal;
+declare function bytes_front(b:BytesObject): U32Val;
 
 /// Return the last element in the `Bytes` object. Traps if the `Bytes` is empty
 // @ts-ignore
 @external("b", "C")
-declare function bytes_back(v:BytesObject): RawVal;
+declare function bytes_back(v:BytesObject): U32Val;
 
 /// Inserts an element at index `i` within the `Bytes` object, shifting all elements after it to the right.
 /// Traps if the index is out of bound
 // @ts-ignore
 @external("b", "D")
-declare function bytes_insert(v:BytesObject, i:RawVal, u:RawVal): BytesObject;
+declare function bytes_insert(v:BytesObject, i:U32Val, u:U32Val): BytesObject;
 
 /// Clone the `Bytes` object `b1`, then moves all the elements of `Bytes` object `b2` into it.
 /// Return the new `Bytes`. Traps if its length overflows a u32.
@@ -379,4 +378,4 @@ declare function bytes_append(b1:BytesObject, b2:BytesObject): BytesObject;
 /// Returns the new `Bytes`. Traps if the index is out of bound.
 // @ts-ignore
 @external("b", "F")
-declare function bytes_slice(b:BytesObject, start:RawVal, end:RawVal): BytesObject;
+declare function bytes_slice(b:BytesObject, start:U32Val, end:U32Val): BytesObject;

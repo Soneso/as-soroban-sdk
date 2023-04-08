@@ -1,10 +1,12 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v0.1.2](https://img.shields.io/badge/v0.1.2-yellow.svg)
+![v0.1.8](https://img.shields.io/badge/v0.1.8-yellow.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
 **This repository contains code that is in very early development, incomplete, not tested, and not recommended for use. The API is unstable, experimental, and is receiving breaking changes frequently.**
+
+**This version supports soroban preview 7  & interface version 32**
 
 ## Quick Start
 
@@ -32,13 +34,13 @@ $ npm install as-soroban-sdk
 You can now write your contract in the ```./assembly/index.ts``` file. For example:
 
 ```typescript
-import {SymbolVal, VectorObject, fromSymbolStr} from 'as-soroban-sdk/lib/value';
+import {SmallSymbolVal, VecObject, fromSmallSymbolStr} from 'as-soroban-sdk/lib/value';
 import {Vec} from 'as-soroban-sdk/lib/vec';
 
-export function hello(to: SymbolVal): VectorObject {
+export function hello(to: SmallSymbolVal): VecObject {
 
   let vec = new Vec();
-  vec.pushFront(fromSymbolStr("Hello"));
+  vec.pushFront(fromSmallSymbolStr("Hello"));
   vec.pushBack(to);
   
   return vec.getHostObject();
@@ -50,9 +52,9 @@ Next you need to add a ```contract.json``` file to the project. It must contain 
 ```json
 {
     "name": "hello word",
-    "version": "0.0.1",
+    "version": "0.1.8",
     "description": "my first contract",
-    "host_functions_version": 29,
+    "host_functions_version": 32,
     "functions": [
         {
             "name" : "hello",
@@ -94,13 +96,13 @@ You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` fol
 To run the contract, you must first install the official soroban cli as described here: [stellar soroban cli](https://github.com/stellar/soroban-cli).
 
 ```shell
-$ cargo install --locked --version 0.6.0 soroban-cli
+$ cargo install --locked --version 0.7.0 soroban-cli
 ```
 
 Run your contract:
 
 ```shell
-$ soroban contract invoke --wasm build/release.wasm --id 1 --fn hello -- --to friend
+$ soroban contract invoke --wasm build/release.wasm --id 1 -- hello --to friend
 ```
 
 You can also use one of our Stellar SDKs to deploy and invoke contracts:
@@ -127,30 +129,9 @@ As helping features for testing one can use **logging** to generate outputs duri
 
 ### Value Conversions
 
-When calling a contract function the host will only pass ```u64``` raw values. The raw values can encode different types of values (e.g. ```i32```, ```u32```, ```symbol```, ```bitset```, etc.) or ```object handles```. Please read more details about them in [CAP-46](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md#host-value-type).
+When calling a contract function the host will only pass ```u64``` raw values. The raw values can encode different types of values (e.g. `i32`, `u32`, `symbol`, `timestamp`, `bool` etc.) or ```object handles``` such as references to vectors, maps, bytes, strings that live in the host.
 
-The SDK can encode and decode these values.
-
-
-```RawVals``` divide up the space of 64 bits according to a 2-level tagging scheme. The first tag is a bit in the least-significant position, indicating whether the `RawVal` is a plain ```u63``` 63-bit unsigned integer, or some more-structured value with a second-level tag in the next most significant 3 bits. The 63-bit unsigned integer case can also be thought of as handling the complete range of non-negative signed 64-bit integers.
-
-The remaining 3 bit tags are assigned to cases, of which 7 are defined and one is currently reserved.
-
-Schematically, the bit-assignment for `RawVal` looks like this:
-
-```text
-0x_NNNN_NNNN_NNNN_NNNX  - u63, for any even X
-0x_0000_000N_NNNN_NNN1  - u32
-0x_0000_000N_NNNN_NNN3  - i32
-0x_NNNN_NNNN_NNNN_NNN5  - static: void, true, false, ...
-0x_IIII_IIII_TTTT_TTT7  - object: 32-bit index I, 28-bit type code T
-0x_NNNN_NNNN_NNNN_NNN9  - symbol: up to 10 6-bit identifier characters
-0x_NNNN_NNNN_NNNN_NNNb  - bitset: up to 60 bits
-0x_CCCC_CCCC_TTTT_TTTd  - status: 32-bit code C, 28-bit type code T
-0x_NNNN_NNNN_NNNN_NNNf  - reserved
-```
-
-The AssemblyScript Soroban SDK can convert these values back and forth. For example converting primitives like i32:
+The SDK can encode and decode these values. For example converting primitives like i32:
 
 ```typescript
 import * as val from "as-soroban-sdk/lib/value";
@@ -161,24 +142,21 @@ let xRaw = val.fromI32(xi32);
 
 // static values
 let isTrue = val.fromBool(rawVal);
-let rawStaticBool = val.toBool(isTrue);
+let rawBool = val.toBool(isTrue);
 
 // objects
-let isObject = val.isObject(rawVal);
+let isVecObj = val.isVec(rawVal); 
+// this rawVal (u64) is a object handle referencing an vector object that lives on the host
 
-if (isObject && val.getObjectType(rawVal) == val.objTypeVec) {
-    let myVec = new Vec(rawVal);
-    myVec.pushFront(val.fromSymbolStr("Hello"));
+if (isVecObj) {
+    let myVec = new Vec(rawVal); // init a (SDK Type) Vec from the handle.
+    myVec.pushFront(val.fromSmallSymbolStr("Hello"));
     let rawVecObj = myVec.getHostObject();
 }
 
 // symbols
-let myRawSymbol = val.fromSymbolStr("Hello");
+let myRawSymbol = val.fromSmallSymbolStr("Hello");
 
-// status
-if (val.getStatusType(rawVal) == val.statusOk) {
-    ...
-}
 // etc.
 ```
 
@@ -189,7 +167,7 @@ The host functions defined in [env.json](https://github.com/stellar/rs-soroban-e
 For example:
 
 ```typescript
-function callContractById(id: string, func: string, args: VectorObject): RawVal 
+function callContractById(id: string, func: string, args: VecObject): RawVal 
 ```
 or 
 
@@ -199,15 +177,15 @@ function putDataFor(symbolKey: string, value: RawVal) : void
 
 ### SDK Types
 
-Following types are supported by this SDK: `Map`, `Vec`, `Bytes`.
+Following types are supported by this SDK: `Map`, `Vec`, `Bytes`, `Str`, `Sym`.
 
 For example work with a vector:
 
 ``` typescript
 let vec = new Vec();
 
-vec.pushFront(fromSymbolStr("Hello"));
-vec.pushBack(fromSymbolStr("friend"));
+vec.pushFront(fromSmallSymbolStr("Hello"));
+vec.pushBack(fromSmallSymbolStr("friend"));
 
 return vec.getHostObject();
 ```
@@ -216,8 +194,8 @@ or a map:
 ``` typescript
 let myMap = new Map();
 
-myMap.put(fromU32(1), fromSymbolStr("Hello"));
-myMap.put(fromU32(2), fromSymbolStr("friend"));
+myMap.put(fromU32(1), fromSmallSymbolStr("Hello"));
+myMap.put(fromU32(2), fromSmallSymbolStr("friend"));
 myMap.put(vec.getHostObject(), fromTrue());
 
 return myMap.getHostObject();
@@ -270,7 +248,7 @@ enum AGE_ERR_CODES {
   TOO_OLD = 2
 }
 
-export function checkAge(age: RawVal): RawVal {
+export function checkAge(age: I32Val): Symbol {
 
   let age2check = toI32(age);
 
@@ -282,7 +260,7 @@ export function checkAge(age: RawVal): RawVal {
     failWithErrorCode(AGE_ERR_CODES.TOO_OLD);
   }
 
-  return fromSymbolStr("OK");
+  return fromSmallSymbolStr("OK");
 }
 ```
 
@@ -313,7 +291,7 @@ import * as context from 'as-soroban-sdk/lib/context';
 
 let args = new Vec();
 args.pushBack(val.fromI32(30));
-args.pushBack(val.fromSymbolStr("celsius"));
+args.pushBack(val.fromSmallSymbolStr("celsius"));
 context.logFtm("We have {} degrees {}!", args);
 
 ```
@@ -331,9 +309,9 @@ or
 ```typescript
 let topicsVec = new Vec();
 
-topicsVec.pushBack(val.fromSymbolStr("TOPIC1"));
-topicsVec.pushBack(val.fromSymbolStr("TOPIC2"));
-topicsVec.pushBack(val.fromSymbolStr("TOPIC3"));
+topicsVec.pushBack(val.fromSmallSymbolStr("TOPIC1"));
+topicsVec.pushBack(val.fromSmallSymbolStr("TOPIC2"));
+topicsVec.pushBack(val.fromSmallSymbolStr("TOPIC3"));
 
 let dataVec = new Vec();
 dataVec.pushBack(val.fromU32(223));
@@ -361,9 +339,9 @@ Example:
 ```json
 {
     "name": "hello word",
-    "version": "0.1.0",
+    "version": "0.1.8",
     "description": "my first contract",
-    "host_functions_version": 29,
+    "host_functions_version": 32,
     "functions": [
         {
             "name" : "hello",
@@ -382,7 +360,7 @@ $ soroban version
 output at the time of writing:
 
 ``` shell
-soroban-env interface version 29
+soroban-env interface version 32
 ```
 
 Additionally you must define the metadata for each function exported by your contract. In the upper example there is only one function named ```hello```.
@@ -400,7 +378,7 @@ You must define the name, the arguments and the return value of the function, so
 }
 ```
 
-Supported argument types are currently: `val` (any type of host value), `u32`, `i32`, `u64`, `i64`, `u128`, `i128`,`bool`, `symbol`, `bitset`, `status`, `bytes`, `invoker`, `address`, `option[valueType]`, `result[okType, errorType]`, `vec[elementType]`, `map[keyType, valueType]`, `set[elementType]` ,`bytesN[size]`. If your function has no arguments, you can pass an empty array.
+Supported argument types are currently: `val` (any type of host value), `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `u256`, `i256`,`bool`, `symbol`, `string`, `status`, `bytes`, `val`, `void`, `timepoint`, `duration`, `address`, `option[valueType]`, `result[okType, errorType]`, `vec[elementType]`, `map[keyType, valueType]`, `set[elementType]` ,`bytesN[size]`. If your function has no arguments, you can pass an empty array.
 
 Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static raw value. You can obtain it by using ```val.fromVoid()```. For this case you should set ```"returns" : "void"``` or remove `"returns"` in the contract.json.
 

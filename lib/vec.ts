@@ -1,10 +1,10 @@
-import { VectorObject, RawVal, fromVoid, fromU32, toU32 } from "./value";
+import { VecObject, RawVal, fromVoid, fromU32, toU32, U32Val, VoidVal } from "./value";
 
 export class Vec {
-    obj: VectorObject;
+    obj: VecObject;
 
-    /// Constructs from a given VectorObject, otherwise creates an empty new vec.
-    constructor(obj:VectorObject = vec_new(fromVoid())) {
+    /// Constructs from a given VecObject, otherwise creates an empty new vec.
+    constructor(obj:VecObject = vec_new(fromVoid())) {
       this.obj = obj;
     }
 
@@ -12,7 +12,7 @@ export class Vec {
      * Returns the handle to the host object as MapObject.
      * @returns handle to the host object.
      */
-    getHostObject(): VectorObject {
+    getHostObject(): VecObject {
         return this.obj;
     }
 
@@ -176,6 +176,26 @@ export class Vec {
     binarySearch(value: RawVal) : u64 {
         return vec_binary_search(this.obj, value);
     }
+
+    /**
+     * Creates a new vec initialized from an input slice of RawVals given by a linear-memory address and length.
+     * @param vals_pos address of the vals.
+     * @param len lenght. 
+     * @returns the new map.
+     */
+    static newFromLinearMemory(vals_pos:u32, len:u32) : Vec {
+        let obj = vec_new_from_linear_memory(fromU32(vals_pos), fromU32(len))
+        return new Vec(obj);
+    }
+    
+    /**
+     * Copy the RawVals of a vec into an array at a given linear-memory address.
+     * @param vals_pos address of the vals.
+     * @param len lenght.
+     */
+    unpackToLinearMemory(vals_pos:u32, len:u32) : void  {
+        vec_unpack_to_linear_memory(this.obj, fromU32(vals_pos), fromU32(len));
+    }
 }
 
 /******************
@@ -187,92 +207,92 @@ export class Vec {
 /// Otherwise, `c` is parsed as an `u32` that represents the initial capacity of the new vector.
 // @ts-ignore
 @external("v", "_")
-declare function vec_new(c: RawVal): VectorObject;
+declare function vec_new(c: RawVal): VecObject;
 
 /// Update the value at index `i` in the vector. Return the new vector.
 /// Trap if the index is out of bounds.
 // @ts-ignore
 @external("v", "0")
-declare function vec_put(v: VectorObject, i: RawVal, x: RawVal): VectorObject;
+declare function vec_put(v: VecObject, i: U32Val, x: RawVal): VecObject;
 
 /// Returns the element at index `i` of the vector. Traps if the index is out of bound.
 // @ts-ignore
 @external("v", "1")
-declare function vec_get(v: VectorObject, i: RawVal): RawVal;
+declare function vec_get(v: VecObject, i: U32Val): RawVal;
 
 /// Delete an element in a vector at index `i`, shifting all elements after it to the left.
 /// Return the new vector. Traps if the index is out of bound.
 // @ts-ignore
 @external("v", "2")
-declare function vec_del(v: VectorObject, i: RawVal): VectorObject;
+declare function vec_del(v: VecObject, i: U32Val): VecObject;
 
 /// Returns length of the vector.
 // @ts-ignore
 @external("v", "3")
-declare function vec_len(v: VectorObject): RawVal;
+declare function vec_len(v: VecObject): U32Val;
 
 /// Push a value to the front of a vector.
 // @ts-ignore
 @external("v", "4")
-declare function vec_push_front(v: VectorObject, x: RawVal): VectorObject;
+declare function vec_push_front(v: VecObject, x: RawVal): VecObject;
 
 /// Removes the first element from the vector and returns the new vector.
 /// Traps if original vector is empty.
 // @ts-ignore
 @external("v", "5")
-declare function vec_pop_front(v: VectorObject): VectorObject;
+declare function vec_pop_front(v: VecObject): VecObject;
 
 /// Appends an element to the back of the vector.
 // @ts-ignore
 @external("v", "6")
-declare function vec_push_back(v: VectorObject, x: RawVal): VectorObject;
+declare function vec_push_back(v: VecObject, x: RawVal): VecObject;
 
 /// Removes the last element from the vector and returns the new vector.
 /// Traps if original vector is empty.
 // @ts-ignore
 @external("v", "7")
-declare function vec_pop_back(v: VectorObject): VectorObject;
+declare function vec_pop_back(v: VecObject): VecObject;
 
 /// Return the first element in the vector. Traps if the vector is empty
 // @ts-ignore
 @external("v", "8")
-declare function vec_front(v: VectorObject): RawVal;
+declare function vec_front(v: VecObject): RawVal;
 
 /// Return the last element in the vector. Traps if the vector is empty
 // @ts-ignore
 @external("v", "9")
-declare function vec_back(v: VectorObject): RawVal;
+declare function vec_back(v: VecObject): RawVal;
 
 /// Inserts an element at index `i` within the vector, shifting all elements after it to the right.
 /// Traps if the index is out of bound
 // @ts-ignore
 @external("v", "A")
-declare function vec_insert(v: VectorObject, i: RawVal, x: RawVal): VectorObject;
+declare function vec_insert(v: VecObject, i: U32Val, x: RawVal): VecObject;
 
 /// Clone the vector `v1`, then moves all the elements of vector `v2` into it.
 /// Return the new vector. Traps if number of elements in the vector overflows a u32.
 // @ts-ignore
 @external("v", "B")
-declare function vec_append(v1: VectorObject, v2: VectorObject): VectorObject;
+declare function vec_append(v1: VecObject, v2: VecObject): VecObject;
 
 /// Copy the elements from `start` index until `end` index, exclusive, in the vector and create a new vector from it.
 /// Return the new vector. Traps if the index is out of bound.
 // @ts-ignore
 @external("v", "C")
-declare function vec_slice(v: VectorObject, start: RawVal, end: RawVal): VectorObject;
+declare function vec_slice(v: VecObject, start: U32Val, end: U32Val): VecObject;
 
 
 /// Get the index of the first occurrence of a given element in the vector.
 /// Returns the u32 index of the value if it's there. Otherwise, it returns `ScStatic::Void`.
 // @ts-ignore
 @external("v", "D")
-declare function vec_first_index_of(v: VectorObject, x: RawVal): RawVal;
+declare function vec_first_index_of(v: VecObject, x: RawVal): RawVal;
 
 /// Get the index of the last occurrence of a given element in the vector.
 /// Returns the u32 index of the value if it's there. Otherwise, it returns `ScStatic::Void`.
 // @ts-ignore
 @external("v", "E")
-declare function vec_last_index_of(v: VectorObject, x:RawVal): RawVal;
+declare function vec_last_index_of(v: VecObject, x:RawVal): RawVal;
 
 /// Binary search a sorted vector for a given element.
 /// If it exists, the high-32 bits of the return value is 0x0001 and the low-32 bits
@@ -282,4 +302,14 @@ declare function vec_last_index_of(v: VectorObject, x:RawVal): RawVal;
 /// maintain sorted order.
 // @ts-ignore
 @external("v", "F")
-declare function vec_binary_search(v: VectorObject, x: RawVal): u64;
+declare function vec_binary_search(v: VecObject, x: RawVal): u64;
+
+/// Return a new vec initialized from an input slice of RawVals given by a linear-memory address and length.
+// @ts-ignore
+@external("v", "G")
+declare function vec_new_from_linear_memory(vals_pos: U32Val, len: U32Val): VecObject;
+
+/// Copy the RawVals of a vec into an array at a given linear-memory address.
+// @ts-ignore
+@external("v", "H")
+declare function vec_unpack_to_linear_memory(vec: VecObject, vals_pos: U32Val, len: U32Val): VoidVal;

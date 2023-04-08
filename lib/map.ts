@@ -1,4 +1,4 @@
-import { RawVal, MapObject, toU32, toBool, VectorObject } from "./value";
+import { RawVal, MapObject, toU32, toBool, VecObject, U32Val, BoolVal, VoidVal, fromU32 } from "./value";
 import { Vec } from "./vec";
 
 export class Map {
@@ -118,6 +118,28 @@ export class Map {
     values() : Vec {
         return new Vec(map_values(this.obj));
     }
+
+    /**
+     * Creates a new map initialized from a set of input slices given by linear-memory addresses and lengths.
+     * @param keys_pos address of the keys.
+     * @param vals_pos address of the vals.
+     * @param len lenght. 
+     * @returns the new map.
+     */
+    static newFromLinearMemory(keys_pos: u32, vals_pos:u32, len:u32) : Map {
+        let obj = map_new_from_linear_memory(fromU32(keys_pos), fromU32(vals_pos), fromU32(len))
+        return new Map(obj);
+    }
+
+    /**
+     * Copy the RawVal values of this map, as described by set of input keys, into an array at a given linear-memory address.
+     * @param keys_pos address of the keys.
+     * @param vals_pos address of the vals.
+     * @param len lenght.
+     */
+    unpackToLinearMemory(keys_pos: u32, vals_pos:u32, len:u32) : void  {
+        map_unpack_to_linear_memory(this.obj, fromU32(keys_pos), fromU32(vals_pos), fromU32(len));
+    }
 }
 
 /******************
@@ -148,12 +170,12 @@ declare function map_del(m:MapObject, k:RawVal): MapObject;
 /// Get the size of a map.
 // @ts-ignore
 @external("m", "3")
-declare function map_len(m:MapObject): RawVal;
+declare function map_len(m:MapObject): U32Val;
 
-/// Test for the presence of a key in a map. Returns (SCStatic) TRUE/FALSE.
+/// Test for the presence of a key in a map. Returns BoolVal.
 // @ts-ignore
 @external("m", "4")
-declare function map_has(m:MapObject, k:RawVal): RawVal;
+declare function map_has(m:MapObject, k:RawVal): BoolVal;
 
 /// Given a key, find the first key less than itself in the map's sorted order.
 /// If such a key does not exist, return an SCStatus containing the error code (TBD).
@@ -183,10 +205,20 @@ declare function map_max_key(m:MapObject): RawVal;
 /// The new vector is ordered in the original map's key-sorted order.
 // @ts-ignore
 @external("m", "9")
-declare function map_keys(m:MapObject): VectorObject;
+declare function map_keys(m:MapObject): VecObject;
 
 /// Return a new vector containing all the values in a map.
 /// The new vector is ordered in the original map's key-sorted order.
 // @ts-ignore
 @external("m", "A")
-declare function map_values(m:MapObject): VectorObject;
+declare function map_values(m:MapObject): VecObject;
+
+/// Return a new map initialized from a set of input slices given by linear-memory addresses and lengths.
+// @ts-ignore
+@external("m", "B")
+declare function map_new_from_linear_memory(keys_pos: U32Val, vals_pos :U32Val, len: U32Val): MapObject;
+
+/// Copy the RawVal values of a map, as described by set of input keys, into an array at a given linear-memory address.
+// @ts-ignore
+@external("m", "B")
+declare function map_unpack_to_linear_memory(map: MapObject, keys_pos: U32Val, vals_pos: U32Val, len: U32Val): VoidVal;

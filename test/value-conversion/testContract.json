@@ -1,38 +1,43 @@
 {
     "name": "val-test",
-    "version": "0.1.0",
-    "description": "eee",
-    "host_functions_version": 29,
+    "version": "0.1.8",
+    "description": "value conversions test",
+    "host_functions_version": 32,
     "functions": [
         {
             "name" : "testI32",
             "arguments": [],
-            "returns" : "val"
+            "returns" : "bool"
         },
         {
             "name" : "testU32",
             "arguments": [],
-            "returns" : "val"
+            "returns" : "bool"
         },
         {
             "name" : "testStatic",
             "arguments": [],
-            "returns" : "val"
+            "returns" : "bool"
+        },
+        {
+            "name" : "testSmall",
+            "arguments": [],
+            "returns" : "bool"
+        },
+        {
+            "name" : "testSSym",
+            "arguments": [],
+            "returns" : "symbol"
         },
         {
             "name" : "testObject",
             "arguments": [],
-            "returns" : "val"
+            "returns" : "bool"
         },
         {
             "name" : "testStatus",
             "arguments": [],
-            "returns" : "val"
-        },
-        {
-            "name" : "testSymbol",
-            "arguments": [],
-            "returns" : "symbol"
+            "returns" : "bool"
         }
     ]
 }

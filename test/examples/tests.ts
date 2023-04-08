@@ -6,17 +6,17 @@ import * as context from '../../lib/context';
 import * as contract from "../../lib/contract";
 import * as address from '../../lib/address';
 
-export function hello(to: val.SymbolVal): val.VectorObject {
+export function hello(to: val.SmallSymbolVal): val.VecObject {
 
   let vec = new Vec();
-  vec.pushFront(val.fromSymbolStr("Hello"));
+  vec.pushFront(val.fromSmallSymbolStr("Hello"));
   vec.pushBack(to);
   
   return vec.getHostObject();
   
 }
 
-export function add(a: val.RawVal, b: val.RawVal): val.RawVal {
+export function add(a: val.I32Val, b: val.I32Val): val.I32Val {
 
   let ai32 = val.toI32(a);
   let bi32 = val.toI32(b);
@@ -24,8 +24,19 @@ export function add(a: val.RawVal, b: val.RawVal): val.RawVal {
   return (val.fromI32(ai32 + bi32));
 }
 
-export function increment(): val.RawVal {
+export function logging(): val.VoidVal {
 
+  context.logStr("Hello, today is a sunny day!");
+
+  let args = new Vec();
+  args.pushBack(val.fromI32(30));
+  args.pushBack(val.fromSmallSymbolStr("celsius"));
+  context.logFtm("We have {} degrees {}!", args);
+  return val.fromVoid();
+
+}
+
+export function increment(): val.U32Val {
   let key = "COUNTER";
   var counter = 0;
   if (ledger.hasDataFor(key)) {
@@ -38,19 +49,6 @@ export function increment(): val.RawVal {
   return counterObj;
 }
 
-export function logging(): val.RawVal {
-
-  context.logStr("Hello, today is a sunny day!");
-
-  let args = new Vec();
-  args.pushBack(val.fromI32(30));
-  args.pushBack(val.fromSymbolStr("celsius"));
-  context.logFtm("We have {} degrees {}!", args);
-
-  return val.fromTrue();
-
-}
-
 enum ALLOWED_AGE_RANGE {
   MIN = 18,
   MAX = 99
@@ -60,8 +58,8 @@ enum AGE_ERR_CODES {
   TOO_OLD = 2
 }
 
-export function checkAge(age: val.RawVal): val.RawVal {
-
+export function checkAge(age: val.I32Val): val.SmallSymbolVal {
+  
   let age2check = val.toI32(age);
 
   if (age2check < ALLOWED_AGE_RANGE.MIN) {
@@ -71,17 +69,16 @@ export function checkAge(age: val.RawVal): val.RawVal {
   if (age2check > ALLOWED_AGE_RANGE.MAX) {
     context.failWithErrorCode(AGE_ERR_CODES.TOO_OLD);
   }
-
-  return val.fromSymbolStr("OK");
+  return val.fromSmallSymbolStr("OK");
 }
 
-export function eventTest(): val.RawVal {
+export function eventTest(): val.BoolVal {
 
   let topicsVec = new Vec();
 
-  topicsVec.pushBack(val.fromSymbolStr("TEST"));
-  topicsVec.pushBack(val.fromSymbolStr("THE"));
-  topicsVec.pushBack(val.fromSymbolStr("EVENTS"));
+  topicsVec.pushBack(val.fromSmallSymbolStr("TEST"));
+  topicsVec.pushBack(val.fromSmallSymbolStr("THE"));
+  topicsVec.pushBack(val.fromSmallSymbolStr("EVENTS"));
 
   let dataVec = new Vec();
   dataVec.pushBack(val.fromU32(223));
@@ -168,7 +165,7 @@ export function callctr2(user: val.AddressObject): val.MapObject {
 }
 
 export function deploy(wasm_hash: val.BytesObject, salt: val.BytesObject, 
-  fn_name: val.SymbolVal, args:val.VectorObject): val.RawVal {
+  fn_name: val.SmallSymbolVal, args:val.VecObject): val.RawVal {
 
   let id = ledger.deployContract(wasm_hash, salt);
   return contract.callContract(id, fn_name, args);

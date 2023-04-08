@@ -17,7 +17,7 @@ export class SdkTransform extends Transform {
     let xdr = XDR.config((xdr) => {
       xdr.typedef("Uint64", xdr.uhyper());
       xdr.typedef("Uint32", xdr.uint());
-      xdr.typedef("ScSymbol", xdr.string(10));
+      xdr.typedef("ScSymbol", xdr.string(32));
 
       xdr.enum("ScEnvMetaKind", {
         scEnvMetaKindInterfaceVersion: 0,
@@ -36,19 +36,23 @@ export class SdkTransform extends Transform {
 
       xdr.enum("ScSpecType", {
         scSpecTypeVal: 0,
-        scSpecTypeU32: 1,
-        scSpecTypeI32: 2,
-        scSpecTypeU64: 3,
-        scSpecTypeI64: 4,
-        scSpecTypeU128: 5,
-        scSpecTypeI128: 6,
-        scSpecTypeBool: 7,
-        scSpecTypeSymbol: 8,
-        scSpecTypeBitset: 9,
-        scSpecTypeStatus: 10,
-        scSpecTypeBytes: 11,
-        scSpecTypeInvoker: 12,
-        scSpecTypeAddress: 13,
+        scSpecTypeBool: 1,
+        scSpecTypeVoid: 2,
+        scSpecTypeStatus: 3,
+        scSpecTypeU32: 4,
+        scSpecTypeI32: 5,
+        scSpecTypeU64: 6,
+        scSpecTypeI64: 7,
+        scSpecTypeTimepoint: 8,
+        scSpecTypeDuration: 9,
+        scSpecTypeU128: 10,
+        scSpecTypeI128: 11,
+        scSpecTypeU256: 12,
+        scSpecTypeI256: 13,
+        scSpecTypeBytes: 14,
+        scSpecTypeString: 16,
+        scSpecTypeSymbol: 17,
+        scSpecTypeAddress: 19,
         scSpecTypeOption: 1000,
         scSpecTypeResult: 1001,
         scSpecTypeVec: 1002,
@@ -98,17 +102,22 @@ export class SdkTransform extends Transform {
         switchName: "type",
         switches: [
           ["scSpecTypeVal", xdr.void()],
-          ["scSpecTypeU64", xdr.void()],
-          ["scSpecTypeI64", xdr.void()],
-          ["scSpecTypeU128", xdr.void()],
-          ["scSpecTypeI128", xdr.void()],
+          ["scSpecTypeBool", xdr.void()],
+          ["scSpecTypeVoid", xdr.void()],
+          ["scSpecTypeStatus", xdr.void()],
           ["scSpecTypeU32", xdr.void()],
           ["scSpecTypeI32", xdr.void()],
-          ["scSpecTypeBool", xdr.void()],
-          ["scSpecTypeSymbol", xdr.void()],
-          ["scSpecTypeBitset", xdr.void()],
-          ["scSpecTypeStatus", xdr.void()],
+          ["scSpecTypeU64", xdr.void()],
+          ["scSpecTypeI64", xdr.void()],
+          ["scSpecTypeTimepoint", xdr.void()],
+          ["scSpecTypeDuration", xdr.void()],
+          ["scSpecTypeU128", xdr.void()],
+          ["scSpecTypeI128", xdr.void()],
+          ["scSpecTypeU256", xdr.void()],
+          ["scSpecTypeI256", xdr.void()],
           ["scSpecTypeBytes", xdr.void()],
+          ["scSpecTypeString", xdr.void()],
+          ["scSpecTypeSymbol", xdr.void()],
           ["scSpecTypeAddress", xdr.void()],
           ["scSpecTypeOption", "option"],
           ["scSpecTypeResult", "result"],
@@ -229,8 +238,12 @@ export class SdkTransform extends Transform {
     switch(argumentTypeStr) {
       case "val":
         return typ;
+      case "bool":
+        return xdr.ScSpecTypeDef.scSpecTypeBool();
       case "void":
-        return typ;
+        return xdr.ScSpecTypeDef.scSpecTypeVoid();
+      case "status":
+        return xdr.ScSpecTypeDef.scSpecTypeStatus();
       case "u32":
         return xdr.ScSpecTypeDef.scSpecTypeU32();
       case "i32":
@@ -239,20 +252,24 @@ export class SdkTransform extends Transform {
         return xdr.ScSpecTypeDef.scSpecTypeU64();
       case "i64":
         return xdr.ScSpecTypeDef.scSpecTypeI64();
+      case "timepoint":
+        return xdr.ScSpecTypeDef.scSpecTypeTimepoint();
+      case "duration":
+        return xdr.ScSpecTypeDef.scSpecTypeDuration();
       case "u128":
         return xdr.ScSpecTypeDef.scSpecTypeU128();
       case "i128":
         return xdr.ScSpecTypeDef.scSpecTypeI128();
-      case "bool":
-        return xdr.ScSpecTypeDef.scSpecTypeBool();
-      case "symbol":
-        return xdr.ScSpecTypeDef.scSpecTypeSymbol();
-      case "bitset":
-        return xdr.ScSpecTypeDef.scSpecTypeBitset();
-      case "status":
-        return xdr.ScSpecTypeDef.scSpecTypeStatus();
+      case "u256":
+        return xdr.ScSpecTypeDef.scSpecTypeU256();
+      case "i256":
+        return xdr.ScSpecTypeDef.scSpecTypeI256();
       case "bytes":
         return xdr.ScSpecTypeDef.scSpecTypeBytes();
+      case "string":
+        return xdr.ScSpecTypeDef.scSpecTypeString();
+      case "symbol":
+        return xdr.ScSpecTypeDef.scSpecTypeSymbol();
       case "address":
         return xdr.ScSpecTypeDef.scSpecTypeAddress();
     }

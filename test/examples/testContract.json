@@ -1,8 +1,8 @@
 {
     "name": "examples",
-    "version": "0.1.0",
+    "version": "0.1.8",
     "description": "test examples",
-    "host_functions_version": 29,
+    "host_functions_version": 32,
     "functions": [
         {
             "name" : "hello",
@@ -27,7 +27,7 @@
         {
             "name" : "logging",
             "arguments": [],
-            "returns" : "val"
+            "returns" : "void"
         },
         {
             "name" : "callctr",
@@ -44,7 +44,7 @@
         {
             "name" : "eventTest",
             "arguments": [],
-            "returns" : "val"
+            "returns" : "bool"
         },
         {
             "name" : "auth",

@@ -1,23 +1,28 @@
 {
     "name": "sdk-types test",
-    "version": "0.1.0",
+    "version": "0.1.8",
     "description": "test sdk types",
-    "host_functions_version": 29,
+    "host_functions_version": 32,
     "functions": [
         {
             "name" : "maps",
             "arguments": [],
-            "returns" : "val"
+            "returns" : "bool"
         },
         {
             "name" : "vecs",
             "arguments": [],
-            "returns" : "val"
+            "returns" : "bool"
         },
         {
             "name" : "bytes",
             "arguments": [],
-            "returns" : "val"
+            "returns" : "bool"
+        },
+        {
+            "name" : "symbols",
+            "arguments": [],
+            "returns" : "bool"
         }
     ]
 }

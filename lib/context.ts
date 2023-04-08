@@ -1,7 +1,7 @@
 
-import { Bytes } from "./bytes";
-import { RawVal, BytesObject, Unsigned64BitIntObject,
-     VectorObject, toU32, toU64, StatusVal, contractError, fromSymbolStr, AddressObject } from "./value";
+import { Str } from "./str";
+import { RawVal, BytesObject, U64Object,
+     VecObject, toU32, toU64, StatusVal, contractError, fromSmallSymbolStr, AddressObject, VoidVal, U32Val, ObjectVal } from "./value";
 import { Vec } from "./vec";
 
 
@@ -12,8 +12,8 @@ import { Vec } from "./vec";
  * @param args The arguments as values in the Vector.
  */
 export function logFtm(msg: string, args:Vec): void {
-    let b = Bytes.fromString(msg);
-    host_log_fmt_values(b.getHostObject(), args.getHostObject());
+    let s = Str.fromString(msg);
+    host_log_fmt_values(s.getHostObject(), args.getHostObject());
 }
 
 /**
@@ -21,9 +21,9 @@ export function logFtm(msg: string, args:Vec): void {
 * @param msg the message to log
 */
 export function logStr(msg: string): void {
-    let b = Bytes.fromString(msg);
+    let s = Str.fromString(msg);
     let args = new Vec();
-    host_log_fmt_values(b.getHostObject(), args.getHostObject());
+    host_log_fmt_values(s.getHostObject(), args.getHostObject());
 }
 
 /**
@@ -32,14 +32,6 @@ export function logStr(msg: string): void {
 */
 export function logValue(value: RawVal): void {
     host_log_value(value);
-}
-
-/**
- * Returns whether the contract invocation is from an account or another contract.
- * @returns 0 for account, 1 for contract.
- */
- export function getInvokerType(): u64 {
-    return get_invoker_type();
 }
 
 /**
@@ -70,13 +62,13 @@ export function getCurrentContractID(): BytesObject {
 }
 
 /**
- * Compares to values as described here: https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md#comparison
- * @param val1 first value to compare
- * @param val2 second value to compare
- * @returns result  -1  if val1 < val2, 0  if val1 == val2, 1  if val1 > val2,
+ * Compare two objects, or at least one object to a non-object, structurally. Returns -1 if a<b, 1 if a>b, or 0 if a==b.
+ * @param a first obj to compare.
+ * @param b second obj to compare.
+ * @returns result  -1 if a<b, 1 if a>b, or 0 if a==b.
  */
-export function compare(val1: RawVal, val2: RawVal): i64 {
-    return obj_cmp(val1, val2);
+export function compareObj(a: RawVal, b: RawVal): i64 {
+    return obj_cmp(a, b);
 }
 
 /**
@@ -112,9 +104,9 @@ export function getLedgerNetworkId(): BytesObject {
  * to the current one as a vector of vectors, where the inside
  * vector contains the contract id as Hash, and a function as
  * a Symbol.
- * @returns the full call stack (type: VectorObject)
+ * @returns the full call stack (type: VecObject)
  */
-export function getCurrentCallStack(): VectorObject {
+export function getCurrentCallStack(): VecObject {
     return get_current_call_stack();
 }
 
@@ -147,12 +139,12 @@ export function publishEvent(topics: Vec, data: RawVal): void {
 }
 
 /**
- * Lets the host publish a "simple" contract event that has only one topic given as a symbol.
- * @param topicSymbol the symbol string to be used as a topic. max 10 characters. [_0-9A-Za-z]
- * @param data datat to be published in the event.
+ * Lets the host publish a "simple" contract event that has only one topic given as a small symbol.
+ * @param topicSymbol the symbol string to be used as a topic. max 9 characters. [_0-9A-Za-z]
+ * @param data data to be published in the event.
  */
 export function publishSimpleEvent(topicSymbol: string, data: RawVal): void {
-    let topic = fromSymbolStr(topicSymbol);
+    let topic = fromSmallSymbolStr(topicSymbol);
     let topics = new Vec();
     topics.pushBack(topic);
     contract_event(topics.getHostObject(), data);
@@ -166,7 +158,7 @@ export function publishSimpleEvent(topicSymbol: string, data: RawVal): void {
 // is live in both Env=Guest and Env=Host configurations.
 // @ts-ignore
 @external("x", "_")
-declare function host_log_value(v: RawVal): RawVal;
+declare function host_log_value(v: RawVal): VoidVal;
 
 /// Get the contractID `Bytes` of the contract which invoked the
 /// running contract. Traps if the running contract was not
@@ -175,16 +167,17 @@ declare function host_log_value(v: RawVal): RawVal;
 @external("x", "0")
 declare function get_invoking_contract(): BytesObject;
 
+/// Compare two objects, or at least one object to a non-object, structurally. 
+/// Returns -1 if a<b, 1 if a>b, or 0 if a==b.
 // @ts-ignore
 @external("x", "1")
 declare function obj_cmp(a: RawVal, b: RawVal): i64;
 
 /// Records a contract event. `topics` is expected to be a `SCVec` with
 /// length <= 4 that CANNOT contain `Vec`, `Map`, or `Bytes` with length > 32
-/// On success, returns an `SCStatus::Ok`
 // @ts-ignore
 @external("x", "2")
-declare function contract_event(topics: VectorObject, data: RawVal): StatusVal;
+declare function contract_event(topics: VecObject, data: RawVal): VoidVal;
 
 /// Gets the 32-byte identifer of the current contract.
 /// Traps if the running contract was notinvoked by a contract.
@@ -195,17 +188,17 @@ declare function get_current_contract_id(): BytesObject;
 /// Return the protocol version of the current ledger as a u32.
 // @ts-ignore
 @external("x", "4")
-declare function get_ledger_version(): RawVal;
+declare function get_ledger_version(): U32Val;
 
 /// Return the sequence number of the current ledger as a u32.
 // @ts-ignore
 @external("x", "5")
-declare function get_ledger_sequence(): RawVal;
+declare function get_ledger_sequence(): U32Val;
 
 /// Return the timestamp number of the current ledger as a u64.
 // @ts-ignore
 @external("x", "6")
-declare function get_ledger_timestamp(): Unsigned64BitIntObject;
+declare function get_ledger_timestamp(): U64Object; // TODO - check this - what about U64SmallVal?
 
 /// Returns the full call stack from the first contract call
 /// to the current one as a vector of vectors, where the inside
@@ -213,33 +206,27 @@ declare function get_ledger_timestamp(): Unsigned64BitIntObject;
 /// a Symbol.
 // @ts-ignore
 @external("x", "7")
-declare function get_current_call_stack(): VectorObject;
+declare function get_current_call_stack(): VecObject;
 
 /// Causes the currently executing contract to fail immediately
 /// with a provided status code, which must be of error-type
 /// `ScStatusType::ContractError`. Does not actually return.
 // @ts-ignore
 @external("x", "8")
-declare function fail_with_status(status: StatusVal): RawVal;
+declare function fail_with_status(status: StatusVal): VoidVal;
 
 // Record a debug event. Fmt must be a Bytes. Args must be a
 // Vec. Void is returned.
 // @ts-ignore
 @external("x", "9")
-declare function host_log_fmt_values(fmt: BytesObject, args: VectorObject): RawVal;
-
-/// Get whether the contract invocation is from an account or
-/// another contract. Returns 0 for account, 1 for contract.
-// @ts-ignore
-@external("x", "a")
-declare function get_invoker_type(): u64;
+declare function host_log_fmt_values(fmt: BytesObject, args: VecObject): VoidVal;
 
 /// Return the network id (sha256 hash of network passphrase) of the current ledger as `Bytes`. The value is always 32 bytes in length.
 // @ts-ignore
-@external("x", "c")
+@external("x", "a")
 declare function get_ledger_network_id(): BytesObject;
 
 /// Get the Address object for the current contract.
 // @ts-ignore
-@external("x", "d")
+@external("x", "b")
 declare function get_current_contract_address(): AddressObject;

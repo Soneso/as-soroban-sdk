@@ -1,4 +1,4 @@
-import { RawVal } from "./value";
+import { BytesObject, VoidVal } from "./value";
 import { ObjectVal } from "./value";
 
 // TODO: add wrapper functions
@@ -33,8 +33,8 @@ export declare function public_key_to_bytes(x:ObjectVal): ObjectVal;
 
 // @ts-ignore
 @external("c", "_")
-export declare function compute_hash_sha256(x:ObjectVal): ObjectVal;
+export declare function compute_hash_sha256(x:BytesObject): BytesObject;
 
 // @ts-ignore
 @external("c", "0")
-export declare function verify_sig_ed25519(x:ObjectVal, k:ObjectVal, s:ObjectVal): RawVal;
+export declare function verify_sig_ed25519(x:BytesObject, k:BytesObject, s:BytesObject): VoidVal;

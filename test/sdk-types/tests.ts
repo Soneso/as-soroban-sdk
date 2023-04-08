@@ -3,13 +3,14 @@ import * as context from "../../lib/context";
 import { Map } from "../../lib/map";
 import { Vec } from "../../lib/vec";
 import { Bytes } from "../../lib/bytes";
+import { Sym } from "../../lib/sym";
 
-export function maps(): val.RawVal {
+export function maps(): val.BoolVal {
 
   let map = new Map();
 
-  let key1 = val.fromSymbolStr("key1");
-  let value1 = val.fromSymbolStr("value1");
+  let key1 = val.fromSmallSymbolStr("key1");
+  let value1 = val.fromSmallSymbolStr("value1");
   map.put(key1, value1);
 
   let key2 = val.fromU32(12);
@@ -22,10 +23,11 @@ export function maps(): val.RawVal {
 
   let value1test = map.get(key1);
   let value2test = map.get(key2);
-  if (context.compare(value1, value1test) != 0 || context.compare(value2, value2test) != 0) {
+
+  if (value1 != value1test || value2 != value2test) {
     return val.fromFalse();
   }
-
+  
   map.del(key2);
   if (map.len() != 1 || !map.has(key1)) {
     return val.fromFalse();
@@ -68,7 +70,7 @@ export function maps(): val.RawVal {
 
   let map3 = new Map(map.getHostObject());
 
-  let comp = context.compare(map2.getHostObject(), map3.getHostObject());
+  let comp = context.compareObj(map2.getHostObject(), map3.getHostObject());
   if (comp != 0) {
     return val.fromFalse();
   }
@@ -76,12 +78,12 @@ export function maps(): val.RawVal {
   return val.fromTrue();
 }
 
-export function vecs(): val.RawVal {
+export function vecs(): val.BoolVal {
 
     let vec = new Vec();
     let val1 = val.fromU32(12);
     let val2 = new Map();
-    val2.put(val.fromI32(-11), val.fromSymbolStr("hello"));
+    val2.put(val.fromI32(-11), val.fromSmallSymbolStr("hello"));
     vec.pushFront(val1);
     vec.pushBack(val2.getHostObject());
 
@@ -105,7 +107,7 @@ export function vecs(): val.RawVal {
     }
 
     let val2Test = vec.back();
-    if (context.compare(val2Test, val2.getHostObject()) != 0) {
+    if (context.compareObj(val2Test, val2.getHostObject()) != 0) {
         return val.fromFalse();
     }
 
@@ -114,7 +116,7 @@ export function vecs(): val.RawVal {
     
     let v2Test = vec.get(0);
     let v1Test = vec.get(1);
-    if (context.compare(v2Test, val2.getHostObject()) != 0 || v1Test != val1) {
+    if (context.compareObj(v2Test, val2.getHostObject()) != 0 || v1Test != val1) {
         return val.fromFalse();
     }
 
@@ -172,13 +174,13 @@ export function vecs(): val.RawVal {
         return val.fromFalse();
     }
 
-    if(context.compare(vec2.getHostObject(), slice.getHostObject()) != 0) {
+    if(context.compareObj(vec2.getHostObject(), slice.getHostObject()) != 0) {
         return val.fromFalse();
     }
     return val.fromTrue();
 }
 
-export function bytes(): val.RawVal {
+export function bytes(): val.BoolVal {
 
 
     let val1 = val.fromU32(12);
@@ -191,24 +193,24 @@ export function bytes(): val.RawVal {
 
 
     let c = Bytes.fromString("hello");
-    c.copyToLinearMemory(val.fromU32(0), val.fromU32(0), val.fromU32(5));
-    let d = Bytes.newFromLinearMemory(val.fromU32(0), val.fromU32(5));
-    if(context.compare(c.getHostObject(), d.getHostObject()) != 0) {
+    c.copyToLinearMemory(0, 0, 5);
+    let d = Bytes.newFromLinearMemory(0, 5);
+    if(context.compareObj(c.getHostObject(), d.getHostObject()) != 0) {
         return val.fromFalse();
     }
     let e = new Bytes();
-    e.copyFromLinearMemory(val.fromU32(0), val.fromU32(0), val.fromU32(5));
-    if(context.compare(e.getHostObject(), d.getHostObject()) != 0) {
+    e.copyFromLinearMemory(0, 0, 5);
+    if(context.compareObj(e.getHostObject(), d.getHostObject()) != 0) {
         return val.fromFalse();
     }
 
     let b = new Bytes();
-    let t0 = val.fromU32(0);
-    let t1 = val.fromU32(1);
-    let t2 = val.fromU32(2);
-    let t3 = val.fromU32(3);
-    let t4 = val.fromU32(4);
-    let t5 = val.fromU32(5);
+    let t0 = 0;
+    let t1 = 1;
+    let t2 = 2;
+    let t3 = 3;
+    let t4 = 4;
+    let t5 = 5;
     b.push(t0);
     b.push(t1);
     b.push(t2);
@@ -243,7 +245,7 @@ export function bytes(): val.RawVal {
 
     let b4 = b3.slice(0, 3);
     let b5 = b.slice(0, 3);
-    if (context.compare(b4.getHostObject(), b5.getHostObject()) != 0) {
+    if (context.compareObj(b4.getHostObject(), b5.getHostObject()) != 0) {
         return val.fromFalse();
     }
 
@@ -252,5 +254,16 @@ export function bytes(): val.RawVal {
         return val.fromFalse();
     }
 
+    return val.fromTrue();
+}
+
+export function symbols() : val.BoolVal {
+
+    let sym1 = Sym.fromSymbolString("hola");
+    let sym2 = Sym.fromSymbolString("hola");
+
+    if (context.compareObj(sym1.getHostObject(), sym2.getHostObject()) != 0) {
+        return val.fromFalse();
+    }
     return val.fromTrue();
 }
