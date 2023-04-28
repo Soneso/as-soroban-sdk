@@ -6,7 +6,7 @@ This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.s
 
 **This repository contains code that is in very early development, incomplete, not tested, and not recommended for use. The API is unstable, experimental, and is receiving breaking changes frequently.**
 
-**This version supports soroban preview 7  & interface version 32**
+**This version supports soroban preview 8  & interface version 32**
 
 ## Quick Start
 
