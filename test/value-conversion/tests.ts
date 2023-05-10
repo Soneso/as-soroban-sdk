@@ -140,17 +140,29 @@ export function testObject(): val.BoolVal {
     return val.fromFalse();
   }
 
+  const UA128VAL = 39;
+  var au128 = val.fromU128Small(UA128VAL);
+  if(!val.isU128Val(au128) || !val.isU128Small(au128) || val.toU128Small(au128) != UA128VAL) {
+    return val.fromFalse();
+  }
+
   const ULO128VAL = 18446744073709551610;
   const UHI128VAL = 18446744073709551611;
   let u128Object = val.fromU128Pieces(ULO128VAL, UHI128VAL);
-  if(!val.isObject(u128Object) || !val.isU128(u128Object) || val.toU128Low64(u128Object) != ULO128VAL || val.toU128High64(u128Object) != UHI128VAL) {
+  if(!val.isObject(u128Object) || !val.isU128Val(u128Object) || !val.isU128Object(u128Object) || val.toU128Low64(u128Object) != ULO128VAL || val.toU128High64(u128Object) != UHI128VAL) {
+    return val.fromFalse();
+  }
+
+  const IA128VAL = -39;
+  var ai128 = val.fromI128Small(IA128VAL);
+  if(!val.isI128Val(ai128) || !val.isI128Small(ai128) || val.toI128Small(ai128) != IA128VAL) {
     return val.fromFalse();
   }
 
   const ILO128VAL = -1844674407370955161;
   const IHI128VAL = 18446744073709551611;
   let i128Object = val.fromI128Pieces(ILO128VAL, IHI128VAL);
-  if(!val.isObject(i128Object) || !val.isI128(i128Object) || val.toI128Low64(i128Object) != ILO128VAL || val.toI128High64(i128Object) != IHI128VAL) {
+  if(!val.isObject(i128Object) || !val.isI128Val(i128Object) || !val.isI128Object(i128Object) || val.toI128Low64(i128Object) != ILO128VAL || val.toI128High64(i128Object) != IHI128VAL) {
     return val.fromFalse();
   }
 

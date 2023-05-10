@@ -16,8 +16,10 @@ export type U64SmallVal = RawVal;
 export type I64SmallVal = RawVal;
 export type TimepointSmallVal = RawVal;
 export type DurationSmallVal = RawVal;
+export type I128Val = RawVal; // can be I128SmallVal or I128Object
+export type U128Val = RawVal; // can be U128SmallVal or U128Object
 export type U128SmallVal = RawVal;
-export type I128SmallVal = RawVal;
+export type I128SmallVal = I128Val;
 export type U256SmallVal = RawVal;
 export type I256SmallVal = RawVal;
 export type Symbol = RawVal;
@@ -30,8 +32,8 @@ export type U64Object = ObjectVal;
 export type I64Object = ObjectVal;
 export type TimepointObject = RawVal;
 export type DurationObject = RawVal;
-export type U128Object = ObjectVal;
-export type I128Object = ObjectVal;
+export type U128Object = U128Val;
+export type I128Object = I128Val;
 export type U256Object = ObjectVal;
 export type I256Object = ObjectVal;
 export type BytesObject = ObjectVal;
@@ -835,11 +837,20 @@ export function isDuration(val: RawVal) : bool {
 // U128
 
 /**
+ * Checks if the given host value represents an u128. It can either be an U128Object or an U128SmallVal.
+ * @param val host value to check.
+ * @returns true if the host value represents an represents an u128. Otherwise false.
+ */
+export function isU128Val(val:RawVal) : bool {
+  return (hasTag(val, rawValTagU128Object) || hasTag(val, rawValTagU128Small));
+}
+
+/**
  * Checks if the given host value represents an object that contains an unsigned 128-bit integer.
  * @param val host value to check.
  * @returns true if the host value represents an object that contains an unsigned 128-bit integer. Otherwise false.
  */
-export function isU128(val: RawVal) : bool {
+export function isU128Object(val: RawVal) : bool {
   return hasTag(val, rawValTagU128Object);
 }
 
@@ -861,7 +872,7 @@ export function fromU128Pieces(lo: u64, hi:u64) : U128Object {
  * @returns the extracted unsigned low 64 bits integer.
  */
 export function toU128Low64(val: U128Object) : u64 {
-    if(!isU128(val)){
+    if(!isU128Object(val)){
       context.fail();
     }
     return obj_to_u128_lo64(val);
@@ -874,7 +885,7 @@ export function toU128Low64(val: U128Object) : u64 {
  * @returns the extracted unsigned high 64 bits integer.
  */
 export function toU128High64(val: U128Object) : u64 {
-  if(!isU128(val)){
+  if(!isU128Object(val)){
     context.fail();
   }
   return obj_to_u128_hi64(val);
@@ -883,11 +894,20 @@ export function toU128High64(val: U128Object) : u64 {
 /// I128
 
 /**
+ * Checks if the given host value represents an i128. It can either be an I128Object or an I128SmallVal.
+ * @param val host value to check.
+ * @returns true if the host value represents an represents an i128. Otherwise false.
+ */
+export function isI128Val(val:RawVal) : bool {
+  return (hasTag(val, rawValTagI128Object) || hasTag(val, rawValTagI128Small));
+}
+
+/**
  * Checks if the given host value represents an object that contains a signed 128-bit integer.
  * @param val host value to check.
  * @returns true if the host value represents an object that contains a signed 128-bit integer. Otherwise false.
  */
-export function isI128(val:RawVal) : bool {
+export function isI128Object(val:RawVal) : bool {
   return hasTag(val, rawValTagI128Object);
 }
 
@@ -909,7 +929,7 @@ export function fromI128Pieces(lo: u64, hi:u64) : I128Object {
  * @returns the extracted unsigned low 64 bits integer.
  */
 export function toI128Low64(val: I128Object) : u64 {
-    if(!isI128(val)){
+    if(!isI128Object(val)){
       context.fail();
     }
     return obj_to_i128_lo64(val);
@@ -922,7 +942,7 @@ export function toI128Low64(val: I128Object) : u64 {
  * @returns the extracted unsigned high 64 bits integer.
  */
 export function toI128High64(val: I128Object) : u64 {
-  if(!isI128(val)){
+  if(!isI128Object(val)){
     context.fail();
   }
   return obj_to_i128_hi64(val);
@@ -932,11 +952,20 @@ export function toI128High64(val: I128Object) : u64 {
 // U256
 
 /**
+ * Checks if the given host value represents an u256. It can either be an U256Object or an U256SmallVal.
+ * @param val host value to check.
+ * @returns true if the host value represents an represents an u256. Otherwise false.
+ */
+export function isU256Val(val:RawVal) : bool {
+  return (hasTag(val, rawValTagU256Object) || hasTag(val, rawValTagU256Small));
+}
+
+/**
  * Checks if the given host value represents an object that contains an u256 integer.
  * @param val host value to check.
  * @returns true if the host value represents an object that contains an u256 integer. Otherwise false.
  */
-export function isU256(val: RawVal) : bool {
+export function isU256Object(val: RawVal) : bool {
   return hasTag(val, rawValTagU256Object);
 }
 
@@ -944,11 +973,20 @@ export function isU256(val: RawVal) : bool {
 // I256
 
 /**
+ * Checks if the given host value represents an i256. It can either be an I256Object or an I256SmallVal.
+ * @param val host value to check.
+ * @returns true if the host value represents an represents an i256. Otherwise false.
+ */
+export function isI256Val(val:RawVal) : bool {
+  return (hasTag(val, rawValTagI256Object) || hasTag(val, rawValTagI256Small));
+}
+
+/**
  * Checks if the given host value represents an object that contains an i256 integer.
  * @param val host value to check.
  * @returns true if the host value represents an object that contains an i256 integer. Otherwise false.
  */
-export function isI256(val: RawVal) : bool {
+export function isI256Object(val: RawVal) : bool {
   return hasTag(val, rawValTagI256Object);
 }
 

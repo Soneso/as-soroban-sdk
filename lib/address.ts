@@ -9,7 +9,6 @@ import { Vec } from "./vec";
  * @param address to be checked as AddressObject
  * @returns void if authorized
  */
-
 export function requireAuth(address: AddressObject): StatusVal {
     return require_auth(address);
 }

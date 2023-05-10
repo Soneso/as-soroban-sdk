@@ -23,6 +23,11 @@
             "name" : "symbols",
             "arguments": [],
             "returns" : "bool"
+        },
+        {
+            "name" : "math128",
+            "arguments": [],
+            "returns" : "bool"
         }
     ]
 }
