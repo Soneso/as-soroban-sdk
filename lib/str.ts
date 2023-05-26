@@ -9,7 +9,10 @@ export class Str {
     }
 
     /**
-     * Constructs a new Str from a given string value
+     * Constructs a new Str from a given string value.
+     * Be careful with this, because it copies temporarily the bytes of the given string to 
+     * linear memory on position 0 to be able to create a SringObject from the linear memory.
+     * If you have something stored in linear memory at that range, it will override it.
      * @param val string value
      * @returns the new Str
      */

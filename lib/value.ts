@@ -156,29 +156,29 @@ const rawValTagI256Object: rawValTag = 71;
 const rawValTagBytesObject: rawValTag = 72;
 
 /// Tag for a [RawVal] that refers to a host-side string object.
-const rawValTagStringObject: rawValTag = 74;
+const rawValTagStringObject: rawValTag = 73;
 
 /// Tag for a [RawVal] that refers to a host-side symbol object.
-const rawValTagSymbolObject: rawValTag = 75;
+const rawValTagSymbolObject: rawValTag = 74;
 
 /// Tag for a [RawVal] that refers to a host-side vector object.
-const rawValTagVecObject: rawValTag = 77;
+const rawValTagVecObject: rawValTag = 75;
 
 /// Tag for a [RawVal] that refers to a host-side map object.
-const rawValTagMapObject: rawValTag = 78;
+const rawValTagMapObject: rawValTag = 76;
 
 /// Tag for a [RawVal] that refers to a host-side contract executable object.
-const rawValTagContractExecutableObject: rawValTag = 79;
+const rawValTagContractExecutableObject: rawValTag = 77;
 
 /// Tag for a [RawVal] that refers to a host-side address object.
-const rawValTagAddressObject: rawValTag = 80;
+const rawValTagAddressObject: rawValTag = 78;
 
 /// Tag for a [RawVal] that corresponds to
 /// [stellar_xdr::ScVal::LedgerKeyNonce] and refers to a host-side
 /// address object that specifies which address it's the nonce for.
-const rawValTagLedgerKeyNonceObject: rawValTag = 81;
+const rawValTagLedgerKeyNonceObject: rawValTag = 79;
 
-const rawValTagObjectCodeUpperBound: rawValTag = 82;
+const rawValTagObjectCodeUpperBound: rawValTag = 80;
 
 const rawValTagBad: rawValTag = 0x7f;
 
@@ -856,13 +856,13 @@ export function isU128Object(val: RawVal) : bool {
 
 /**
  * Creates an host value that represents an object containing an unsigned 128-bit integer.
- * Convert the low and high 64-bit words of a u128 to an object containing a u128.
+ * Convert the high and low 64-bit words of a u128 to an object containing a u128.
+ * @param hi high 64-bit words.
  * @param lo low 64-bit words.
- * @param lo high 64-bit words.
  * @returns the created host value as U128Object
  */
-export function fromU128Pieces(lo: u64, hi:u64) : U128Object {
-    return obj_from_u128_pieces(lo, hi);
+export function fromU128Pieces(hi:u64, lo: u64) : U128Object {
+    return obj_from_u128_pieces(hi, lo);
 }
 
 /**
@@ -913,13 +913,13 @@ export function isI128Object(val:RawVal) : bool {
 
 /**
  * Creates an host value that represents an object containing a signed 128-bit integer.
- * Convert the low and high 64-bit words of a i128 to an object containing a i128.
+ * Convert the high and low 64-bit words of a i128 to an object containing a i128.
+ * @param hi high 64-bit words.
  * @param lo low 64-bit words.
- * @param lo high 64-bit words.
  * @returns the created host value as I128Object.
  */
-export function fromI128Pieces(lo: u64, hi:u64) : I128Object {
-    return obj_from_i128_pieces(lo, hi);
+export function fromI128Pieces(hi:i64, lo: u64) : I128Object {
+    return obj_from_i128_pieces(hi, lo);
 }
 
 /**
@@ -939,9 +939,9 @@ export function toI128Low64(val: I128Object) : u64 {
  * Extract the high 64 bits from an object containing a i128.
  * Traps if the host value doese not represent an object that conatains a signed 128-bit integer. To avoid, you can check it with isI128().
  * @param val the host value (Type: I128Object).
- * @returns the extracted unsigned high 64 bits integer.
+ * @returns the extracted high 64 bits integer.
  */
-export function toI128High64(val: I128Object) : u64 {
+export function toI128High64(val: I128Object) : i64 {
   if(!isI128Object(val)){
     context.fail();
   }
@@ -969,6 +969,70 @@ export function isU256Object(val: RawVal) : bool {
   return hasTag(val, rawValTagU256Object);
 }
 
+/**
+ * Creates an host value that represents an object containing an unsigned 256-bit integer.
+ * Convert the four 64-bit words of an u256 (big-endian) to an object containing an u256.
+ * @param hi_hi high of high part - bits 192-255.
+ * @param hi_lo low of high part - bits 128-191.
+ * @param lo_hi high of low part - bits 64-127.
+ * @param lo_lo low of low part - bits 0-63.
+ * @returns the created host value as U256Object
+ */
+export function fromU256Pieces(hi_hi: u64, hi_lo:u64, lo_hi: u64, lo_lo:u64, ) : U256Object {
+  return obj_from_u256_pieces(hi_hi, hi_lo, lo_hi, lo_lo);
+}
+
+/**
+ * Extract the highest 64-bits (bits 192-255) from an object containing an u256.
+ * Traps if the host value doese not represent an object that conatains an unsigned 256-bit integer. To avoid, you can check it with isU256().
+ * @param val the host value (Type: U256Object) 
+ * @returns the extracted unsigned 64 bits integer.
+ */
+export function toU256HiHi(val: U256Object) : u64 {
+  if(!isU256Object(val)){
+    context.fail();
+  }
+  return obj_to_u256_hi_hi(val)
+}
+
+/**
+ * Extract bits 128-191 from an object containing an u256.
+ * Traps if the host value doese not represent an object that conatains an unsigned 256-bit integer. To avoid, you can check it with isU256().
+ * @param val the host value (Type: U256Object) 
+ * @returns the extracted unsigned 64 bits integer.
+ */
+export function toU256HiLo(val: U256Object) : u64 {
+  if(!isU256Object(val)){
+    context.fail();
+  }
+  return obj_to_u256_hi_lo(val)
+}
+
+/**
+ * Extract bits 64-127 from an object containing an u256.
+ * Traps if the host value doese not represent an object that conatains an unsigned 256-bit integer. To avoid, you can check it with isU256().
+ * @param val the host value (Type: U256Object) 
+ * @returns the extracted unsigned 64 bits integer.
+ */
+export function toU256LoHi(val: U256Object) : u64 {
+  if(!isU256Object(val)){
+    context.fail();
+  }
+  return obj_to_u256_lo_hi(val)
+}
+
+/**
+ * Extract the lowest 64-bits (bits 0-63) from an object containing an u256.
+ * Traps if the host value doese not represent an object that conatains an unsigned 256-bit integer. To avoid, you can check it with isU256().
+ * @param val the host value (Type: U256Object) 
+ * @returns the extracted unsigned 64 bits integer.
+ */
+export function toU256LoLo(val: U256Object) : u64 {
+  if(!isU256Object(val)){
+    context.fail();
+  }
+  return obj_to_u256_lo_lo(val)
+}
 
 // I256
 
@@ -988,6 +1052,71 @@ export function isI256Val(val:RawVal) : bool {
  */
 export function isI256Object(val: RawVal) : bool {
   return hasTag(val, rawValTagI256Object);
+}
+
+/**
+ * Creates an host value that represents an object containing a signed 256-bit integer.
+ * Convert the four 64-bit words of an i256 (big-endian) to an object containing an i256.
+ * @param hi_hi high of high part - bits 192-255.
+ * @param hi_lo low of high part - bits 128-191.
+ * @param lo_hi high of low part - bits 64-127.
+ * @param lo_lo low of low part - bits 0-63.
+ * @returns the created host value as U256Object
+ */
+export function fromI256Pieces(hi_hi: i64, hi_lo:u64, lo_hi: u64, lo_lo:u64, ) : I256Object {
+  return obj_from_i256_pieces(hi_hi, hi_lo, lo_hi, lo_lo);
+}
+
+/**
+ * Extract the highest 64-bits (bits 192-255) from an object containing an i256.
+ * Traps if the host value doese not represent an object that conatains a signed 256-bit integer. To avoid, you can check it with isI256().
+ * @param val the host value (Type: I256Object) 
+ * @returns the extracted signed 64 bits integer.
+ */
+export function toI256HiHi(val: I256Object) : i64 {
+  if(!isI256Object(val)){
+    context.fail();
+  }
+  return obj_to_i256_hi_hi(val)
+}
+
+/**
+ * Extract bits 128-191 from an object containing an i256.
+ * Traps if the host value doese not represent an object that conatains a signed 256-bit integer. To avoid, you can check it with isI256().
+ * @param val the host value (Type: I256Object) 
+ * @returns the extracted unsigned 64 bits integer.
+ */
+export function toI256HiLo(val: U256Object) : u64 {
+  if(!isI256Object(val)){
+    context.fail();
+  }
+  return obj_to_i256_hi_lo(val)
+}
+
+/**
+ * Extract bits 64-127 from an object containing an i256.
+ * Traps if the host value doese not represent an object that conatains a signed 256-bit integer. To avoid, you can check it with isI256().
+ * @param val the host value (Type: I256Object) 
+ * @returns the extracted unsigned 64 bits integer.
+ */
+export function toI256LoHi(val: I256Object) : u64 {
+  if(!isI256Object(val)){
+    context.fail();
+  }
+  return obj_to_i256_lo_hi(val)
+}
+
+/**
+ * Extract the lowest 64-bits (bits 0-63) from an object containing an i256.
+ * Traps if the host value doese not represent an object that conatains a signed 256-bit integer. To avoid, you can check it with isI256().
+ * @param val the host value (Type: I256Object) 
+ * @returns the extracted unsigned 64 bits integer.
+ */
+export function toI256LoLo(val: U256Object) : u64 {
+  if(!isI256Object(val)){
+    context.fail();
+  }
+  return obj_to_i256_lo_lo(val)
 }
 
 // BytesObject
@@ -1324,10 +1453,10 @@ declare function obj_from_i64(v:i64): I64Object;
 @external("i", "2")
 declare function obj_to_i64(ojb:I64Object): i64;
 
-/// Convert the low and high 64-bit words of a u128 to an object containing a u128.
+/// Convert the high and low 64-bit words of a u128 to an object containing a u128.
 // @ts-ignore
 @external("i", "5")
-declare function obj_from_u128_pieces(lo:u64, hi:u64): U128Object;
+declare function obj_from_u128_pieces(hi:u64, lo:u64): U128Object;
 
 /// Extract the low 64 bits from an object containing a u128.
 // @ts-ignore
@@ -1339,10 +1468,10 @@ declare function obj_to_u128_lo64(obj:U128Object): u64;
 @external("i", "7")
 declare function obj_to_u128_hi64(obj:U128Object): u64;
 
-/// Convert the lo and hi 64-bit words of an i128 to an object containing an i128.
+/// Convert the high and low 64-bit words of an i128 to an object containing an i128.
 // @ts-ignore
 @external("i", "8")
-declare function obj_from_i128_pieces(lo:u64, hi:u64): I128Object;
+declare function obj_from_i128_pieces(hi:i64, lo:u64): I128Object;
 
 /// Extract the low 64 bits from an object containing an i128.
 // @ts-ignore
@@ -1352,4 +1481,54 @@ declare function obj_to_i128_lo64(obj:I128Object): u64;
 /// Extract the high 64 bits from an object containing an i128.
 // @ts-ignore
 @external("i", "a")
-declare function obj_to_i128_hi64(obj:I128Object): u64;
+declare function obj_to_i128_hi64(obj:I128Object): i64;
+
+/// Convert the four 64-bit words of an u256 (big-endian) to an object containing an u256.
+// @ts-ignore
+@external("i", "b")
+declare function obj_from_u256_pieces(hi_hi:u64, hi_lo:u64, lo_hi:u64, lo_lo:u64): U256Object;
+
+/// Extract the highest 64-bits (bits 192-255) from an object containing an u256.
+// @ts-ignore
+@external("i", "c")
+declare function obj_to_u256_hi_hi(obj:U256Object): u64;
+
+/// Extract bits 128-191 from an object containing an u256.
+// @ts-ignore
+@external("i", "d")
+declare function obj_to_u256_hi_lo(obj:U256Object): u64;
+
+/// Extract bits 64-127 from an object containing an u256.
+// @ts-ignore
+@external("i", "e")
+declare function obj_to_u256_lo_hi(obj:U256Object): u64;
+
+/// Extract the lowest 64-bits (bits 0-63) from an object containing an u256.
+// @ts-ignore
+@external("i", "f")
+declare function obj_to_u256_lo_lo(obj:U256Object): u64;
+
+/// Convert the four 64-bit words of an i256 (big-endian) to an object containing an i256.
+// @ts-ignore
+@external("i", "g")
+declare function obj_from_i256_pieces(hi_hi:i64, hi_lo:u64, lo_hi:u64, lo_lo:u64): I256Object;
+
+/// Extract the highest 64-bits (bits 192-255) from an object containing an u256.
+// @ts-ignore
+@external("i", "h")
+declare function obj_to_i256_hi_hi(obj:U256Object): i64;
+
+/// Extract bits 128-191 from an object containing an u256.
+// @ts-ignore
+@external("i", "i")
+declare function obj_to_i256_hi_lo(obj:U256Object): u64;
+
+/// Extract bits 64-127 from an object containing an u256.
+// @ts-ignore
+@external("i", "j")
+declare function obj_to_i256_lo_hi(obj:U256Object): u64;
+
+/// Extract the lowest 64-bits (bits 0-63) from an object containing an u256.
+// @ts-ignore
+@external("i", "k")
+declare function obj_to_i256_lo_lo(obj:U256Object): u64;

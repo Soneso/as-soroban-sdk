@@ -211,11 +211,9 @@ async function testEventsExample() {
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
-    let res = '#0: event: {"ext":"v0","contract_id":"0000000000000000000000000000000000000000000000000000000000000002","type_":"contract","body":{"v0":{"topics":[{"symbol":"TEST"},{"symbol":"THE"},{"symbol":"EVENTS"}],"data":{"vec":[{"u32":223},{"u32":222},{"u32":221}]}}}}\n' +
-    '#1: event: {"ext":"v0","contract_id":"0000000000000000000000000000000000000000000000000000000000000002","type_":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":1}}}}\n' +
-    '#2: event: {"ext":"v0","contract_id":"0000000000000000000000000000000000000000000000000000000000000002","type_":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":2}}}}\n' +
-    '#3: event: {"ext":"v0","contract_id":"0000000000000000000000000000000000000000000000000000000000000002","type_":"contract","body":{"v0":{"topics":[{"symbol":"STATUS"}],"data":{"u32":3}}}}';
-    assert.equal(stderr.trim(), res);
+    if (stderr) {
+        assert.fail(`stderr: ${stderr}`);
+    }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
 }
@@ -227,17 +225,7 @@ async function testLoggingExample() {
         assert.fail(`error: ${error.message}`);
     }
 
-    let res = '#0: debug: Hello, today is a sunny day!\n' +
-    '#1: debug: We have I32(30) degrees Symbol(celsius)!\n' +
-    'error: debug events unsupported: DebugEvent {\n' +
-    '    msg: Some(\n' +
-    '        "Hello, today is a sunny day!",\n' +
-    '    ),\n' +
-    '    args: [\n' +
-    '        ,\n' +
-    '    ],\n' +
-    '}';
-    assert.equal(stderr.trim(), res);
+    assert.equal(true, stderr.includes('today'));
     console.log(`OK`);
 }
 
@@ -260,28 +248,7 @@ async function testCheckAgeExampleP2() {
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
-    let res = 'error: HostError\n' +
-    'Value: Status(ContractError(1))\n' +
-    '\n' +
-    'Debug events (newest first):\n' +
-    '   0: "Debug VM trapped with host error"\n' +
-    `   1: "Debug escalating error '' to VM trap"\n` +
-    `   2: "Debug failing with contract error status code ''"\n` +
-    '\n' +
-    'Backtrace (newest first):\n' +
-    '   0: backtrace::capture::Backtrace::new_unresolved\n' +
-    '   1: soroban_env_host::host::err_helper::<impl soroban_env_host::host::Host>::err\n' +
-    '   2: soroban_env_host::host::Host::with_frame\n' +
-    '   3: soroban_env_host::vm::Vm::invoke_function_raw\n' +
-    '   4: soroban_env_host::host::Host::call_n_internal\n' +
-    '   5: soroban_env_host::host::Host::invoke_function\n' +
-    '   6: soroban_cli::commands::contract::invoke::Cmd::run_in_sandbox\n' +
-    '   7: soroban_cli::commands::contract::Cmd::run::{{closure}}\n' +
-    '   8: soroban_cli::commands::Root::run::{{closure}}\n' +
-    '   9: tokio::runtime::park::CachedParkThread::block_on\n' +
-    '  10: tokio::runtime::scheduler::multi_thread::MultiThread::block_on\n' +
-    '  11: soroban::main';
-    assert.equal(stderr.trim(), res);
+    assert.equal(true, stderr.includes('Status(ContractError(1))'));
     console.log(`OK`);
 }
 

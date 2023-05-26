@@ -146,9 +146,9 @@ export function testObject(): val.BoolVal {
     return val.fromFalse();
   }
 
-  const ULO128VAL = 18446744073709551610;
   const UHI128VAL = 18446744073709551611;
-  let u128Object = val.fromU128Pieces(ULO128VAL, UHI128VAL);
+  const ULO128VAL = 18446744073709551610;
+  let u128Object = val.fromU128Pieces(UHI128VAL, ULO128VAL);
   if(!val.isObject(u128Object) || !val.isU128Val(u128Object) || !val.isU128Object(u128Object) || val.toU128Low64(u128Object) != ULO128VAL || val.toU128High64(u128Object) != UHI128VAL) {
     return val.fromFalse();
   }
@@ -159,10 +159,52 @@ export function testObject(): val.BoolVal {
     return val.fromFalse();
   }
 
-  const ILO128VAL = -1844674407370955161;
   const IHI128VAL = 18446744073709551611;
-  let i128Object = val.fromI128Pieces(ILO128VAL, IHI128VAL);
+  const ILO128VAL = -1844674407370955161;
+  let i128Object = val.fromI128Pieces(IHI128VAL, ILO128VAL);
   if(!val.isObject(i128Object) || !val.isI128Val(i128Object) || !val.isI128Object(i128Object) || val.toI128Low64(i128Object) != ILO128VAL || val.toI128High64(i128Object) != IHI128VAL) {
+    return val.fromFalse();
+  }
+
+  const UA256VAL = 39;
+  var au256 = val.fromU256Small(UA256VAL);
+  if(!val.isU256Val(au256) || !val.isU256Small(au256) || val.toU256Small(au256) != UA256VAL) {
+    return val.fromFalse();
+  }
+
+  const U256HIHIVAL = 10;
+  const U256HILOVAL = 11;
+  const U256LOHIVAL = 12;
+  const U256LOLOVAL = 13;
+  let u256Object = val.fromU256Pieces(U256HIHIVAL, U256HILOVAL, U256LOHIVAL, U256LOLOVAL);
+  if(!val.isObject(u256Object) || !val.isU256Val(u256Object) || !val.isU256Object(u256Object)) {
+    return val.fromFalse();
+  }
+  if(val.toU256HiHi(u256Object) != U256HIHIVAL || val.toU256HiLo(u256Object) != U256HILOVAL) {
+    return val.fromFalse();
+  }
+  if(val.toU256LoHi(u256Object) != U256LOHIVAL || val.toU256LoLo(u256Object) != U256LOLOVAL) {
+    return val.fromFalse();
+  }
+
+  const IA256VAL = -39;
+  var iu256 = val.fromI256Small(IA256VAL);
+  if(!val.isI256Val(iu256) || !val.isI256Small(iu256) || val.toI256Small(iu256) != IA256VAL) {
+    return val.fromFalse();
+  }
+
+  const I256HIHIVAL = -10;
+  const I256HILOVAL = 11;
+  const I256LOHIVAL = 12;
+  const I256LOLOVAL = 13;
+  let i256Object = val.fromI256Pieces(I256HIHIVAL, I256HILOVAL, I256LOHIVAL, I256LOLOVAL);
+  if(!val.isObject(i256Object) || !val.isI256Val(i256Object) || !val.isI256Object(i256Object)) {
+    return val.fromFalse();
+  }
+  if(val.toI256HiHi(i256Object) != I256HIHIVAL || val.toI256HiLo(i256Object) != I256HILOVAL) {
+    return val.fromFalse();
+  }
+  if(val.toI256LoHi(i256Object) != I256LOHIVAL || val.toI256LoLo(i256Object) != I256LOLOVAL) {
     return val.fromFalse();
   }
 

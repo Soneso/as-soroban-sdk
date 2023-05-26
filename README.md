@@ -1,12 +1,12 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v0.1.8](https://img.shields.io/badge/v0.1.8-yellow.svg)
+![v0.2.1](https://img.shields.io/badge/v0.2.1-yellow.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
-**This repository contains code that is in very early development, incomplete, not tested, and not recommended for use. The API is unstable, experimental, and is receiving breaking changes frequently.**
+**This repository contains code that is in early development, incomplete, not fully tested. The API is experimental, and is receiving breaking changes frequently.**
 
-**This version supports soroban preview 8  & interface version 32**
+**This version supports soroban preview 9  & interface version 37**
 
 ## Quick Start
 
@@ -54,7 +54,7 @@ Next you need to add a ```contract.json``` file to the project. It must contain 
     "name": "hello word",
     "version": "0.1.8",
     "description": "my first contract",
-    "host_functions_version": 32,
+    "host_functions_version": 37,
     "functions": [
         {
             "name" : "hello",
@@ -96,7 +96,7 @@ You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` fol
 To run the contract, you must first install the official soroban cli as described here: [stellar soroban cli](https://github.com/stellar/soroban-cli).
 
 ```shell
-$ cargo install --locked --version 0.7.0 soroban-cli
+$ cargo install --locked --version 0.8.0 soroban-cli
 ```
 
 Run your contract:
@@ -124,8 +124,7 @@ This assembly script Soroban SDK **can** help you with:
 - Meta Generation
 - Contract Spec Generation
 - Testing
-
-As helping features for testing one can use **logging** to generate outputs during the execution of the contract in the sandbox (only sandbox - soroban-cli). The assembly script Soroban SDK also provided the possibility to **publish events**. 
+ 
 
 ### Value Conversions
 
@@ -268,7 +267,7 @@ However, one can create own user defined types with ease by translating them int
 
 ## Testing
 
-Testing can be done to some extent by using **logging**, **events** and the **soroban-cli**.
+Testing can be done to some extent by using **events** and the **soroban-cli**.
 
 See the [testing example](https://github.com/Soneso/as-soroban-examples/tree/main/testing) that demonstrates a simple way to test a contract.
 
@@ -341,7 +340,7 @@ Example:
     "name": "hello word",
     "version": "0.1.8",
     "description": "my first contract",
-    "host_functions_version": 32,
+    "host_functions_version": 37,
     "functions": [
         {
             "name" : "hello",
@@ -360,7 +359,7 @@ $ soroban version
 output at the time of writing:
 
 ``` shell
-soroban-env interface version 32
+soroban-env interface version 37
 ```
 
 Additionally you must define the metadata for each function exported by your contract. In the upper example there is only one function named ```hello```.
@@ -405,5 +404,6 @@ You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-
 | [timelock example](https://github.com/Soneso/as-soroban-examples/tree/main/timelock)| Demonstrates how to write a timelock and implements a greatly simplified claimable balance similar to the claimable balance feature available on Stellar.|
 | [multi swap example](https://github.com/Soneso/as-soroban-examples/tree/main/multi_swap)| This example demonstrates how authorized calls can be batched together. It swaps a pair of tokens between the two groups of users that authorized the swap operation from the atomic swap example.|
 | [single offer sale example](https://github.com/Soneso/as-soroban-examples/tree/main/single_offer)| The single offer sale example demonstrates how to write a contract that allows a seller to set up an offer to sell token A for token B to multiple buyers.|
+| [liquidity pool example](https://github.com/Soneso/as-soroban-examples/tree/main/liquidity_pool)| Demonstrates how to write a constant product liquidity pool contract.|
 
 More examples can be found in the [test cases](https://github.com/Soneso/as-soroban-sdk/tree/main/test)

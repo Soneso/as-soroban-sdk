@@ -2,7 +2,7 @@
     "name": "val-test",
     "version": "0.1.8",
     "description": "value conversions test",
-    "host_functions_version": 32,
+    "host_functions_version": 37,
     "functions": [
         {
             "name" : "testI32",

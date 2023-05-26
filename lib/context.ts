@@ -1,7 +1,8 @@
-
 import { Str } from "./str";
-import { RawVal, BytesObject, U64Object,
-     VecObject, toU32, toU64, StatusVal, contractError, fromSmallSymbolStr, AddressObject, VoidVal, U32Val, ObjectVal } from "./value";
+import {
+    RawVal, BytesObject, U64Object,
+    VecObject, toU32, toU64, StatusVal, contractError, fromSmallSymbolStr, AddressObject, VoidVal, U32Val, isU64Small, toU64Small, fromU32
+} from "./value";
 import { Vec } from "./vec";
 
 
@@ -11,7 +12,7 @@ import { Vec } from "./vec";
  * @param msg the format string. E.g. "Hello {}".
  * @param args The arguments as values in the Vector.
  */
-export function logFtm(msg: string, args:Vec): void {
+export function logFtm(msg: string, args: Vec): void {
     let s = Str.fromString(msg);
     host_log_fmt_values(s.getHostObject(), args.getHostObject());
 }
@@ -35,9 +36,8 @@ export function logValue(value: RawVal): void {
 }
 
 /**
- * Returns the address `Object` which invoked the
- * running contract.
- * @returns the invoking address as AddressObject
+ * Get the address object for the current contract.
+ * @returns the current contract address as AddressObject
  */
 export function getCurrentContractAddress(): AddressObject {
     return get_current_contract_address();
@@ -83,12 +83,16 @@ export function getLedgerVersion(): u32 {
  * Return the sequence number of the current ledger as a u32.
  * @returns sequence number of the current ledger as a u32.
  */
- export function getLedgerSequence(): u32 {
+export function getLedgerSequence(): u32 {
     return toU32(get_ledger_sequence());
 }
 
 export function getLedgerTimestamp(): u64 {
-    return toU64(get_ledger_timestamp());
+    let tmp = get_ledger_timestamp();
+    if (isU64Small(tmp)) {
+        return toU64Small(tmp);
+    }
+    return toU64(tmp);
 }
 
 /**
@@ -114,7 +118,7 @@ export function getCurrentCallStack(): VecObject {
  * Causes the currently executing contract to fail immediately.
  * It traps with with contract error status code and error code 0
  */
-export function fail() : void {
+export function fail(): void {
     fail_with_status(contractError(0));
 }
 
@@ -123,7 +127,7 @@ export function fail() : void {
  * It traps with with contract error status code and error code as given by parameter.
  * @param errCode the error code to use.
  */
-export function failWithErrorCode(errCode: u32) : void {
+export function failWithErrorCode(errCode: u32): void {
     fail_with_status(contractError(errCode));
 }
 
@@ -159,6 +163,7 @@ export function publishSimpleEvent(topicSymbol: string, data: RawVal): void {
 // @ts-ignore
 @external("x", "_")
 declare function host_log_value(v: RawVal): VoidVal;
+
 
 /// Get the contractID `Bytes` of the contract which invoked the
 /// running contract. Traps if the running contract was not
@@ -208,9 +213,8 @@ declare function get_ledger_timestamp(): U64Object; // TODO - check this - what 
 @external("x", "7")
 declare function get_current_call_stack(): VecObject;
 
-/// Causes the currently executing contract to fail immediately
-/// with a provided status code, which must be of error-type
-/// `ScStatusType::ContractError`. Does not actually return.
+/// Causes the currently executing contract to fail immediately with a provided error code, 
+/// which must be of error-type `ScErrorType::Contract`. Does not actually return.
 // @ts-ignore
 @external("x", "8")
 declare function fail_with_status(status: StatusVal): VoidVal;

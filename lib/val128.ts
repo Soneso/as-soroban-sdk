@@ -273,7 +273,7 @@ export function i128add(a:I128Val, b:I128Val) : I128Val {
     let bhi = __reshi;
     let reslo = add(alo, ahi, blo, bhi);
     let reshi = __hi;
-    return packI128Val(reslo, reshi);
+    return packI128Val(reshi, reslo);
 }
 
 /**
@@ -290,7 +290,7 @@ export function u128add(a:U128Val, b:U128Val) : U128Val {
     let bhi = __reshi;
     let reslo = add(alo, ahi, blo, bhi);
     let reshi = __hi;
-    return packU128Val(reslo, reshi);
+    return packU128Val(reshi, reslo);
 }
 
 /**
@@ -312,7 +312,7 @@ export function i128sub(a:I128Val, b:I128Val) : I128Val {
     let bhi = __reshi;
     let reslo = sub(alo, ahi, blo, bhi);
     let reshi = __hi;
-    return packI128Val(reslo, reshi);
+    return packI128Val(reshi, reslo);
 }
 
 /**
@@ -329,7 +329,7 @@ export function u128sub(a:U128Val, b:U128Val) : U128Val {
     let bhi = __reshi;
     let reslo = sub(alo, ahi, blo, bhi);
     let reshi = __hi;
-    return packU128Val(reslo, reshi);
+    return packU128Val(reshi, reslo);
 }
 
 /**
@@ -351,7 +351,7 @@ export function i128mul(a:I128Val, b:I128Val) : I128Val {
     let bhi = __reshi;
     let reslo = mul(alo, ahi, blo, bhi);
     let reshi = __hi;
-    return packI128Val(reslo, reshi);
+    return packI128Val(reshi, reslo);
 }
 
 /**
@@ -368,7 +368,7 @@ export function u128mul(a:U128Val, b:U128Val) : U128Val {
     let bhi = __reshi;
     let reslo = mul(alo, ahi, blo, bhi);
     let reshi = __hi;
-    return packU128Val(reslo, reshi);
+    return packU128Val(reshi, reslo);
 }
 
 /**
@@ -390,7 +390,7 @@ export function i128div(a:I128Val, b:I128Val) : I128Val {
     let bhi = __reshi;
     let reslo = div(alo, ahi, blo, bhi);
     let reshi = __hi;
-    return packI128Val(reslo, reshi);
+    return packI128Val(reshi, reslo);
 }
 
 /**
@@ -407,7 +407,7 @@ export function u128div(a:U128Val, b:U128Val) : U128Val {
     let bhi = __reshi;
     let reslo = div(alo, ahi, blo, bhi);
     let reshi = __hi;
-    return packU128Val(reslo, reshi);
+    return packU128Val(reshi, reslo);
 }
 
 /**
@@ -431,7 +431,7 @@ export function i128muldiv(number:I128Val, numerator:I128Val, denominator: I128V
     let chi = __reshi;
     let reslo = muldiv(alo, ahi, blo, bhi, clo, chi);
     let reshi = __hi;
-    return packI128Val(reslo, reshi);
+    return packI128Val(reshi, reslo);
 }
 
 /**
@@ -451,7 +451,7 @@ export function u128muldiv(number:U128Val, numerator:U128Val, denominator: U128V
     let chi = __reshi;
     let reslo = muldiv(alo, ahi, blo, bhi, clo, chi);
     let reshi = __hi;
-    return packU128Val(reslo, reshi);
+    return packU128Val(reshi, reslo);
 }
 
 /**
@@ -470,7 +470,7 @@ export function i128sqrt(val:I128Val) : I128Val {
     let vhi = __reshi;
     let reslo = sqrt(vlo, vhi);
     let reshi = __hi;
-    return packI128Val(reslo, reshi);
+    return packI128Val(reshi, reslo);
 }
 
 /**
@@ -484,7 +484,7 @@ export function u128sqrt(val:U128Val) : U128Val {
     let vhi = __reshi;
     let reslo = sqrt(vlo, vhi);
     let reshi = __hi;
-    return packU128Val(reslo, reshi);
+    return packU128Val(reshi, reslo);
 }
 
 /**
@@ -504,7 +504,7 @@ export function i128pow(base:I128Val, exponent:i32) : I128Val {
     let vhi = __reshi;
     let reslo = pow(vlo, vhi, exponent);
     let reshi = __hi;
-    return packI128Val(reslo, reshi);
+    return packI128Val(reshi, reslo);
 }
 
 /**
@@ -519,7 +519,7 @@ export function u128pow(base:U128Val, exponent:i32) : U128Val {
     let vhi = __reshi;
     let reslo = pow(vlo, vhi, exponent);
     let reshi = __hi;
-    return packU128Val(reslo, reshi);
+    return packU128Val(reshi, reslo);
 }
 
 /*****************
@@ -563,21 +563,21 @@ function getU128Parts(value:U128Val) : u64 {
 
 // converts a positive i128 into a raw host value. If it fits into 56 bits it returns I128SmallVal
 // otherwise it returns an I128Object.
-function packI128Val(vlo: u64, vhi: u64) : I128Val {
+function packI128Val(vhi: u64, vlo: u64) : I128Val {
     if (vhi == 0 && vlo <= 0xFFFFFFFFFFFF) { // 56 bits
         return fromI128Small(vlo);
     } else {
-        return fromI128Pieces(vlo, vhi);
+        return fromI128Pieces(vhi, vlo);
     }
 }
 
 // converts a positive u128 into a raw host value. If it fits into 56 bits it returns U128SmallVal
 // otherwise it returns an U128Object.
-function packU128Val(vlo: u64, vhi: u64) : U128Val {
+function packU128Val(vhi: u64, vlo: u64) : U128Val {
     if (vhi == 0 && vlo <= 0xFFFFFFFFFFFF) { // 56 bits
         return fromU128Small(vlo);
     } else {
-        return fromU128Pieces(vlo, vhi);
+        return fromU128Pieces(vhi, vlo);
     }
 }
 

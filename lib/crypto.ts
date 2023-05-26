@@ -37,4 +37,4 @@ export declare function compute_hash_sha256(x:BytesObject): BytesObject;
 
 // @ts-ignore
 @external("c", "0")
-export declare function verify_sig_ed25519(x:BytesObject, k:BytesObject, s:BytesObject): VoidVal;
+export declare function verify_sig_ed25519(k:BytesObject, x:BytesObject, s:BytesObject): VoidVal;

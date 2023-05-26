@@ -298,18 +298,18 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(40);
-    u128ValB = val.fromU128Pieces(50, 100);
+    u128ValB = val.fromU128Pieces(100, 50);
     if (!val128.u128lt(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
-    u128ValB = val.fromU128Pieces(50, 100);
+    u128ValA  = val.fromU128Pieces(0, 40);
+    u128ValB = val.fromU128Pieces(100, 50);
     if (!val128.u128lt(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0,40);
     u128ValB = val.fromU128Small(50);
     if (!val128.u128lt(u128ValA, u128ValB)) {
         return val.fromFalse();
@@ -323,18 +323,18 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(40);
-    i128ValB = val.fromI128Pieces(50, 100);
+    i128ValB = val.fromI128Pieces(100, 50);
     if (!val128.i128lt(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
-    i128ValB = val.fromI128Pieces(50, 100);
+    i128ValA  = val.fromI128Pieces(0, 40);
+    i128ValB = val.fromI128Pieces(100, 50);
     if (!val128.i128lt(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(50);
     if (!val128.i128lt(i128ValA, i128ValB)) {
         return val.fromFalse();
@@ -358,18 +358,18 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(40);
-    u128ValB = val.fromU128Pieces(50, 100);
+    u128ValB = val.fromU128Pieces(100, 50);
     if (!val128.u128le(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
-    u128ValB = val.fromU128Pieces(50, 100);
+    u128ValA  = val.fromU128Pieces(0, 40);
+    u128ValB = val.fromU128Pieces(100, 50);
     if (!val128.u128le(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(40);
     if (!val128.u128le(u128ValA, u128ValB)) {
         return val.fromFalse();
@@ -382,18 +382,18 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(40);
-    u128ValB = val.fromU128Pieces(40, 0);
+    u128ValB = val.fromU128Pieces(0, 40);
     if (!val128.u128le(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
-    u128ValB = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
+    u128ValB = val.fromU128Pieces(0, 40);
     if (!val128.u128le(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(40);
     if (!val128.u128le(u128ValA, u128ValB)) {
         return val.fromFalse();
@@ -407,18 +407,18 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(40);
-    i128ValB = val.fromI128Pieces(50, 100);
+    i128ValB = val.fromI128Pieces(100, 50);
     if (!val128.i128le(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
-    i128ValB = val.fromI128Pieces(50, 100);
+    i128ValA  = val.fromI128Pieces(0, 40);
+    i128ValB = val.fromI128Pieces(100, 50);
     if (!val128.i128le(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(40);
     if (!val128.i128le(i128ValA, i128ValB)) {
         return val.fromFalse();
@@ -431,18 +431,18 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(40);
-    i128ValB = val.fromI128Pieces(40, 0);
+    i128ValB = val.fromI128Pieces(0, 40);
     if (!val128.i128le(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
-    i128ValB = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
+    i128ValB = val.fromI128Pieces(0, 40);
     if (!val128.i128le(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(40);
     if (!val128.i128le(i128ValA, i128ValB)) {
         return val.fromFalse();
@@ -466,18 +466,18 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(50);
-    u128ValB = val.fromU128Pieces(40, 0);
+    u128ValB = val.fromU128Pieces(0, 40);
     if (!val128.u128gt(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(50, 100);
-    u128ValB = val.fromU128Pieces(40, 100);
+    u128ValA  = val.fromU128Pieces(100, 50);
+    u128ValB = val.fromU128Pieces(100, 40);
     if (!val128.u128gt(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 100);
+    u128ValA  = val.fromU128Pieces(100, 40);
     u128ValB = val.fromU128Small(50);
     if (!val128.u128gt(u128ValA, u128ValB)) {
         return val.fromFalse();
@@ -491,18 +491,18 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(50);
-    i128ValB = val.fromI128Pieces(40, 0);
+    i128ValB = val.fromI128Pieces(0, 40);
     if (!val128.i128gt(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 100);
-    i128ValB = val.fromI128Pieces(30, 100);
+    i128ValA  = val.fromI128Pieces(100, 40);
+    i128ValB = val.fromI128Pieces(100, 30);
     if (!val128.i128gt(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 100);
+    i128ValA  = val.fromI128Pieces(100, 40);
     i128ValB = val.fromI128Small(50);
     if (!val128.i128gt(i128ValA, i128ValB)) {
         return val.fromFalse();
@@ -526,18 +526,18 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(50);
-    u128ValB = val.fromU128Pieces(40, 0);
+    u128ValB = val.fromU128Pieces(0, 40);
     if (!val128.u128ge(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(50, 100);
-    u128ValB = val.fromU128Pieces(40, 100);
+    u128ValA  = val.fromU128Pieces(100, 50);
+    u128ValB = val.fromU128Pieces(100, 40);
     if (!val128.u128ge(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(40);
     if (!val128.u128ge(u128ValA, u128ValB)) {
         return val.fromFalse();
@@ -550,18 +550,18 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(40);
-    u128ValB = val.fromU128Pieces(40, 0);
+    u128ValB = val.fromU128Pieces(0, 40);
     if (!val128.u128ge(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 100);
-    u128ValB = val.fromU128Pieces(40, 100);
+    u128ValA  = val.fromU128Pieces(100, 40);
+    u128ValB = val.fromU128Pieces(100, 40);
     if (!val128.u128ge(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(40);
     if (!val128.u128ge(u128ValA, u128ValB)) {
         return val.fromFalse();
@@ -575,18 +575,18 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(50);
-    i128ValB = val.fromI128Pieces(40, 0);
+    i128ValB = val.fromI128Pieces(0, 40);
     if (!val128.i128ge(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 100);
-    i128ValB = val.fromI128Pieces(30, 100);
+    i128ValA  = val.fromI128Pieces(100, 40);
+    i128ValB = val.fromI128Pieces(100, 30);
     if (!val128.i128ge(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(40);
     if (!val128.i128ge(i128ValA, i128ValB)) {
         return val.fromFalse();
@@ -599,25 +599,25 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(40);
-    i128ValB = val.fromI128Pieces(40, 0);
+    i128ValB = val.fromI128Pieces(0, 40);
     if (!val128.i128ge(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 100);
-    i128ValB = val.fromI128Pieces(40, 100);
+    i128ValA  = val.fromI128Pieces(100, 40);
+    i128ValB = val.fromI128Pieces(100, 40);
     if (!val128.i128ge(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(40);
     if (!val128.i128ge(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
     // Should compare equal two U128Val
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(40);
     if (!val128.u128eq(u128ValA, u128ValB)) {
         return val.fromFalse();
@@ -630,25 +630,25 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(40);
-    u128ValB = val.fromU128Pieces(40, 0);
+    u128ValB = val.fromU128Pieces(0, 40);
     if (!val128.u128eq(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 100);
-    u128ValB = val.fromU128Pieces(40, 100);
+    u128ValA  = val.fromU128Pieces(100, 40);
+    u128ValB = val.fromU128Pieces(100, 40);
     if (!val128.u128eq(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(40);
     if (!val128.u128eq(u128ValA, u128ValB)) {
         return val.fromFalse();
     }
 
     // Should compare equal two I128Val
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(40);
     if (!val128.i128eq(i128ValA, i128ValB)) {
         return val.fromFalse();
@@ -661,50 +661,50 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(40);
-    i128ValB = val.fromI128Pieces(40, 0);
+    i128ValB = val.fromI128Pieces(0, 40);
     if (!val128.i128eq(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 100);
-    i128ValB = val.fromI128Pieces(40, 100);
+    i128ValA  = val.fromI128Pieces(100, 40);
+    i128ValB = val.fromI128Pieces(100, 40);
     if (!val128.i128eq(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(40);
     if (!val128.i128eq(i128ValA, i128ValB)) {
         return val.fromFalse();
     }
 
     // ordering
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(40);
     if (val128.i128ord(i128ValA, i128ValB) != 0) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(20, 0);
+    i128ValA  = val.fromI128Pieces(0, 20);
     i128ValB = val.fromI128Small(40);
     if (val128.i128ord(i128ValA, i128ValB) != -1) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(50, 0);
+    i128ValA  = val.fromI128Pieces(0, 50);
     i128ValB = val.fromI128Small(40);
     if (val128.i128ord(i128ValA, i128ValB) != 1) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(50, 2);
-    i128ValB = val.fromI128Pieces(50, 0);
+    i128ValA  = val.fromI128Pieces(2, 50);
+    i128ValB = val.fromI128Pieces(0, 50);
     if (val128.i128ord(i128ValA, i128ValB) != 1) {
         return val.fromFalse();
     }
 
     i128ValA  = val.fromI128Small(40);
-    i128ValB = val.fromI128Pieces(50, 1);
+    i128ValB = val.fromI128Pieces(1, 50);
     if (val128.i128ord(i128ValA, i128ValB) != -1) {
         return val.fromFalse();
     }
@@ -715,32 +715,32 @@ export function math128() : val.BoolVal {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromI128Pieces(40, 0);
+    u128ValA  = val.fromI128Pieces(0, 40);
     u128ValB = val.fromI128Small(40);
     if (val128.i128ord(u128ValA, u128ValB) != 0) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(20, 0);
+    u128ValA  = val.fromU128Pieces(0, 20);
     u128ValB = val.fromU128Small(40);
     if (val128.u128ord(u128ValA, u128ValB) != -1) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(50, 0);
+    u128ValA  = val.fromU128Pieces(0, 50);
     u128ValB = val.fromU128Small(40);
     if (val128.u128ord(u128ValA, u128ValB) != 1) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(50, 2);
-    u128ValB = val.fromU128Pieces(50, 0);
+    u128ValA  = val.fromU128Pieces(2, 50);
+    u128ValB = val.fromU128Pieces(0, 50);
     if (val128.u128ord(u128ValA, u128ValB) != 1) {
         return val.fromFalse();
     }
 
     u128ValA  = val.fromU128Small(40);
-    u128ValB = val.fromU128Pieces(50, 1);
+    u128ValB = val.fromU128Pieces(1, 50);
     if (val128.u128ord(u128ValA, u128ValB) != -1) {
         return val.fromFalse();
     }
@@ -776,7 +776,7 @@ export function math128() : val.BoolVal {
     }
 
     // Should add two U128Val
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(40);
     var u128ValR = val.fromU128Small(80);
     if (!val128.u128eq(u128ValR, val128.u128add(u128ValA, u128ValB))) {
@@ -790,27 +790,27 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(40);
-    u128ValB = val.fromU128Pieces(40, 0);
+    u128ValB = val.fromU128Pieces(0, 40);
     if (!val128.u128eq(u128ValR, val128.u128add(u128ValA, u128ValB))) {
         return val.fromFalse();
     }
     
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(40);
     if (!val128.u128eq(u128ValR, val128.u128add(u128ValA, u128ValB))) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 100);
-    u128ValB = val.fromU128Pieces(40, 100);
-    u128ValR = val.fromU128Pieces(80, 200);
+    u128ValA  = val.fromU128Pieces(100, 40);
+    u128ValB = val.fromU128Pieces(100, 40);
+    u128ValR = val.fromU128Pieces(200, 80);
     if (!val128.u128eq(u128ValR, val128.u128add(u128ValA, u128ValB))) {
         return val.fromFalse();
     }
 
     
     // Should add two I128Val
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(40);
     var i128ValR = val.fromI128Small(80);
     if (!val128.i128eq(i128ValR, val128.i128add(i128ValA, i128ValB))) {
@@ -824,20 +824,20 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(40);
-    i128ValB = val.fromI128Pieces(40, 0);
+    i128ValB = val.fromI128Pieces(0, 40);
     if (!val128.i128eq(i128ValR, val128.i128add(i128ValA, i128ValB))) {
         return val.fromFalse();
     }
     
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(40);
     if (!val128.i128eq(i128ValR, val128.i128add(i128ValA, i128ValB))) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 100);
-    i128ValB = val.fromI128Pieces(40, 100);
-    i128ValR = val.fromI128Pieces(80, 200);
+    i128ValA  = val.fromI128Pieces(100, 40);
+    i128ValB = val.fromI128Pieces(100, 40);
+    i128ValR = val.fromI128Pieces(200, 80);
     if (!val128.i128eq(i128ValR, val128.i128add(i128ValA, i128ValB))) {
         return val.fromFalse();
     }
@@ -883,7 +883,7 @@ export function math128() : val.BoolVal {
     }
 
     // Should sub two U128Val
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(20);
     u128ValR = val.fromU128Small(20);
     if (!val128.u128eq(u128ValR, val128.u128sub(u128ValA, u128ValB))) {
@@ -897,26 +897,26 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(40);
-    u128ValB = val.fromU128Pieces(20, 0);
+    u128ValB = val.fromU128Pieces(0, 20);
     if (!val128.u128eq(u128ValR, val128.u128sub(u128ValA, u128ValB))) {
         return val.fromFalse();
     }
     
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(20);
     if (!val128.u128eq(u128ValR, val128.u128sub(u128ValA, u128ValB))) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 100);
-    u128ValB = val.fromU128Pieces(40, 100);
+    u128ValA  = val.fromU128Pieces(100, 40);
+    u128ValB = val.fromU128Pieces(100, 40);
     u128ValR = val.fromU128Pieces(0, 0);
     if (!val128.u128eq(u128ValR, val128.u128sub(u128ValA, u128ValB))) {
         return val.fromFalse();
     }
 
     // Should sub two I128Val
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(20);
     i128ValR = val.fromI128Small(20);
     if (!val128.i128eq(i128ValR, val128.i128sub(i128ValA, i128ValB))) {
@@ -930,19 +930,19 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(40);
-    i128ValB = val.fromI128Pieces(20, 0);
+    i128ValB = val.fromI128Pieces(0, 20);
     if (!val128.i128eq(i128ValR, val128.i128sub(i128ValA, i128ValB))) {
         return val.fromFalse();
     }
     
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(20);
     if (!val128.i128eq(i128ValR, val128.i128sub(i128ValA, i128ValB))) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 100);
-    i128ValB = val.fromI128Pieces(40, 100);
+    i128ValA  = val.fromI128Pieces(100, 40);
+    i128ValB = val.fromI128Pieces(100, 40);
     i128ValR = val.fromI128Pieces(0, 0);
     if (!val128.i128eq(i128ValR, val128.i128sub(i128ValA, i128ValB))) {
         return val.fromFalse();
@@ -981,7 +981,7 @@ export function math128() : val.BoolVal {
     }
 
     // Should mul two U128Val
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(20);
     u128ValR = val.fromU128Small(800);
     if (!val128.u128eq(u128ValR, val128.u128mul(u128ValA, u128ValB))) {
@@ -995,26 +995,26 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(40);
-    u128ValB = val.fromU128Pieces(20, 0);
+    u128ValB = val.fromU128Pieces(0, 20);
     if (!val128.u128eq(u128ValR, val128.u128mul(u128ValA, u128ValB))) {
         return val.fromFalse();
     }
     
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(20);
     if (!val128.u128eq(u128ValR, val128.u128mul(u128ValA, u128ValB))) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
-    u128ValB = val.fromU128Pieces(20, 0);
-    u128ValR = val.fromU128Pieces(800, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
+    u128ValB = val.fromU128Pieces(0, 20);
+    u128ValR = val.fromU128Pieces(0, 800);
     if (!val128.u128eq(u128ValR, val128.u128mul(u128ValA, u128ValB))) {
         return val.fromFalse();
     }
 
     // Should mul two I128Val
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(20);
     i128ValR = val.fromI128Small(800);
     if (!val128.i128eq(i128ValR, val128.i128mul(i128ValA, i128ValB))) {
@@ -1028,20 +1028,20 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(40);
-    i128ValB = val.fromI128Pieces(20, 0);
+    i128ValB = val.fromI128Pieces(0, 20);
     if (!val128.i128eq(i128ValR, val128.i128mul(i128ValA, i128ValB))) {
         return val.fromFalse();
     }
     
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(20);
     if (!val128.i128eq(i128ValR, val128.i128mul(i128ValA, i128ValB))) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
-    i128ValB = val.fromI128Pieces(20, 0);
-    i128ValR = val.fromI128Pieces(800, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
+    i128ValB = val.fromI128Pieces(0, 20);
+    i128ValR = val.fromI128Pieces(0, 800);
     if (!val128.i128eq(i128ValR, val128.i128mul(i128ValA, i128ValB))) {
         return val.fromFalse();
     }
@@ -1209,7 +1209,7 @@ export function math128() : val.BoolVal {
     }
 
      // Should div two U128Val
-     u128ValA  = val.fromU128Pieces(40, 0);
+     u128ValA  = val.fromU128Pieces(0, 40);
      u128ValB = val.fromU128Small(20);
      u128ValR = val.fromU128Small(2);
      if (!val128.u128eq(u128ValR, val128.u128div(u128ValA, u128ValB))) {
@@ -1223,26 +1223,26 @@ export function math128() : val.BoolVal {
      }
  
      u128ValA  = val.fromU128Small(40);
-     u128ValB = val.fromU128Pieces(20, 0);
+     u128ValB = val.fromU128Pieces(0, 20);
      if (!val128.u128eq(u128ValR, val128.u128div(u128ValA, u128ValB))) {
          return val.fromFalse();
      }
      
-     u128ValA  = val.fromU128Pieces(40, 0);
+     u128ValA  = val.fromU128Pieces(0, 40);
      u128ValB = val.fromU128Small(20);
      if (!val128.u128eq(u128ValR, val128.u128div(u128ValA, u128ValB))) {
          return val.fromFalse();
      }
  
-     u128ValA  = val.fromU128Pieces(40, 0);
-     u128ValB = val.fromU128Pieces(20, 0);
-     u128ValR = val.fromU128Pieces(2, 0);
+     u128ValA  = val.fromU128Pieces(0, 40);
+     u128ValB = val.fromU128Pieces(0, 20);
+     u128ValR = val.fromU128Pieces(0, 2);
      if (!val128.u128eq(u128ValR, val128.u128div(u128ValA, u128ValB))) {
          return val.fromFalse();
      }
  
      // Should div two I128Val
-     i128ValA  = val.fromI128Pieces(40, 0);
+     i128ValA  = val.fromI128Pieces(0, 40);
      i128ValB = val.fromI128Small(20);
      i128ValR = val.fromI128Small(2);
      if (!val128.i128eq(i128ValR, val128.i128div(i128ValA, i128ValB))) {
@@ -1256,20 +1256,20 @@ export function math128() : val.BoolVal {
      }
  
      i128ValA  = val.fromI128Small(40);
-     i128ValB = val.fromI128Pieces(20, 0);
+     i128ValB = val.fromI128Pieces(0, 20);
      if (!val128.i128eq(i128ValR, val128.i128div(i128ValA, i128ValB))) {
          return val.fromFalse();
      }
      
-     i128ValA  = val.fromI128Pieces(40, 0);
+     i128ValA  = val.fromI128Pieces(0, 40);
      i128ValB = val.fromI128Small(20);
      if (!val128.i128eq(i128ValR, val128.i128div(i128ValA, i128ValB))) {
          return val.fromFalse();
      }
  
-     i128ValA  = val.fromI128Pieces(40, 0);
-     i128ValB = val.fromI128Pieces(20, 0);
-     i128ValR = val.fromI128Pieces(2, 0);
+     i128ValA  = val.fromI128Pieces(0, 40);
+     i128ValB = val.fromI128Pieces(0, 20);
+     i128ValR = val.fromI128Pieces(0, 2);
      if (!val128.i128eq(i128ValR, val128.i128div(i128ValA, i128ValB))) {
          return val.fromFalse();
      }
@@ -1338,7 +1338,7 @@ export function math128() : val.BoolVal {
     }
 
     // Should muldiv U128Val values
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(20);
     var u128ValC = val.fromU128Small(20);
     u128ValR = val.fromU128Small(40);
@@ -1353,26 +1353,26 @@ export function math128() : val.BoolVal {
     }
 
     u128ValA  = val.fromU128Small(40);
-    u128ValB = val.fromU128Pieces(20, 0);
+    u128ValB = val.fromU128Pieces(0, 20);
     if (!val128.u128eq(u128ValR, val128.u128muldiv(u128ValA, u128ValB, u128ValC))) {
         return val.fromFalse();
     }
     
-    u128ValA  = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
     u128ValB = val.fromU128Small(20);
     if (!val128.u128eq(u128ValR, val128.u128muldiv(u128ValA, u128ValB, u128ValC))) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(40, 0);
-    u128ValB = val.fromU128Pieces(20, 0);
-    u128ValR = val.fromU128Pieces(40, 0);
+    u128ValA  = val.fromU128Pieces(0, 40);
+    u128ValB = val.fromU128Pieces(0, 20);
+    u128ValR = val.fromU128Pieces(0, 40);
     if (!val128.u128eq(u128ValR, val128.u128muldiv(u128ValA, u128ValB, u128ValC))) {
         return val.fromFalse();
     }
 
     // Should muldiv I128Val values
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(20);
     var i128ValC = val.fromI128Small(20);
     i128ValR = val.fromI128Small(40);
@@ -1387,24 +1387,23 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Small(40);
-    i128ValB = val.fromI128Pieces(20, 0);
+    i128ValB = val.fromI128Pieces(0, 20);
     if (!val128.i128eq(i128ValR, val128.i128muldiv(i128ValA, i128ValB, i128ValC))) {
         return val.fromFalse();
     }
     
-    i128ValA  = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
     i128ValB = val.fromI128Small(20);
     if (!val128.i128eq(i128ValR, val128.i128muldiv(i128ValA, i128ValB, i128ValC))) {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(40, 0);
-    i128ValB = val.fromI128Pieces(20, 0);
-    i128ValR = val.fromI128Pieces(40, 0);
+    i128ValA  = val.fromI128Pieces(0, 40);
+    i128ValB = val.fromI128Pieces(0, 20);
+    i128ValR = val.fromI128Pieces(0, 40);
     if (!val128.i128eq(i128ValR, val128.i128muldiv(i128ValA, i128ValB, i128ValC))) {
         return val.fromFalse();
     }
-
 
     // Should sqrt zero number
     b_lo = u128.sqrt(0,0);
@@ -1470,13 +1469,13 @@ export function math128() : val.BoolVal {
     }
 
     i128ValA  = val.fromI128Pieces(0x3333333333333333, 0x3333333333333333);
-    i128ValR = val.fromI128Pieces(0x727C9716FFB764D5, 0);
+    i128ValR = val.fromI128Pieces(0, 0x727C9716FFB764D5);
     if (!val128.i128eq(i128ValR, val128.i128sqrt(i128ValA))) {
         return val.fromFalse();
     }
 
     u128ValA  = val.fromU128Pieces(0x3333333333333333, 0x3333333333333333);
-    u128ValR = val.fromU128Pieces(0x727C9716FFB764D5, 0);
+    u128ValR = val.fromU128Pieces(0, 0x727C9716FFB764D5);
     if (!val128.u128eq(u128ValR, val128.u128sqrt(u128ValA))) {
         return val.fromFalse();
     }
@@ -1589,14 +1588,14 @@ export function math128() : val.BoolVal {
         return val.fromFalse();
     }
 
-    i128ValA  = val.fromI128Pieces(12345678, 0);
-    i128ValR = val.fromI128Pieces(0x017FEC50E04509B8, 0x66);
+    i128ValA  = val.fromI128Pieces(0, 12345678);
+    i128ValR = val.fromI128Pieces(0x66, 0x017FEC50E04509B8);
     if (!val128.i128eq(i128ValR, val128.i128pow(i128ValA, 3))) {
         return val.fromFalse();
     }
 
-    u128ValA  = val.fromU128Pieces(12345678, 0);
-    u128ValR = val.fromU128Pieces(0x017FEC50E04509B8, 0x66);
+    u128ValA  = val.fromU128Pieces(0, 12345678);
+    u128ValR = val.fromU128Pieces(0x66, 0x017FEC50E04509B8);
     if (!val128.u128eq(u128ValR, val128.u128pow(u128ValA, 3))) {
         return val.fromFalse();
     }
@@ -1628,7 +1627,7 @@ export function math128() : val.BoolVal {
     if (!u128.eq(b_lo, b_hi, 0, 0)) {
         return val.fromFalse();
     }
-
+    
     return val.fromTrue();
     
 }

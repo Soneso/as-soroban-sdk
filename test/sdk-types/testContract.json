@@ -2,7 +2,7 @@
     "name": "sdk-types test",
     "version": "0.1.8",
     "description": "test sdk types",
-    "host_functions_version": 32,
+    "host_functions_version": 37,
     "functions": [
         {
             "name" : "maps",
