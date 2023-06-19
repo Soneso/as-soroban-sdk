@@ -1,6 +1,6 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v0.2.1](https://img.shields.io/badge/v0.2.1-yellow.svg)
+![v0.2.2](https://img.shields.io/badge/v0.2.2-yellow.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
