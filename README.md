@@ -377,12 +377,40 @@ You must define the name, the arguments and the return value of the function, so
 }
 ```
 
-Supported argument types are currently: `val` (any type of host value), `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `u256`, `i256`,`bool`, `symbol`, `string`, `status`, `bytes`, `val`, `void`, `timepoint`, `duration`, `address`, `option[valueType]`, `result[okType, errorType]`, `vec[elementType]`, `map[keyType, valueType]`, `set[elementType]` ,`bytesN[size]`. If your function has no arguments, you can pass an empty array.
+Supported argument types are currently: `val` (any type of host value), `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `u256`, `i256`,`bool`, `symbol`, `string`, `status`, `bytes`, `val`, `void`, `timepoint`, `duration`, `address`, `option[valueType]`, `result[okType, errorType]`, `vec[elementType]`, `map[keyType, valueType]`, `set[elementType]` ,`bytesN[size]`, `udt(name)`, `tuple(value types separated by ;)`. If your function has no arguments, you can pass an empty array.
 
 Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static raw value. You can obtain it by using ```val.fromVoid()```. For this case you should set ```"returns" : "void"``` or remove `"returns"` in the contract.json.
 
 See also [Meta Generation](https://soroban.stellar.org/docs/SDKs/byo#meta-generation) and [Contract Spec Generation](https://soroban.stellar.org/docs/SDKs/byo#contract-spec-generation)
 
+In addition to `functions`, for more advanced use cases, one can optionally define udt: `structs`, `errors`, `enums` and `unions`. For example:
+
+```json
+{
+  "structs":[
+      {
+          "name" : "Signature",
+          "fields": [
+              {"name": "public_key", "type": "bytesN[32]"},
+              {"name": "signature", "type": "bytesN[64]"}
+          ]
+      }
+  ],
+  "errors":[
+      {
+          "name" : "AccError",
+          "cases": [
+              {"name": "NotEnoughSigners", "value": 1},
+              {"name": "NegativeAmount", "value": 2},
+              {"name": "BadSignatureOrder", "value": 3},
+              {"name": "UnknownSigner", "value": 4}
+          ]
+      }
+  ]
+}
+```
+
+The generation is implemented in [transform.mjs](https://github.com/Soneso/as-soroban-sdk/blob/main/transforms.mjs).
 
 ## Examples
 You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-soroban-examples) repository:
