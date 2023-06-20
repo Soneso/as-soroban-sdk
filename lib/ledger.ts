@@ -122,7 +122,7 @@ declare function del_contract_data(k:RawVal): VoidVal;
 /// been installed on this network. `salt` is used to create a unique contract id.
 // @ts-ignore
 @external("l", "3")
-export declare function create_contract_from_contract(wasm_hash:BytesObject, salt:BytesObject): BytesObject;
+declare function create_contract_from_contract(wasm_hash:BytesObject, salt:BytesObject): BytesObject;
 
 /// Replaces the executable of the current contract with the provided Wasm code identified by a hash. 
 /// Wasm entry corresponding to the hash has to already be present in the ledger. 

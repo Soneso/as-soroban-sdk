@@ -1,4 +1,5 @@
-import { AddressObject, RawVal, StatusVal, VecObject, BytesObject } from "./value";
+import { Bytes } from "./bytes";
+import { AddressObject, RawVal, VecObject, BytesObject, VoidVal } from "./value";
 import { Vec } from "./vec";
 
 
@@ -9,7 +10,7 @@ import { Vec } from "./vec";
  * @param address to be checked as AddressObject
  * @returns void if authorized
  */
-export function requireAuth(address: AddressObject): StatusVal {
+export function requireAuth(address: AddressObject): VoidVal {
     return require_auth(address);
 }
 
@@ -22,8 +23,26 @@ export function requireAuth(address: AddressObject): StatusVal {
  * @param args vector containing the args
  * @returns void if authorized
  */
-export function requireAuthForArgs(address: AddressObject, args:Vec): StatusVal {
+export function requireAuthForArgs(address: AddressObject, args:Vec): VoidVal {
     return require_auth_for_args(address, args.getHostObject());
+}
+
+/**
+ * Converts a provided 32-byte Stellar account public key to the corresponding address. 
+ * @param pk_bytes the public key
+ * @returns the address object handle.
+ */
+export function accountPublicKeyToAddress(pk_bytes: Bytes): AddressObject {
+    return account_public_key_to_address(pk_bytes.getHostObject());
+}
+
+/**
+ * Converts a provided 32-byte contract identifier to a corresponding Address object.
+ * @param contract_id_bytes the contract id.
+ * @returns the address object handle.
+ */
+export function contractIdToAddress(contract_id_bytes: Bytes): AddressObject {
+    return contract_id_to_address(contract_id_bytes.getHostObject());
 }
 
 /******************
@@ -35,7 +54,7 @@ export function requireAuthForArgs(address: AddressObject, args:Vec): StatusVal 
 /// Traps if the invocation hasn't been authorized.
 // @ts-ignore
 @external("a", "_")
-declare function require_auth_for_args(address: AddressObject, args:VecObject): RawVal;
+declare function require_auth_for_args(address: AddressObject, args:VecObject): VoidVal;
 
 
 /// Checks if the address has authorized the invocation of the 

@@ -435,3 +435,48 @@ You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-
 | [liquidity pool example](https://github.com/Soneso/as-soroban-examples/tree/main/liquidity_pool)| Demonstrates how to write a constant product liquidity pool contract.|
 
 More examples can be found in the [test cases](https://github.com/Soneso/as-soroban-sdk/tree/main/test)
+
+## Using as-bignum for working with big numbers
+
+If you need arithmetic and binary operations for working with big numbers such as {i,u}128 or {i,u}256 then there are some possibilities. On the one hand there will probably be host functions for them starting from soroban preview 10. Furthermore we have implemented a couple of functions into this SDK. But the functions from the SDK are limited, work only for positive {i,u}128 and will probably be removed soon. 
+
+A better option is to use the library [as-bignum](https://github.com/MaxGraey/as-bignum/tree/master). However, it does not work with soroban right away, because some functions throw errors, which leads to an import statement in the compiled wasm code, which in turn is not accepted by the Soroban VM:
+
+```
+// wat representation
+ (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
+```
+Such special imports need support from the environment, which is currently not available. See [AS special imports](https://www.assemblyscript.org/concepts.html#special-imports).
+
+But this can also be circumvented by implementing a special `abort` function in the contract.
+
+To do so, you must first declare it in your `asconfig.json` file. E.g.
+```json
+{
+  "extends": "as-soroban-sdk/sdkasconfig",
+  "targets": {
+    "release": {
+      "outFile": "build/release.wasm",
+      "textFile": "build/release.wat",
+      "use": "abort=assembly/index/myAbort"
+    },
+    "debug": {
+      "outFile": "build/debug.wasm",
+      "textFile": "build/debug.wat",
+      "use": "abort=assembly/index/myAbort"
+    }
+  }
+}
+```
+
+Then implement the function in your contract:
+
+```ts
+function myAbort(
+  message: string | null,
+  fileName: string | null,
+  lineNumber: u32,
+  columnNumber: u32
+): void {//...}
+```
+By doing so, the import statement will not be added to the wasm code during compilation. And when invoking the contract, no `VmError(Instantiation)` will be thrown while using the `as-bignum` functions.
