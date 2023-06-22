@@ -433,6 +433,7 @@ You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-
 | [multi swap example](https://github.com/Soneso/as-soroban-examples/tree/main/multi_swap)| This example demonstrates how authorized calls can be batched together. It swaps a pair of tokens between the two groups of users that authorized the swap operation from the atomic swap example.|
 | [single offer sale example](https://github.com/Soneso/as-soroban-examples/tree/main/single_offer)| The single offer sale example demonstrates how to write a contract that allows a seller to set up an offer to sell token A for token B to multiple buyers.|
 | [liquidity pool example](https://github.com/Soneso/as-soroban-examples/tree/main/liquidity_pool)| Demonstrates how to write a constant product liquidity pool contract.|
+| [custom account example](https://github.com/Soneso/as-soroban-examples/tree/main/custom_account)| This example is an advanced auth example which demonstrates how to implement a simple account contract that supports multisig and customizable authorization policies.|
 
 More examples can be found in the [test cases](https://github.com/Soneso/as-soroban-sdk/tree/main/test)
 
