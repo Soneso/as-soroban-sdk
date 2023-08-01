@@ -222,21 +222,16 @@ export function testObject(): val.BoolVal {
   return val.fromTrue();
 }
 
-export function testStatus(): val.BoolVal {
+export function testErrors(): val.BoolVal {
 
   const errCode = 33;
   let contractErr = val.contractError(errCode);
-  if(!val.isStatus(contractErr) || val.getStatusType(contractErr) != val.statusContractErr || val.getStatusCode(contractErr) != errCode) {
+  if(!val.isError(contractErr) || val.getErrorType(contractErr) != val.errorTypeContract || val.getErrorCode(contractErr) != errCode) {
     return val.fromFalse();
   }
 
-  let contractErr2 = val.fromStatus(val.statusContractErr, errCode);
-  if (val.getStatusType(contractErr2) != val.getStatusType(contractErr) || val.getStatusCode(contractErr2) != val.getStatusCode(contractErr)) {
-    return val.fromFalse();
-  }
-
-  let statusOk = val.fromStatus(val.statusOk, 0);
-  if(!val.isStatus(statusOk)) {
+  let contractErr2 = val.fromError(val.errorTypeContract, errCode);
+  if (val.getErrorType(contractErr2) != val.getErrorType(contractErr) || val.getErrorCode(contractErr2) != val.getErrorCode(contractErr)) {
     return val.fromFalse();
   }
 

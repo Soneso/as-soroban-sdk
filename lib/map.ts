@@ -1,4 +1,7 @@
-import { RawVal, MapObject, toU32, toBool, VecObject, U32Val, BoolVal, VoidVal, fromU32 } from "./value";
+import { map_del, map_get, map_has, map_keys, map_len, map_max_key, map_min_key, map_new, 
+    map_new_from_linear_memory, map_next_key, map_prev_key, map_put, 
+    map_unpack_to_linear_memory, map_values } from "./env";
+import { RawVal, MapObject, toU32, toBool, fromU32 } from "./value";
 import { Vec } from "./vec";
 
 export class Map {
@@ -141,84 +144,3 @@ export class Map {
         map_unpack_to_linear_memory(this.obj, fromU32(keys_pos), fromU32(vals_pos), fromU32(len));
     }
 }
-
-/******************
- * HOST FUNCTIONS *
- ******************/
-
-/// Create an empty new map.
-// @ts-ignore
-@external("m", "_")
-declare function map_new(): MapObject;
-
-/// Insert a key/value mapping into an existing map, and return the map object handle.
-/// If the map already has a mapping for the given key, the previous value is overwritten.
-// @ts-ignore
-@external("m", "0")
-declare function map_put(m:MapObject, k:RawVal, v:RawVal): MapObject;
-
-/// Get the value for a key from a map. Traps if key is not found.
-// @ts-ignore
-@external("m", "1")
-declare function map_get(m:MapObject, k:RawVal): RawVal;
-
-/// Remove a key/value mapping from a map if it exists, traps if doesn't.
-// @ts-ignore
-@external("m", "2")
-declare function map_del(m:MapObject, k:RawVal): MapObject;
-
-/// Get the size of a map.
-// @ts-ignore
-@external("m", "3")
-declare function map_len(m:MapObject): U32Val;
-
-/// Test for the presence of a key in a map. Returns BoolVal.
-// @ts-ignore
-@external("m", "4")
-declare function map_has(m:MapObject, k:RawVal): BoolVal;
-
-/// Given a key, find the first key less than itself in the map's sorted order.
-/// If such a key does not exist, return an SCStatus containing the error code (TBD).
-// @ts-ignore
-@external("m", "5")
-declare function map_prev_key(m:MapObject, k:RawVal): RawVal;
-
-/// Given a key, find the first key greater than itself in the map's sorted order.
-/// If such a key does not exist, return an SCStatus containing the error code (TBD).
-// @ts-ignore
-@external("m", "6")
-declare function map_next_key(m:MapObject, k:RawVal): RawVal;
-
-/// Find the minimum key from a map.
-/// If the map is empty, return an SCStatus containing the error code (TBD).
-// @ts-ignore
-@external("m", "7")
-declare function map_min_key(m:MapObject): RawVal;
-
-/// Find the maximum key from a map.
-/// If the map is empty, return an SCStatus containing the error code (TBD).
-// @ts-ignore
-@external("m", "8")
-declare function map_max_key(m:MapObject): RawVal;
-
-/// Return a new vector containing all the keys in a map.
-/// The new vector is ordered in the original map's key-sorted order.
-// @ts-ignore
-@external("m", "9")
-declare function map_keys(m:MapObject): VecObject;
-
-/// Return a new vector containing all the values in a map.
-/// The new vector is ordered in the original map's key-sorted order.
-// @ts-ignore
-@external("m", "A")
-declare function map_values(m:MapObject): VecObject;
-
-/// Return a new map initialized from a set of input slices given by linear-memory addresses and lengths.
-// @ts-ignore
-@external("m", "B")
-declare function map_new_from_linear_memory(keys_pos: U32Val, vals_pos :U32Val, len: U32Val): MapObject;
-
-/// Copy the RawVal values of a map, as described by set of input keys, into an array at a given linear-memory address.
-// @ts-ignore
-@external("m", "B")
-declare function map_unpack_to_linear_memory(map: MapObject, keys_pos: U32Val, vals_pos: U32Val, len: U32Val): VoidVal;

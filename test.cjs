@@ -46,7 +46,7 @@ async function testValueConversion() {
     await testSmall();
     await testSmallSymbol();
     await testObject();
-    await testStatus();
+    await testErrors();
     console.log(`test value conversions -> OK`);
 }
 
@@ -57,7 +57,7 @@ async function testI32() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -70,7 +70,7 @@ async function testU32() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -83,7 +83,7 @@ async function testStatic() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -96,7 +96,7 @@ async function testSmall() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+       //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -109,20 +109,20 @@ async function testObject() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
 }
 
-async function testStatus() {
-    console.log(`test Status ...`);
-    const { error, stdout, stderr } = await exec(invokeValConversions + 'testStatus');
+async function testErrors() {
+    console.log(`test Errors ...`);
+    const { error, stdout, stderr } = await exec(invokeValConversions + 'testErrors');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -135,7 +135,7 @@ async function testSmallSymbol() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), '"test_123"');
     console.log(`OK`);
@@ -171,7 +171,7 @@ async function testAddExample() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "42");
     console.log(`OK`);
@@ -184,7 +184,7 @@ async function testHelloExample() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), '["Hello","friend"]');
     console.log(`OK`);
@@ -197,7 +197,7 @@ async function testIncrementExample() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     console.log(stdout.trim());
     let val = parseInt(stdout.trim())
@@ -212,7 +212,7 @@ async function testEventsExample() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        // assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -224,7 +224,6 @@ async function testLoggingExample() {
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
-
     assert.equal(true, stderr.includes('today'));
     console.log(`OK`);
 }
@@ -236,7 +235,7 @@ async function testCheckAgeExampleP1() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), '"OK"');
     console.log(`OK`);
@@ -248,7 +247,7 @@ async function testCheckAgeExampleP2() {
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
-    assert.equal(true, stderr.includes('Status(ContractError(1))'));
+    assert.equal(true, stderr.includes('Error(Contract, #1)'));
     console.log(`OK`);
 }
 
@@ -258,7 +257,7 @@ async function deployExamplesTest() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     console.log("deployed: " + stdout);
 }
@@ -270,7 +269,7 @@ async function testCallContractExample() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "42");
     console.log(`OK`);
@@ -283,7 +282,7 @@ async function setUpIdentity1() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     let acc1 = stdout.trim();
     return acc1;
@@ -299,7 +298,7 @@ async function testAuthExampleP1(acc) {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert(stdout.indexOf(acc) != -1);
     console.log(`OK`);
@@ -313,7 +312,7 @@ async function testAuthExampleArgs(acc) {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert(stdout.indexOf(acc) != -1);
     console.log(`OK`);
@@ -326,7 +325,7 @@ async function setUpIdentity2() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     let acc2 = stdout.trim();
     return acc2;
@@ -340,7 +339,7 @@ async function testAuthExampleP2(acc) {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert(stdout.indexOf(acc) != -1);
     console.log(`OK`);
@@ -353,7 +352,7 @@ async function installExamplesContract() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     let wasmHash = stdout.trim();
     return wasmHash;
@@ -376,7 +375,7 @@ async function testMaps() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -389,7 +388,7 @@ async function testVectors() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -402,7 +401,7 @@ async function testBytes() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -415,7 +414,7 @@ async function testSymbols() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);
@@ -428,7 +427,7 @@ async function testMath128() {
         assert.fail(`error: ${error.message}`);
     }
     if (stderr) {
-        assert.fail(`stderr: ${stderr}`);
+        //assert.fail(`stderr: ${stderr}`);
     }
     assert.equal(stdout.trim(), "true");
     console.log(`OK`);

@@ -5,6 +5,7 @@ import { Map } from "../../lib/map";
 import * as context from '../../lib/context';
 import * as contract from "../../lib/contract";
 import * as address from '../../lib/address';
+import { Bytes } from "../../lib/bytes";
 
 export function hello(to: val.SmallSymbolVal): val.VecObject {
 
@@ -27,11 +28,20 @@ export function add(a: val.I32Val, b: val.I32Val): val.I32Val {
 export function logging(): val.VoidVal {
 
   context.logStr("Hello, today is a sunny day!");
+  
+  context.logValue(val.fromI128Pieces(100,100));
 
-  let args = new Vec();
-  args.pushBack(val.fromI32(30));
-  args.pushBack(val.fromSmallSymbolStr("celsius"));
-  context.logFtm("We have {} degrees {}!", args);
+  let vals = new Vec();
+  vals.pushBack(val.fromI32(30));
+  vals.pushBack(val.fromSmallSymbolStr("celsius"));
+  context.log("Today temperature is: ", vals);
+
+  let msgBytes = Bytes.fromString("Hey");
+  let msgLen = msgBytes.len(); //u32
+  msgBytes.copyToLinearMemory(0, 0, msgLen);
+  vals.unpackToLinearMemory(1051, vals.len());
+  context.logFromLinearMemory(0, msgLen, 1051, vals.len());
+
   return val.fromVoid();
 
 }
@@ -39,13 +49,13 @@ export function logging(): val.VoidVal {
 export function increment(): val.U32Val {
   let key = "COUNTER";
   var counter = 0;
-  if (ledger.hasDataFor(key)) {
-    let dataObj = ledger.getDataFor(key);
+  if (ledger.hasDataFor(key, val.storageTypePersistent)) {
+    let dataObj = ledger.getDataFor(key, val.storageTypePersistent);
     counter = val.toU32(dataObj);
   }
   counter += 1;
   let counterObj = val.fromU32(counter);
-  ledger.putDataFor(key, counterObj);
+  ledger.putDataFor(key, counterObj, val.storageTypePersistent, val.fromU32(0));
   return counterObj;
 }
 
@@ -88,15 +98,15 @@ export function eventTest(): val.BoolVal {
   context.publishEvent(topicsVec, dataVec.getHostObject());
 
 
-  let statusTest = val.fromStatus(val.statusContractErr, val.unknownErrGeneral)
-  if (val.isStatus(statusTest)) {
-    context.publishSimpleEvent("STATUS", val.fromU32(1));
+  let errorTest = val.fromError(val.errorTypeContract, val.errorCodeExceededLimit)
+  if (val.isError(errorTest)) {
+    context.publishSimpleEvent("ERROR", val.fromU32(1));
   }
-  if (val.getStatusType(statusTest) == val.statusContractErr) {
-    context.publishSimpleEvent("STATUS", val.fromU32(2));
+  if (val.getErrorType(errorTest) == val.errorTypeContract) {
+    context.publishSimpleEvent("ERROR", val.fromU32(2));
   }
-  if (val.getStatusCode(statusTest) == val.unknownErrGeneral) {
-    context.publishSimpleEvent("STATUS", val.fromU32(3));
+  if (val.getErrorCode(errorTest) == val.errorCodeExceededLimit) {
+    context.publishSimpleEvent("ERROR", val.fromU32(3));
   }
 
   return val.fromTrue();
@@ -119,13 +129,13 @@ export function auth(user: val.AddressObject): val.MapObject {
   
   let key = user;
   var counter = 0;
-  if (ledger.hasData(key)) {
-    let dataVal = ledger.getData(key);
+  if (ledger.hasData(key, val.storageTypePersistent)) {
+    let dataVal = ledger.getData(key, val.storageTypePersistent);
     counter = val.toU32(dataVal);
   }
   counter += 1;
   let counterVal = val.fromU32(counter);
-  ledger.putData(key, counterVal);
+  ledger.putData(key, counterVal, val.storageTypePersistent, val.fromU32(0));
 
   let map = new Map();
   map.put(key, counterVal);
@@ -142,13 +152,13 @@ export function authArgs(user: val.AddressObject, value: val.RawVal): val.MapObj
   
   let key = user;
   var counter = 0;
-  if (ledger.hasData(key)) {
-    let dataVal = ledger.getData(key);
+  if (ledger.hasData(key, val.storageTypePersistent)) {
+    let dataVal = ledger.getData(key, val.storageTypePersistent);
     counter = val.toU32(dataVal);
   }
   counter += val.toU32(value);
   let counterVal = val.fromU32(counter);
-  ledger.putData(key, counterVal);
+  ledger.putData(key, counterVal, val.storageTypePersistent, val.fromU32(0));
 
   let map = new Map();
   map.put(key, counterVal);
@@ -167,6 +177,6 @@ export function callctr2(user: val.AddressObject): val.MapObject {
 export function deploy(wasm_hash: val.BytesObject, salt: val.BytesObject, 
   fn_name: val.SmallSymbolVal, args:val.VecObject): val.RawVal {
 
-  let id = ledger.deployContract(wasm_hash, salt);
+  let id = ledger.deployContract(context.getCurrentContractAddress(), wasm_hash, salt);
   return contract.callContract(id, fn_name, args);
 }

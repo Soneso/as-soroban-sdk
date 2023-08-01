@@ -1,5 +1,6 @@
 import { Bytes } from "./bytes";
-import { StringObject, U32Val, VoidVal, toU32, fromU32 } from "./value";
+import { string_copy_to_linear_memory, string_len, string_new_from_linear_memory } from "./env";
+import { StringObject, toU32, fromU32 } from "./value";
 
 export class Str {
     obj: StringObject;
@@ -61,23 +62,3 @@ export class Str {
     }
 
 }
-
-/*****************
-* HOST Functions *
-******************/
-
-/// Copies a slice of bytes from a `String` object specified at offset `s_pos` with length `len` into the linear memory at position `lm_pos`.
-/// Traps if either the `String` object or the linear memory doesn't have enough bytes.
-// @ts-ignore
-@external("b", "G")
-declare function string_copy_to_linear_memory(s:StringObject, s_pos:U32Val, lm_pos:U32Val, len:U32Val): VoidVal;
-
-/// Constructs a new `String` object initialized with bytes copied from a linear memory slice specified at position `lm_pos` with length `len`.
-// @ts-ignore
-@external("b", "I")
-declare function string_new_from_linear_memory(lm_pos:U32Val, len:U32Val): StringObject;
-
-/// Returns length of the `String` object.
-// @ts-ignore
-@external("b", "K")
-declare function string_len(s:StringObject): U32Val;

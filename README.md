@@ -1,12 +1,12 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v0.2.2](https://img.shields.io/badge/v0.2.2-yellow.svg)
+![v0.2.3](https://img.shields.io/badge/v0.2.3-yellow.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
 **This repository contains code that is in early development, incomplete, not fully tested. The API is experimental, and is receiving breaking changes frequently.**
 
-**This version supports soroban preview 9  & interface version 37**
+**This version supports soroban preview 10  & interface version 85899345971**
 
 ## Quick Start
 
@@ -52,9 +52,9 @@ Next you need to add a ```contract.json``` file to the project. It must contain 
 ```json
 {
     "name": "hello word",
-    "version": "0.1.8",
+    "version": "0.2.0",
     "description": "my first contract",
-    "host_functions_version": 37,
+    "host_functions_version": 85899345971,
     "functions": [
         {
             "name" : "hello",
@@ -96,7 +96,7 @@ You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` fol
 To run the contract, you must first install the official soroban cli as described here: [stellar soroban cli](https://github.com/stellar/soroban-cli).
 
 ```shell
-$ cargo install --locked --version 0.8.0 soroban-cli
+cargo install --locked --version 0.9.4 soroban-cli
 ```
 
 Run your contract:
@@ -168,11 +168,8 @@ For example:
 ```typescript
 function callContractById(id: string, func: string, args: VecObject): RawVal 
 ```
-or 
 
-```typescript
-function putDataFor(symbolKey: string, value: RawVal) : void
-```
+But one can also access them directly via `env.ts`.
 
 ### SDK Types
 
@@ -210,8 +207,8 @@ context.failWithErrorCode(AGE_ERR_CODES.TOO_YOUNG);
 
 or 
 ```typescript
-if(isStatus(rawVal) && getStatusType(rawVal) == statusStorageErr) {
-    return fromU32(getStatusCode(rawVal))
+if(isError(rawVal) && getErrorType(rawVal) == errorTypeContract) {
+    return fromU32(getErrorCode(rawVal))
 }
 ```
 
@@ -283,15 +280,15 @@ import * as context from 'as-soroban-sdk/lib/context';
 context.logStr("Today is a sunny day!");
 ```
 
-### Log a formatted utf8 string message
+### Log a string message and values
 
 ```typescript
 import * as context from 'as-soroban-sdk/lib/context';
 
-let args = new Vec();
-args.pushBack(val.fromI32(30));
-args.pushBack(val.fromSmallSymbolStr("celsius"));
-context.logFtm("We have {} degrees {}!", args);
+let values = new Vec();
+values.pushBack(val.fromI32(30));
+values.pushBack(val.fromSmallSymbolStr("celsius"));
+context.log("Today temperature:", values);
 
 ```
 
@@ -359,7 +356,7 @@ $ soroban version
 output at the time of writing:
 
 ``` shell
-soroban-env interface version 37
+soroban-env interface version 85899345971
 ```
 
 Additionally you must define the metadata for each function exported by your contract. In the upper example there is only one function named ```hello```.

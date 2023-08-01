@@ -1,4 +1,9 @@
 import * as context from "./context";
+import { obj_from_i128_pieces, obj_from_i256_pieces, obj_from_i64, obj_from_u128_pieces, 
+  obj_from_u256_pieces, obj_from_u64, obj_to_i128_hi64, obj_to_i128_lo64, obj_to_i256_hi_hi, 
+  obj_to_i256_hi_lo, obj_to_i256_lo_hi, obj_to_i256_lo_lo, obj_to_i64, obj_to_u128_hi64, 
+  obj_to_u128_lo64, obj_to_u256_hi_hi, obj_to_u256_hi_lo, obj_to_u256_lo_hi, 
+  obj_to_u256_lo_lo, obj_to_u64 } from "./env";
 
 export type RawVal = u64;
 
@@ -9,33 +14,38 @@ export type BoolVal = RawVal;
 export type FalseVal = BoolVal;
 export type TrueVal = BoolVal;
 export type VoidVal = RawVal;
-export type StatusVal = RawVal;
+export type ErrorVal = RawVal;
 export type U32Val = RawVal;
 export type I32Val = RawVal;
-export type U64SmallVal = RawVal;
-export type I64SmallVal = RawVal;
+export type U64Val = RawVal;
+export type I64Val = RawVal;
+export type U64SmallVal = U64Val;
+export type I64SmallVal = I64Val;
 export type TimepointSmallVal = RawVal;
 export type DurationSmallVal = RawVal;
 export type I128Val = RawVal; // can be I128SmallVal or I128Object
 export type U128Val = RawVal; // can be U128SmallVal or U128Object
 export type U128SmallVal = RawVal;
 export type I128SmallVal = I128Val;
-export type U256SmallVal = RawVal;
-export type I256SmallVal = RawVal;
+export type U256Val = RawVal;
+export type U256SmallVal = U256Val;
+export type I256Val = RawVal;
+export type I256SmallVal = I256Val;
 export type Symbol = RawVal;
 export type SmallSymbolVal = Symbol;
 export type LedgerKeyContractExecutableVal = RawVal;
+export type StorageType = RawVal;
 
 // Objects
 export type ObjectVal = RawVal;
-export type U64Object = ObjectVal;
-export type I64Object = ObjectVal;
+export type U64Object = U64Val;
+export type I64Object = I64Val;
 export type TimepointObject = RawVal;
 export type DurationObject = RawVal;
 export type U128Object = U128Val;
 export type I128Object = I128Val;
-export type U256Object = ObjectVal;
-export type I256Object = ObjectVal;
+export type U256Object = U256Val;
+export type I256Object = I256Val;
 export type BytesObject = ObjectVal;
 export type StringObject = ObjectVal;
 export type SymbolObject = Symbol;
@@ -75,8 +85,8 @@ const rawValTagTrue: rawValTag = 1;
 /// Tag for a [RawVal] that is empty/absent (eg. void, null, nil, undefined, None)
 const rawValTagVoid: rawValTag = 2;
 
-/// Tag for a [RawVal] that is contains an error code.
-const rawValTagStatus: rawValTag = 3;
+/// Tag for a [RawVal] that contains an error code.
+const rawValTagError: rawValTag = 3;
 
 /// Tag for a [RawVal] that contains a [u32] number.
 const rawValTagU32: rawValTag = 4;
@@ -167,11 +177,8 @@ const rawValTagVecObject: rawValTag = 75;
 /// Tag for a [RawVal] that refers to a host-side map object.
 const rawValTagMapObject: rawValTag = 76;
 
-/// Tag for a [RawVal] that refers to a host-side contract executable object.
-const rawValTagContractExecutableObject: rawValTag = 77;
-
 /// Tag for a [RawVal] that refers to a host-side address object.
-const rawValTagAddressObject: rawValTag = 78;
+const rawValTagAddressObject: rawValTag = 77;
 
 /// Tag for a [RawVal] that corresponds to
 /// [stellar_xdr::ScVal::LedgerKeyNonce] and refers to a host-side
@@ -182,10 +189,39 @@ const rawValTagObjectCodeUpperBound: rawValTag = 80;
 
 const rawValTagBad: rawValTag = 0x7f;
 
+/*****************
+* [Storage Types] *
+******************/
+export const storageTypeTemporary: StorageType = 0;
+export const storageTypePersistent: StorageType = 1;
+export const storageTypeInstance: StorageType = 2;
 
-/*******************
-* HELPER FUNCTIONS.*
-********************/
+/***********************************************************************************************************
+* [Errors] - rawValTag 6: an error value consisting of a 28-bit error type code followed by a 32-bit error code.*
+************************************************************************************************************/
+export type errorType = u8;
+export const errorTypeContract: errorType = 0;
+export const errorTypeWasmVm: errorType = 1;
+export const errorTypeContext: errorType = 2;
+export const errorTypeStorage: errorType = 3;
+export const errorTypeObject: errorType = 4
+export const errorTypeCrypto: errorType = 5;
+export const errorTypeEvents: errorType = 6;
+export const errorTypeBudget: errorType = 7;
+export const errorTypeValue: errorType = 8;
+export const errorTypeAuth: errorType = 9;
+
+export type errorCode = u32;
+export const errorCodeArithDomain: errorCode = 0;
+export const errorCodeIndexBounds: errorCode = 1;
+export const errorCodeInvalidInput: errorCode = 2;
+export const errorCodeMissingValue: errorCode = 3;
+export const errorCodeExistingValue: errorCode = 4;
+export const errorCodeExceededLimit: errorCode = 5;
+export const errorCodeInvalidAction: errorCode = 6;
+export const errorCodeInternalError: errorCode = 7;
+export const errorCodeUnexpectedType: errorCode = 8;
+export const errorCodeUnexpectedSize: errorCode = 9;
 
 // Booleans
 
@@ -1176,17 +1212,6 @@ export function isSymbolObject(val: RawVal) : bool {
   return hasTag(val, rawValTagMapObject);
 }
 
-// ContractExecutableObject
-
-/**
- * Checks if the given host value represents an object that contains contract executable code.
- * @param val host value to check.
- * @returns true if the host value represents an object that contains an contract executable code. Otherwise false.
- */
-export function isContractExecutableObject(val: RawVal) : bool {
-  return hasTag(val, rawValTagContractExecutableObject);
-}
-
 /**
  * Checks if the given host value represents an object that contains an address.
  * @param val host value to check.
@@ -1206,64 +1231,52 @@ export function isLedgerKeyNonceObject(val: RawVal) : bool {
 }
 
 /**
- * Builds a StatusVal for a contract error for the given error code.
- * @param errCode the error code to create the StatusVal from
- * @returns the created StatusVal.
+ * Builds a ErrorVal for a contract error for the given error code.
+ * @param errCode the error code to create the ErrorVal from
+ * @returns the created ErrorVal.
  */
-export function contractError(errCode: u32) : StatusVal {
-    return fromMajorMinorAndTag(errCode, statusContractErr, rawValTagStatus);
+export function contractError(errCode: u32) : ErrorVal {
+    return fromMajorMinorAndTag(errCode, errorTypeContract, rawValTagError);
 }
 
 /**
- * Checks if the given value is of type status and represents status ok.
- * @param value the StatusVal to check
- * @returns true if status ok, otherwise false
- */
-export function isStatusOK(value: StatusVal) : bool {
-  if (!isStatus(value) || getStatusType(value) != statusOk) {
-    return false;
-  }
-  return true;
-}
-
-/**
- * Creates a StatusVal from a given status type and status code.
- * @param type status type. e.g. statusContractErr, or statusOk
- * @param code status code. e.g. unknownErrGeneral
+ * Creates a ErrorVal from a given error type and error code.
+ * @param type error type. e.g. errorTypeStorage
+ * @param code status code. e.g. errorCodeInvalidInput
  * @returns the created StatusVal
  */
-export function fromStatus(type: statusType, code: u32) : StatusVal {
-  return fromMajorMinorAndTag(code, type, rawValTagStatus);
+export function fromError(type: errorType, code: errorCode) : ErrorVal {
+  return fromMajorMinorAndTag(code, type, rawValTagError);
 }
 
 /**
- * Checks if the given host value represents a status value.
+ * Checks if the given host value represents an error value.
  * @param val host value to check (Type: RawVal)
- * @returns true if the host value represents a status value. otherwise false. 
+ * @returns true if the host value represents an error value. otherwise false. 
  */
-export function isStatus(val: RawVal): bool {
-  return hasTag(val, rawValTagStatus);
+export function isError(val: RawVal): bool {
+  return hasTag(val, rawValTagError);
 }
 
 /**
- * Retruns the status type from a given StatusVal. Traps if no StatusVal. To avoid, you can check it with isStatus().
- * @param status the status to get the type from
- * @returns the status type
+ * Retruns the error type from a given ErrorVal. Traps if no ErrorVal. To avoid, you can check it with isError().
+ * @param error the error to get the type from (ErrorVal)
+ * @returns the error type
  */
-export function getStatusType(status: StatusVal) : statusType {
-  if (!isStatus(status)) {
+export function getErrorType(error: ErrorVal) : errorType {
+  if (!isError(error)) {
     context.fail();
   }
-  return getMinor(status) as u8;
+  return getMinor(error) as u8;
 }
 
 /**
- * Retruns the status type from a given StatusVal. Traps if no StatusVal. To avoid, you can check it with isStatus().
- * @param status the status to get the code from
- * @returns the status code
+ * Retruns the status type from a given ErrorVal. Traps if no ErrorVal. To avoid, you can check it with isError().
+ * @param error the error to get the code from
+ * @returns the error code
  */
-export function getStatusCode(status: StatusVal) : u32 {
-  if (!isStatus(status)) {
+export function getErrorCode(status: ErrorVal) : u32 {
+  if (!isError(status)) {
     context.fail();
   }
   return getMajor(status);
@@ -1339,196 +1352,3 @@ function getMinor(val:RawVal) : u32 {
 function getMajor(val:RawVal) : u32 {
   return (getBody(val) >> MINOR_BITS) as u32;
 }
-
-
-/***********************************************************************************************************
-* [Status] - rawValTag 6: a status value consisting of a 28-bit type code followed by a 32-bit status code.*
-************************************************************************************************************/
-export type statusType = u8;
-export const statusOk: statusType = 0;
-export const statusUnknownErr: statusType = 1;
-export const statusHostValErr: statusType = 2;
-export const statusHostObjErr: statusType = 3;
-export const statusHostFuncErr: statusType = 4;
-export const statusStorageErr: statusType = 5;
-export const statusContextErr: statusType = 6;
-export const statusVMErr: statusType = 7;
-export const statusContractErr: statusType = 8;
-export const statusHostAuthErr: statusType = 9;
-
-export type hostValErrCode = u32;
-export const hostValUnknownErr: hostValErrCode = 0;
-export const hostValReservedTagVal: hostValErrCode = 1;
-export const hostValUnexpectedValType: hostValErrCode = 2;
-export const hostValU63OutOfRange: hostValErrCode = 3;
-export const hostValU32OutOfRange: hostValErrCode = 4;
-export const hostValStaticUnknown: hostValErrCode = 5;
-export const hostValMissingObj: hostValErrCode = 6;
-export const hostValSymbolToLong: hostValErrCode = 7;
-export const hostValSymbolBadChar: hostValErrCode = 8;
-export const hostValContainsNonUTF8: hostValErrCode = 9;
-export const hostValBitsetTooManyBits: hostValErrCode = 10;
-export const hostValStatusUnknown: hostValErrCode = 11;
-
-export type hostObjErrCode = u32;
-export const hostObjUnknownErr: hostObjErrCode = 0;
-export const hostObjUnknownReference: hostObjErrCode = 1;
-export const hostObjUnexpectedType: hostObjErrCode = 2;
-export const hostObjObjCountExceedsU32Max: hostObjErrCode = 3;
-export const hostObjObjNotExists: hostObjErrCode = 4;
-export const hostObjVecIndexOutOfBounds: hostObjErrCode = 5;
-export const hostObjContractHashWrongLength: hostObjErrCode = 6;
-
-export type hostFuncErrCode = u32;
-export const hostFuncUnknownErr: hostFuncErrCode = 0;
-export const hostFuncUnexpectedHostFuncAction: hostFuncErrCode = 1;
-export const hostFuncInputArgsWrongLenght: hostFuncErrCode = 2;
-export const hostFuncInputArgsWrongType: hostFuncErrCode = 3;
-export const hostFuncInputArgsInvalid: hostFuncErrCode = 4;
-
-export type hostStorageErrCode = u32;
-export const hostStorageUnknownErr: hostStorageErrCode = 0;
-export const hostStorageExpectCOntractData: hostStorageErrCode = 1;
-export const hostStorageReadWriteAccessToReadonlyEntry: hostStorageErrCode = 2;
-export const hostStorageAccessToUnknownEntry: hostStorageErrCode = 3;
-export const hostStorageMissingKeyInGet: hostStorageErrCode = 4;
-export const hostStorageGetOnDeletedKey: hostStorageErrCode = 5;
-
-export type hostAuthErrCode = u32;
-export const hostAuthUnknownErr: hostAuthErrCode = 0;
-export const hostAuthNonceErr: hostAuthErrCode = 1;
-export const hostAuthDuplicateAuthorization: hostAuthErrCode = 2;
-export const hostAuthNotAuthorited: hostAuthErrCode = 3;
-
-export type hostContextErrCode = u32;
-export const hostContextUnknownErr: hostContextErrCode = 0;
-export const hostContextNoContractRunning: hostContextErrCode = 1;
-
-export type vmErrCode = u32;
-export const vmUnknown: vmErrCode = 0;
-export const vmValidation: vmErrCode = 1;
-export const vmInstantiation: vmErrCode = 2;
-export const vmFunction: vmErrCode = 3;
-export const vmTable: vmErrCode = 4;
-export const vmMemory: vmErrCode = 5;
-export const vmGlobal: vmErrCode = 6;
-export const vmValue: vmErrCode = 7;
-export const vmTrapUnreachable: vmErrCode = 8;
-export const vmTrapMemoryAccessOutOfBounds: vmErrCode = 9;
-export const vmTrapTableAccessOutOfBounds: vmErrCode = 10;
-export const vmTrapElemUninitialized: vmErrCode = 11;
-export const vmTrapDivisionByZero: vmErrCode = 12;
-export const vmTrapIntegerOverflow: vmErrCode = 13;
-export const vmTrapInvalidConversionToInt: vmErrCode = 14;
-export const vmTrapStackOverflow: vmErrCode = 15;
-export const vmTrapUnexpectedSignature: vmErrCode = 16;
-export const vmTrapMemLimitExceeded: vmErrCode = 17;
-export const vmTrapCPULimitExceeded: vmErrCode = 18;
-
-export type unknownErrCode = u32;
-export const unknownErrGeneral: unknownErrCode = 0;
-export const unknownErrXDR: unknownErrCode = 1;
-
-/******************
- * HOST FUNCTIONS *
- ******************/
-
-/// Convert an u64 to an object containing an u64.
-// @ts-ignore
-@external("i", "_")
-declare function obj_from_u64(v:u64): U64Object;
-
-/// Convert an object containing an u64 to an u64.
-// @ts-ignore
-@external("i", "0")
-declare function obj_to_u64(ojb:U64Object): u64;
-
-/// Convert an i64 to an object containing an i64.
-// @ts-ignore
-@external("i", "1")
-declare function obj_from_i64(v:i64): I64Object;
-
-/// Convert an object containing an i64 to an i64.
-// @ts-ignore
-@external("i", "2")
-declare function obj_to_i64(ojb:I64Object): i64;
-
-/// Convert the high and low 64-bit words of a u128 to an object containing a u128.
-// @ts-ignore
-@external("i", "5")
-declare function obj_from_u128_pieces(hi:u64, lo:u64): U128Object;
-
-/// Extract the low 64 bits from an object containing a u128.
-// @ts-ignore
-@external("i", "6")
-declare function obj_to_u128_lo64(obj:U128Object): u64;
-
-/// Extract the high 64 bits from an object containing a u128.
-// @ts-ignore
-@external("i", "7")
-declare function obj_to_u128_hi64(obj:U128Object): u64;
-
-/// Convert the high and low 64-bit words of an i128 to an object containing an i128.
-// @ts-ignore
-@external("i", "8")
-declare function obj_from_i128_pieces(hi:i64, lo:u64): I128Object;
-
-/// Extract the low 64 bits from an object containing an i128.
-// @ts-ignore
-@external("i", "9")
-declare function obj_to_i128_lo64(obj:I128Object): u64;
-
-/// Extract the high 64 bits from an object containing an i128.
-// @ts-ignore
-@external("i", "a")
-declare function obj_to_i128_hi64(obj:I128Object): i64;
-
-/// Convert the four 64-bit words of an u256 (big-endian) to an object containing an u256.
-// @ts-ignore
-@external("i", "b")
-declare function obj_from_u256_pieces(hi_hi:u64, hi_lo:u64, lo_hi:u64, lo_lo:u64): U256Object;
-
-/// Extract the highest 64-bits (bits 192-255) from an object containing an u256.
-// @ts-ignore
-@external("i", "c")
-declare function obj_to_u256_hi_hi(obj:U256Object): u64;
-
-/// Extract bits 128-191 from an object containing an u256.
-// @ts-ignore
-@external("i", "d")
-declare function obj_to_u256_hi_lo(obj:U256Object): u64;
-
-/// Extract bits 64-127 from an object containing an u256.
-// @ts-ignore
-@external("i", "e")
-declare function obj_to_u256_lo_hi(obj:U256Object): u64;
-
-/// Extract the lowest 64-bits (bits 0-63) from an object containing an u256.
-// @ts-ignore
-@external("i", "f")
-declare function obj_to_u256_lo_lo(obj:U256Object): u64;
-
-/// Convert the four 64-bit words of an i256 (big-endian) to an object containing an i256.
-// @ts-ignore
-@external("i", "g")
-declare function obj_from_i256_pieces(hi_hi:i64, hi_lo:u64, lo_hi:u64, lo_lo:u64): I256Object;
-
-/// Extract the highest 64-bits (bits 192-255) from an object containing an u256.
-// @ts-ignore
-@external("i", "h")
-declare function obj_to_i256_hi_hi(obj:U256Object): i64;
-
-/// Extract bits 128-191 from an object containing an u256.
-// @ts-ignore
-@external("i", "i")
-declare function obj_to_i256_hi_lo(obj:U256Object): u64;
-
-/// Extract bits 64-127 from an object containing an u256.
-// @ts-ignore
-@external("i", "j")
-declare function obj_to_i256_lo_hi(obj:U256Object): u64;
-
-/// Extract the lowest 64-bits (bits 0-63) from an object containing an u256.
-// @ts-ignore
-@external("i", "k")
-declare function obj_to_i256_lo_lo(obj:U256Object): u64;

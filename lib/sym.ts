@@ -1,4 +1,5 @@
 import { Bytes } from "./bytes";
+import { symbol_copy_to_linear_memory, symbol_index_in_linear_memory, symbol_len, symbol_new_from_linear_memory } from "./env";
 import { SymbolObject, U32Val, VoidVal, toU32, fromU32 } from "./value";
 
 export class Sym {
@@ -63,36 +64,8 @@ export class Sym {
      * @param len see decription (u32)
      * @returns position as u32
      */
-    symbol_index_in_linear_memory(slices_pos:u32, len:u32) : u32 {
+    symbolIndexInLinearMemory(slices_pos:u32, len:u32) : u32 {
         let res = symbol_index_in_linear_memory(this.obj, fromU32(slices_pos), fromU32(len));
         return toU32(res);
     }
 }
-
-
-/*****************
-* HOST Functions *
-******************/
-
-
-/// Copies a slice of bytes from a `Symbol` object specified at offset `s_pos` with length `len` into the linear memory at position `lm_pos`. 
-/// Traps if either the `Symbol` object or the linear memory doesn't have enough bytes.
-// @ts-ignore
-@external("b", "H")
-declare function symbol_copy_to_linear_memory(s:SymbolObject, s_pos:U32Val, lm_pos:U32Val, len:U32Val): VoidVal;
-
-/// Constructs a new `Symbol` object initialized with bytes copied from a linear memory slice specified at position `lm_pos` with length `len`.
-// @ts-ignore
-@external("b", "J")
-declare function symbol_new_from_linear_memory(lm_pos:U32Val, len:U32Val): SymbolObject;
-
-
-/// Returns length of the `Symbol` object.
-// @ts-ignore
-@external("b", "L")
-declare function symbol_len(s:SymbolObject): U32Val;
-
-/// Return the index of a Symbol in an array of linear-memory byte-slices, or trap if not found.
-// @ts-ignore
-@external("b", "M")
-declare function symbol_index_in_linear_memory(s:SymbolObject, slices_pos: U32Val, len:U32Val): U32Val;

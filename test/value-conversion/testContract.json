@@ -1,8 +1,8 @@
 {
     "name": "val-test",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "description": "value conversions test",
-    "host_functions_version": 37,
+    "host_functions_version": 85899345971,
     "functions": [
         {
             "name" : "testI32",
@@ -35,7 +35,7 @@
             "returns" : "bool"
         },
         {
-            "name" : "testStatus",
+            "name" : "testErrors",
             "arguments": [],
             "returns" : "bool"
         }

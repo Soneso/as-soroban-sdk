@@ -1,4 +1,7 @@
-import { BytesObject, RawVal, U32Val, fromU32, toU32 } from "./value";
+import { bytes_append, bytes_back, bytes_copy_from_linear_memory, bytes_copy_to_linear_memory, 
+    bytes_del, bytes_front, bytes_get, bytes_insert, bytes_len, bytes_new, bytes_new_from_linear_memory, 
+    bytes_pop, bytes_push, bytes_put, bytes_slice, deserialize_from_bytes, serialize_to_bytes } from "./env";
+import { BytesObject, RawVal, fromU32, toU32 } from "./value";
 
 export class Bytes {
     obj: BytesObject;
@@ -90,7 +93,7 @@ export class Bytes {
     }
 
     /**
-     * Creates a new Bytes object by serializing a RawVal into XDR opaque `Bytes` object.
+     * Creates a new Bytes object by serializing a (SC)RawVal into XDR opaque `Bytes` object.
      * @param v value to serialize 
      * @returns the new Bytes object
      */
@@ -99,7 +102,7 @@ export class Bytes {
     }
 
     /**
-     * Deserialize this `Bytes` object to get back the RawVal.
+     * Deserialize this `Bytes` object to get back the (SC)RawVal.
      * @returns the deserialized value
      */
     deserialize(): RawVal {
@@ -275,107 +278,3 @@ export class Bytes {
         // Of course you have to ensure that the parameters are not bigger than 0x0F 
     }
 }
-
-/*****************
-* HOST Functions *
-******************/
-
-/// Serializes an (SC)Val into XDR opaque `Bytes` object.
-// @ts-ignore
-@external("b", "_")
-declare function serialize_to_bytes(v:RawVal): BytesObject;
-
-/// Deserialize a `Bytes` object to get back the (SC)Val.
-// @ts-ignore
-@external("b", "0")
-declare function deserialize_from_bytes(b:BytesObject): RawVal;
-
-/// Copies a slice of bytes from a `Bytes` object specified at offset `b_pos` with
-/// length `len` into the linear memory at position `lm_pos`.
-/// Traps if either the `Bytes` object or the linear memory doesn't have enough bytes.
-// @ts-ignore
-@external("b", "1")
-declare function bytes_copy_to_linear_memory(b:BytesObject, b_pos:U32Val, lm_pos:U32Val, len:U32Val): RawVal;
-
-/// Copies a segment of the linear memory specified at position `lm_pos` with
-/// length `len`, into a `Bytes` object at offset `b_pos`. The `Bytes` object may
-/// grow in size to accommodate the new bytes.
-/// Traps if the linear memory doesn't have enough bytes.
-// @ts-ignore
-@external("b", "2")
-declare function bytes_copy_from_linear_memory(b:BytesObject, b_pos:U32Val, lm_pos:U32Val, len:U32Val): BytesObject;
-
-/// Constructs a new `Bytes` object initialized with bytes copied from a linear memory slice specified at position `lm_pos` with length `len`.
-// @ts-ignore
-@external("b", "3")
-declare function bytes_new_from_linear_memory(lm_pos:U32Val, len:U32Val): BytesObject;
-
-// --------------------------------------------------------
-// These functions below ($3-$F) mirror vector operations +
-// --------------------------------------------------------
-
-/// Create an empty new `Bytes` object.
-// @ts-ignore
-@external("b", "4")
-declare function bytes_new(): BytesObject;
-
-/// Update the value at index `i` in the `Bytes` object. Return the new `Bytes`.
-/// Trap if the index is out of bounds.
-// @ts-ignore
-@external("b", "5")
-declare function bytes_put(v:BytesObject, i:U32Val, u:U32Val): BytesObject;
-
-/// Returns the element at index `i` of the `Bytes` object. Traps if the index is out of bound.
-// @ts-ignore
-@external("b", "6")
-declare function bytes_get(b:BytesObject, i:U32Val): U32Val;
-
-/// Delete an element in a `Bytes` object at index `i`, shifting all elements after it to the left.
-/// Return the new `Bytes`. Traps if the index is out of bound.
-// @ts-ignore
-@external("b", "7")
-declare function bytes_del(v:BytesObject, i:U32Val): BytesObject;
-
-/// Returns length of the `Bytes` object.
-// @ts-ignore
-@external("b", "8")
-declare function bytes_len(v:BytesObject): U32Val;
-
-/// Appends an element to the back of the `Bytes` object.
-// @ts-ignore
-@external("b", "9")
-declare function bytes_push(v:BytesObject, u:RawVal): BytesObject;
-
-/// Removes the last element from the `Bytes` object and returns the new `Bytes`.
-/// Traps if original `Bytes` is empty.
-// @ts-ignore
-@external("b", "A")
-declare function bytes_pop(b:BytesObject): BytesObject;
-
-/// Return the first element in the `Bytes` object. Traps if the `Bytes` is empty
-// @ts-ignore
-@external("b", "B")
-declare function bytes_front(b:BytesObject): U32Val;
-
-/// Return the last element in the `Bytes` object. Traps if the `Bytes` is empty
-// @ts-ignore
-@external("b", "C")
-declare function bytes_back(v:BytesObject): U32Val;
-
-/// Inserts an element at index `i` within the `Bytes` object, shifting all elements after it to the right.
-/// Traps if the index is out of bound
-// @ts-ignore
-@external("b", "D")
-declare function bytes_insert(v:BytesObject, i:U32Val, u:U32Val): BytesObject;
-
-/// Clone the `Bytes` object `b1`, then moves all the elements of `Bytes` object `b2` into it.
-/// Return the new `Bytes`. Traps if its length overflows a u32.
-// @ts-ignore
-@external("b", "E")
-declare function bytes_append(b1:BytesObject, b2:BytesObject): BytesObject;
-
-/// Copies the elements from `start` index until `end` index, exclusive, in the `Bytes` object and creates a new `Bytes` from it.
-/// Returns the new `Bytes`. Traps if the index is out of bound.
-// @ts-ignore
-@external("b", "F")
-declare function bytes_slice(b:BytesObject, start:U32Val, end:U32Val): BytesObject;
