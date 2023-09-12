@@ -2,7 +2,8 @@ import { Transform } from "assemblyscript/transform";
 import * as fs from 'fs'
 import * as XDR from 'js-xdr';
 
-const META_NAME = "contractenvmetav0";
+const META_ENV_NAME = "contractenvmetav0";
+const META_NAME = "contractmetav0";
 const SPEC_NAME = "contractspecv0";
 const CONTRACT_JSON = "./contract.json";
 
@@ -28,8 +29,8 @@ export class SdkTransform extends Transform {
     // Contracts must contain a WASM custom section with name contractenvmetav0 and containing a serialized SCEnvMetaEntry. 
     // The interface version stored within should match the version of the host functions supported.
 
-    let meta = xdr.ScEnvMetaEntry.scEnvMetaKindInterfaceVersion(new xdr.Uint64(contractData.host_functions_version));
-    asModule.addCustomSection(META_NAME, meta.toXDR());
+    let envMeta = xdr.ScEnvMetaEntry.scEnvMetaKindInterfaceVersion(new xdr.Uint64(contractData.host_functions_version));
+    asModule.addCustomSection(META_ENV_NAME, envMeta.toXDR());
     console.log('host function version: ', contractData.host_functions_version);
 
     //Contracts should contain a WASM custom section with name contractspecv0 and containing a serialized stream of SCSpecEntry. 
@@ -47,8 +48,36 @@ export class SdkTransform extends Transform {
       let res = Buffer.concat(specEntries);
       asModule.addCustomSection(SPEC_NAME, res);
     } else {
-      console.error("ERROR::COULD NOT GENERATE METADATA");
+      console.error("ERROR::COULD NOT GENERATE ENV METADATA");
     }
+
+    // Contracts may optionally contain a Wasm custom section with name contractmetav0 and containing a serialized SCMetaEntry. 
+    // Contracts may store any metadata in the entries that can be used by applications and tooling off-network.
+
+    let metaEntries = SdkTransform.getMeta(contractData, xdr);
+    if (metaEntries.length != 0) {
+      let res = Buffer.concat(metaEntries);
+      asModule.addCustomSection(META_NAME, res);
+    }
+  }
+
+  static getMeta(contractData, xdr) {
+    let metaEntries = [];
+    if (contractData.meta === undefined) {
+      return metaEntries;
+    }
+    contractData.meta.forEach((item) => {
+
+      let key = item.key === undefined ? '' : item.key;
+      let value = item.value === undefined ? '' : item.value;
+      
+      if (key !== '' && value !== '') {
+        let metaV0 = new xdr.ScMetaV0({key:key, val:value});
+        let metaEntry = xdr.ScMetaEntry.scMetaV0(metaV0);
+        metaEntries.push(metaEntry.toXDR());
+      }
+    });
+    return metaEntries;
   }
 
   static getFunctions(contractData, xdr) {
@@ -410,6 +439,26 @@ export class SdkTransform extends Transform {
       xdr.typedef("Uint64", xdr.uhyper());
       xdr.typedef("Uint32", xdr.uint());
       xdr.typedef("ScSymbol", xdr.string(32));
+
+      xdr.struct("ScMetaV0", [
+        ["key", xdr.string()],
+        ["val", xdr.string()],
+      ]);
+
+      xdr.enum("ScMetaKind", {
+        scMetaV0: 0,
+      });
+
+      xdr.union("ScMetaEntry", {
+        switchOn: xdr.lookup("ScMetaKind"),
+        switchName: "kind",
+        switches: [
+          ["scMetaV0", "v0"],
+        ],
+        arms: {
+          v0: xdr.lookup("ScMetaV0"),
+        },
+      });
 
       xdr.enum("ScEnvMetaKind", {
         scEnvMetaKindInterfaceVersion: 0,
