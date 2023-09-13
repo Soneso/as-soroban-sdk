@@ -1,7 +1,4 @@
 {
-    "name": "val-test",
-    "version": "0.1.9",
-    "description": "value conversions test",
     "host_functions_version": 51,
     "functions": [
         {
@@ -38,6 +35,20 @@
             "name" : "testErrors",
             "arguments": [],
             "returns" : "bool"
+        }
+    ],
+    "meta": [
+        {
+            "key" : "name",
+            "value" : "val-test"
+        },
+        {
+            "key" : "version",
+            "value" : "0.2.0"
+        },
+        {
+            "key" : "description",
+            "value" : "value conversions test"
         }
     ]
 }

@@ -1,7 +1,4 @@
 {
-    "name": "sdk-types test",
-    "version": "0.1.8",
-    "description": "test sdk types",
     "host_functions_version": 51,
     "functions": [
         {
@@ -28,6 +25,20 @@
             "name" : "math128",
             "arguments": [],
             "returns" : "bool"
+        }
+    ],
+    "meta": [
+        {
+            "key" : "name",
+            "value" : "sdk-types test"
+        },
+        {
+            "key" : "version",
+            "value" : "0.2.0"
+        },
+        {
+            "key" : "description",
+            "value" : "test sdk types"
         }
     ]
 }

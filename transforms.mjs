@@ -6,6 +6,9 @@ const META_ENV_NAME = "contractenvmetav0";
 const META_NAME = "contractmetav0";
 const SPEC_NAME = "contractspecv0";
 const CONTRACT_JSON = "./contract.json";
+const SDK_VERSION_META_KEY = "assdkver" 
+const SDK_VERSION = "0.2.4";
+
 
 export class SdkTransform extends Transform {
 
@@ -54,18 +57,26 @@ export class SdkTransform extends Transform {
     // Contracts may optionally contain a Wasm custom section with name contractmetav0 and containing a serialized SCMetaEntry. 
     // Contracts may store any metadata in the entries that can be used by applications and tooling off-network.
 
-    let metaEntries = SdkTransform.getMeta(contractData, xdr);
-    if (metaEntries.length != 0) {
-      let res = Buffer.concat(metaEntries);
-      asModule.addCustomSection(META_NAME, res);
-    }
+    let metaEntries = SdkTransform.getContractMeta(contractData, xdr);
+    let res = Buffer.concat(metaEntries);
+    asModule.addCustomSection(META_NAME, res);
+
   }
 
-  static getMeta(contractData, xdr) {
+  static getContractMeta(contractData, xdr) {
     let metaEntries = [];
+    
+    // add sdk version
+    let metaV0 = new xdr.ScMetaV0({key:SDK_VERSION_META_KEY, val:SDK_VERSION});
+    let metaEntry = xdr.ScMetaEntry.scMetaV0(metaV0);
+    metaEntries.push(metaEntry.toXDR());
+
+    // add data provided by user
     if (contractData.meta === undefined) {
+      // no meta from user found
       return metaEntries;
     }
+
     contractData.meta.forEach((item) => {
 
       let key = item.key === undefined ? '' : item.key;
@@ -77,6 +88,7 @@ export class SdkTransform extends Transform {
         metaEntries.push(metaEntry.toXDR());
       }
     });
+
     return metaEntries;
   }
 

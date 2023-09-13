@@ -1,7 +1,4 @@
 {
-    "name": "examples",
-    "version": "0.1.8",
-    "description": "test examples",
     "host_functions_version": 51,
     "functions": [
         {
@@ -77,12 +74,16 @@
     ],
     "meta": [
         {
-            "key" : "sdk name",
-            "value" : "as-soroban-sdk"
+            "key" : "name",
+            "value" : "examples test"
         },
         {
-            "key" : "sdk version",
-            "value" : "0.2.4"
+            "key" : "version",
+            "value" : "0.2.0"
+        },
+        {
+            "key" : "description",
+            "value" : "test examples"
         }
-    ] 
+    ]
 }
