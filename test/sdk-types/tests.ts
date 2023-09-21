@@ -37,16 +37,15 @@ export function maps(): val.BoolVal {
 
   map.put(key2, value2); //in front!
 
-  let minKey = map.getMinKey();
-  let maxKey = map.getMaxKey();
+  let minKey = map.getKeyByPos(0);
+  let maxKey = map.getKeyByPos(1);
   if (key1 != maxKey || key2 != minKey) {
     return val.fromFalse();
   }
 
-  let k2Test = map.getPrevKey(key1);
-  let k1Test = map.getNextKey(key2);
-  
-  if (k2Test != key2 || k1Test != key1) {
+  let minVal = map.getValueByPos(0);
+  let maxVal = map.getValueByPos(1);
+  if (value1 != maxVal || value2 != minVal) {
     return val.fromFalse();
   }
 
@@ -170,15 +169,6 @@ export function vecs(): val.BoolVal {
         return val.fromFalse();
     }
 
-    let vec2 = Vec.newWithCapacity(3);
-    vec2.append(slice);
-    if (vec2.len() != 3) {
-        return val.fromFalse();
-    }
-
-    if(context.compareObj(vec2.getHostObject(), slice.getHostObject()) != 0) {
-        return val.fromFalse();
-    }
     return val.fromTrue();
 }
 

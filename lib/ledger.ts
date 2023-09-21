@@ -32,9 +32,9 @@ export function hasData(key: RawVal, storageType:StorageType): bool {
  * and none will be set if this is a new entry. Otherwise, `flags` is a `U32Val`. If the value is 0, then all flags are cleared. 
  * If it's not 0, then flags will be set to the passed in value.
  */
- export function putDataFor(smallSymbolKey: string, value: RawVal, storageType: StorageType, flags: RawVal) : void {
+ export function putDataFor(smallSymbolKey: string, value: RawVal, storageType: StorageType) : void {
     let keySymbolVal = fromSmallSymbolStr(smallSymbolKey);
-    put_contract_data(keySymbolVal, value, storageType, flags);
+    put_contract_data(keySymbolVal, value, storageType);
 }
 
 /**
@@ -46,8 +46,8 @@ export function hasData(key: RawVal, storageType:StorageType): bool {
  * and none will be set if this is a new entry. Otherwise, `flags` is a `U32Val`. If the value is 0, then all flags are cleared. 
  * If it's not 0, then flags will be set to the passed in value.
  */
- export function putData(key: RawVal, value: RawVal, storageType: StorageType, flags: RawVal) : void {
-    put_contract_data(key, value, storageType, flags);
+ export function putData(key: RawVal, value: RawVal, storageType: StorageType) : void {
+    put_contract_data(key, value, storageType);
 }
 
 /**

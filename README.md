@@ -1,12 +1,10 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v0.2.4](https://img.shields.io/badge/v0.2.4-yellow.svg)
+![v0.2.5](https://img.shields.io/badge/v0.2.5-yellow.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
-**This repository contains code that is in early development, incomplete, not fully tested. The API is experimental, and is receiving breaking changes frequently.**
-
-**This version supports soroban preview 10  & interface version 51 (or 85899345971)**
+**This version supports soroban preview 11 (Protocol 20)**
 
 ## Quick Start
 
@@ -51,7 +49,6 @@ Next you need to add a `contract.json` file to the project. It must contain the 
 
 ```json
 {
-    "host_functions_version": 51,
     "functions": [
         {
             "name" : "hello",
@@ -93,13 +90,13 @@ You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` fol
 To run the contract, you must first install the official soroban cli as described here: [stellar soroban cli](https://github.com/stellar/soroban-cli).
 
 ```shell
-cargo install --locked --version 0.9.4 soroban-cli
+cargo install --locked --version 20.0.0-rc2 soroban-cli
 ```
 
 Run your contract:
 
 ```shell
-$ soroban contract invoke --wasm build/release.wasm --id 1 -- hello --to friend
+$ soroban -q contract invoke --wasm build/release.wasm --id 1 -- hello --to friend
 ```
 
 You can also use one of our Stellar SDKs to deploy and invoke contracts:
@@ -113,7 +110,7 @@ You can also use one of our Stellar SDKs to deploy and invoke contracts:
 
 In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official [Soroban documentation](https://soroban.stellar.org), one can find the requirements for a Soroban SDK.
 
-This assembly script Soroban SDK **can** help you with:
+This Assembly Script Soroban SDK **can** help you with:
 - Value Conversions
 - Host functions
 - SDK Types
@@ -211,23 +208,17 @@ if(isError(rawVal) && getErrorType(rawVal) == errorTypeContract) {
 
 See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
 
-### Environment meta generation
-
-Contracts must contain a WASM custom section with name `contractenvmetav0` and containing a serialized `SCEnvMetaEntry`. The interface version stored within should match the version of the host functions supported.
-
-The AssemblyScript Soroban SDK simplifies this by providing the possibility to enter the interface version number in the `contract.json` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
-
-### Contract meta generation
-Contracts may also optionally contain a Wasm custom section with name `contractmetav0` and containing a serialized `SCMetaEntry`. Contracts may store any metadata in the entries that can be used by applications and tooling off-network.
-
-The AssemblyScript Soroban SDK simplifies this by providing the possibility to add meta entries in the `contract.json` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
-
 
 ### Contract spec generation
 
 Contracts should contain a WASM custom section with name `contractspecv0` and containing a serialized stream of `SCSpecEntry`. There should be a `SCSpecEntry` for every function, struct, and union exported by the contract.
 
 The AS Soroban SDK simplifies this by providing the possibility to enter the functions spec in the `contract.json` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
+
+### Contract meta generation
+Contracts may optionally contain a Wasm custom section with name `contractmetav0` and containing a serialized `SCMetaEntry`. Contracts may store any metadata in the entries that can be used by applications and tooling off-network.
+
+The AssemblyScript Soroban SDK simplifies this by providing the possibility to add meta entries in the `contract.json` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
 
 
 ### User Defined Types
@@ -330,7 +321,7 @@ They need to be attached to the `.wasm` module. Therefore we need the `contract.
 
 The SDK parses the `contract.json` file when compiling the contract and converts it to the needed data structures to be added to the `.wasm` module. This is done by using an AssemblyScript transform (see: [transforms.mjs](https://github.com/Soneso/as-soroban-sdk/blob/main/transforms.mjs)). 
 
-Required fields are `host_functions_version` and the `functions` array in a `contract.json` file located in the root directory of your assembly script project. 
+Required field is the `functions` array in a `contract.json` file located in the root directory of your assembly script project. 
 
 Additionally one can also provide optional contract metadata with the `meta` array.
 
@@ -338,7 +329,6 @@ Example:
 
 ```json
 {
-    "host_functions_version": 85899345971,
     "functions": [
         {
             "name" : "hello",
@@ -363,18 +353,7 @@ Example:
 }
 ```
 
-To find out the needed `host_functions_version` you can execute the `soroban version` command of the soroban-cli. The interface version stored within should match the version of the host functions supported.
-
-``` shell
-$ soroban version
-```
-output at the time of writing:
-
-``` shell
-soroban-env interface version 85899345971
-```
-
-Additionally you must define the contract spec for each function exported by your contract. In the upper example there is only one function named `hello`.
+You must define the contract spec for each function exported by your contract. In the upper example there is only one function named `hello`.
 You must define the name, the arguments and the return value of the function, so that the host environment can execute it.
 
 ```json
@@ -393,7 +372,7 @@ Supported argument types are currently: `val` (any type of host value), `u32`, `
 
 Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static raw value. You can obtain it by using ```val.fromVoid()```. For this case you should set ```"returns" : "void"``` or remove `"returns"` in the contract.json.
 
-See also [Environment Meta Generation](https://soroban.stellar.org/docs/reference/sdks/build-your-own-sdk#environment-meta-generation),  [Contract Spec Generation](https://soroban.stellar.org/docs/reference/sdks/build-your-own-sdk#contract-spec-generation) and [Contract Meta Generation](https://soroban.stellar.org/docs/reference/sdks/build-your-own-sdk#contract-meta-generation)
+See also [Contract Spec Generation](https://soroban.stellar.org/docs/reference/sdks/build-your-own-sdk#contract-spec-generation) and [Contract Meta Generation](https://soroban.stellar.org/docs/reference/sdks/build-your-own-sdk#contract-meta-generation)
 
 In addition to `functions`, for more advanced use cases, one can optionally define udt: `structs`, `errors`, `enums` and `unions`. For example:
 
@@ -443,7 +422,6 @@ You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-
 | [token example](https://github.com/Soneso/as-soroban-examples/tree/main/token)| Demonstrates how to write a token contract that implements the Stellar [token interface](https://soroban.stellar.org/docs/reference/interfaces/token-interface).|
 | [atomic swap example](https://github.com/Soneso/as-soroban-examples/tree/main/atomic-swap)| Swaps two tokens between two authorized parties atomically while following the limits they set. This example demonstrates advanced usage of Soroban auth framework and assumes the reader is familiar with the auth example and with Soroban token usage.|
 | [timelock example](https://github.com/Soneso/as-soroban-examples/tree/main/timelock)| Demonstrates how to write a timelock and implements a greatly simplified claimable balance similar to the claimable balance feature available on Stellar.|
-| [multi swap example](https://github.com/Soneso/as-soroban-examples/tree/main/multi_swap)| This example demonstrates how authorized calls can be batched together. It swaps a pair of tokens between the two groups of users that authorized the swap operation from the atomic swap example.|
 | [single offer sale example](https://github.com/Soneso/as-soroban-examples/tree/main/single_offer)| The single offer sale example demonstrates how to write a contract that allows a seller to set up an offer to sell token A for token B to multiple buyers.|
 | [liquidity pool example](https://github.com/Soneso/as-soroban-examples/tree/main/liquidity_pool)| Demonstrates how to write a constant product liquidity pool contract.|
 | [custom account example](https://github.com/Soneso/as-soroban-examples/tree/main/custom_account)| This example is an advanced auth example which demonstrates how to implement a simple account contract that supports multisig and customizable authorization policies.|

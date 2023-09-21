@@ -1,13 +1,13 @@
 import { vec_append, vec_back, vec_binary_search, vec_del, vec_first_index_of, vec_front,
      vec_get, vec_insert, vec_last_index_of, vec_len, vec_new, vec_new_from_linear_memory, vec_pop_back,
      vec_pop_front, vec_push_back, vec_push_front, vec_put, vec_slice, vec_unpack_to_linear_memory } from "./env";
-import { VecObject, RawVal, fromVoid, fromU32, toU32} from "./value";
+import { VecObject, RawVal, fromU32, toU32} from "./value";
 
 export class Vec {
     obj: VecObject;
 
     /// Constructs from a given VecObject, otherwise creates an empty new vec.
-    constructor(obj:VecObject = vec_new(fromVoid())) {
+    constructor(obj:VecObject = vec_new()) {
       this.obj = obj;
     }
 
@@ -17,15 +17,6 @@ export class Vec {
      */
     getHostObject(): VecObject {
         return this.obj;
-    }
-
-    /**
-     * Creates a new vector with the given capacity.
-     * @param capacity capacity of the Vector
-     * @returns the new Vector.
-     */
-    static newWithCapacity(capacity: u32) : Vec {
-        return new Vec(vec_new(fromU32(capacity)));
     }
  
     /**

@@ -55,7 +55,7 @@ export function increment(): val.U32Val {
   }
   counter += 1;
   let counterObj = val.fromU32(counter);
-  ledger.putDataFor(key, counterObj, val.storageTypePersistent, val.fromU32(0));
+  ledger.putDataFor(key, counterObj, val.storageTypePersistent);
   return counterObj;
 }
 
@@ -135,7 +135,7 @@ export function auth(user: val.AddressObject): val.MapObject {
   }
   counter += 1;
   let counterVal = val.fromU32(counter);
-  ledger.putData(key, counterVal, val.storageTypePersistent, val.fromU32(0));
+  ledger.putData(key, counterVal, val.storageTypePersistent);
 
   let map = new Map();
   map.put(key, counterVal);
@@ -158,7 +158,7 @@ export function authArgs(user: val.AddressObject, value: val.RawVal): val.MapObj
   }
   counter += val.toU32(value);
   let counterVal = val.fromU32(counter);
-  ledger.putData(key, counterVal, val.storageTypePersistent, val.fromU32(0));
+  ledger.putData(key, counterVal, val.storageTypePersistent);
 
   let map = new Map();
   map.put(key, counterVal);

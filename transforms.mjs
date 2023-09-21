@@ -7,7 +7,8 @@ const META_NAME = "contractmetav0";
 const SPEC_NAME = "contractspecv0";
 const CONTRACT_JSON = "./contract.json";
 const SDK_VERSION_META_KEY = "assdkver" 
-const SDK_VERSION = "0.2.4";
+const SDK_VERSION = "0.2.5";
+const HOST_FUNCTIONS_VERSION = 0;
 
 
 export class SdkTransform extends Transform {
@@ -32,9 +33,9 @@ export class SdkTransform extends Transform {
     // Contracts must contain a WASM custom section with name contractenvmetav0 and containing a serialized SCEnvMetaEntry. 
     // The interface version stored within should match the version of the host functions supported.
 
-    let envMeta = xdr.ScEnvMetaEntry.scEnvMetaKindInterfaceVersion(new xdr.Uint64(contractData.host_functions_version));
+    let envMeta = xdr.ScEnvMetaEntry.scEnvMetaKindInterfaceVersion(new xdr.Uint64(HOST_FUNCTIONS_VERSION));
     asModule.addCustomSection(META_ENV_NAME, envMeta.toXDR());
-    console.log('host function version: ', contractData.host_functions_version);
+    // console.log('host function version: ', HOST_FUNCTIONS_VERSION);
 
     //Contracts should contain a WASM custom section with name contractspecv0 and containing a serialized stream of SCSpecEntry. 
     //There should be a SCSpecEntry for every function, struct, and union exported by the contract.

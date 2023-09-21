@@ -1,5 +1,5 @@
-import { map_del, map_get, map_has, map_keys, map_len, map_max_key, map_min_key, map_new, 
-    map_new_from_linear_memory, map_next_key, map_prev_key, map_put, 
+import { map_del, map_get, map_has, map_keys, map_len, map_key_by_pos, map_new, 
+    map_new_from_linear_memory, map_val_by_pos, map_put, 
     map_unpack_to_linear_memory, map_values } from "./env";
 import { RawVal, MapObject, toU32, toBool, fromU32 } from "./value";
 import { Vec } from "./vec";
@@ -67,41 +67,12 @@ export class Map {
     }
 
     /**
-     * Given a key, finds the first key lower than itself in the map's sorted order.
-     * If such a key does not exist, returns an SCStatus containing the error code (TBD).
-     * @param key the key to search for (type: RawVal)
-     * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
+     * Get the key from a map at position `i`. If `i` is an invalid position, return ScError.
+     * @param i position
+     * @returns the key if found, otherwise an error
      */
-    getPrevKey(key: RawVal) : RawVal {
-        return map_prev_key(this.obj, key);
-    }
-
-    /**
-     * Given a key, finds the first key greater than itself in the map's sorted order.
-     * If such a key does not exist, returns an SCStatus containing the error code (TBD).
-     * @param key the key to search for (type: RawVal)
-     * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
-     */
-    getNextKey(key: RawVal) : RawVal {
-        return map_next_key(this.obj, key);
-    }
-
-    /**
-     * Finds the minimum key from this map.
-     * If the map is empty, returns an SCStatus containing the error code (TBD).
-     * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
-     */
-    getMinKey() : RawVal {
-        return map_min_key(this.obj);
-    }
-
-    /**
-     * Finds the maximum key from this map.
-     * If the map is empty, returns an SCStatus containing the error code (TBD).
-     * @returns the key if found, otherwise an error of SCStatus (type: RawVal)
-     */
-    getMaxKey() : RawVal {
-        return map_max_key(this.obj);
+    getKeyByPos(i:u32) : RawVal {
+        return map_key_by_pos(this.obj, fromU32(i));
     }
 
     /**
@@ -120,6 +91,15 @@ export class Map {
      */
     values() : Vec {
         return new Vec(map_values(this.obj));
+    }
+
+    /**
+     * Get the value from a map at position `i`. If `i` is an invalid position, return ScError.
+     * @param i position
+     * @returns the value if found, otherwise an error
+     */
+    getValueByPos(i:u32) : RawVal {
+        return map_val_by_pos(this.obj, fromU32(i));
     }
 
     /**

@@ -14,7 +14,6 @@ import { RawVal, BytesObject, VecObject, ErrorVal, AddressObject, U32Val, VoidVa
 // @ts-ignore
 @external("x", "_")
 export declare function log_from_linear_memory(msg_pos: U32Val, msg_len: U32Val, vals_pos: U32Val, vals_len: U32Val): VoidVal;
-// declare function host_log_value(v: RawVal): VoidVal; - removed
 
 // Get the address object of the contract which invoked the running contract. 
 // Traps if the running contract was not invoked by a contract.
@@ -79,6 +78,10 @@ export declare function get_ledger_network_id(): BytesObject;
 @external("x", "9")
 export declare function get_current_contract_address(): AddressObject;
 
+/// Returns the max ledger sequence that an entry can live to (inclusive).
+// @ts-ignore
+@external("x", "a")
+export declare function get_max_expiration_ledger(): U32Val;
 
 /******************
  * INT *
@@ -107,192 +110,192 @@ export declare function obj_to_i64(ojb:I64Object): i64;
 
 /// Convert the high and low 64-bit words of a u128 to an object containing a u128.
 // @ts-ignore
-@external("i", "5")
+@external("i", "3")
 export declare function obj_from_u128_pieces(hi:u64, lo:u64): U128Object;
 
 /// Extract the low 64 bits from an object containing a u128.
 // @ts-ignore
-@external("i", "6")
+@external("i", "4")
 export declare function obj_to_u128_lo64(obj:U128Object): u64;
 
 /// Extract the high 64 bits from an object containing a u128.
 // @ts-ignore
-@external("i", "7")
+@external("i", "5")
 export declare function obj_to_u128_hi64(obj:U128Object): u64;
 
 /// Convert the high and low 64-bit words of an i128 to an object containing an i128.
 // @ts-ignore
-@external("i", "8")
+@external("i", "6")
 export declare function obj_from_i128_pieces(hi:i64, lo:u64): I128Object;
 
 /// Extract the low 64 bits from an object containing an i128.
 // @ts-ignore
-@external("i", "9")
+@external("i", "7")
 export declare function obj_to_i128_lo64(obj:I128Object): u64;
 
 /// Extract the high 64 bits from an object containing an i128.
 // @ts-ignore
-@external("i", "a")
+@external("i", "8")
 export declare function obj_to_i128_hi64(obj:I128Object): i64;
 
 /// Convert the four 64-bit words of an u256 (big-endian) to an object containing an u256.
 // @ts-ignore
-@external("i", "b")
+@external("i", "9")
 export declare function obj_from_u256_pieces(hi_hi:u64, hi_lo:u64, lo_hi:u64, lo_lo:u64): U256Object;
 
 /// Create a U256 `Val` from its representation as a byte array in big endian.
 // @ts-ignore
-@external("i", "c")
+@external("i", "a")
 export declare function u256_val_from_be_bytes(bytes:BytesObject): U256Val;
 
 /// Return the memory representation of this U256 `Val` as a byte array in big endian byte order.
 // @ts-ignore
-@external("i", "d")
+@external("i", "b")
 export declare function u256_val_to_be_bytes(val:U256Val): BytesObject;
 
 /// Extract the highest 64-bits (bits 192-255) from an object containing an u256.
 // @ts-ignore
-@external("i", "e")
+@external("i", "c")
 export declare function obj_to_u256_hi_hi(obj:U256Object): u64;
 
 /// Extract bits 128-191 from an object containing an u256.
 // @ts-ignore
-@external("i", "f")
+@external("i", "d")
 export declare function obj_to_u256_hi_lo(obj:U256Object): u64;
 
 /// Extract bits 64-127 from an object containing an u256.
 // @ts-ignore
-@external("i", "g")
+@external("i", "e")
 export declare function obj_to_u256_lo_hi(obj:U256Object): u64;
 
 /// Extract the lowest 64-bits (bits 0-63) from an object containing an u256.
 // @ts-ignore
-@external("i", "h")
+@external("i", "f")
 export declare function obj_to_u256_lo_lo(obj:U256Object): u64;
 
 /// Convert the four 64-bit words of an i256 (big-endian) to an object containing an i256.
 // @ts-ignore
-@external("i", "i")
+@external("i", "g")
 export declare function obj_from_i256_pieces(hi_hi:i64, hi_lo:u64, lo_hi:u64, lo_lo:u64): I256Object;
 
 /// Create a I256 `Val` from its representation as a byte array in big endian.
 // @ts-ignore
-@external("i", "j")
+@external("i", "h")
 export declare function i256_val_from_be_bytes(bytes:BytesObject): I256Val;
 
 /// Return the memory representation of this I256 `Val` as a byte array in big endian byte order.
 // @ts-ignore
-@external("i", "k")
+@external("i", "i")
 export declare function i256_val_to_be_bytes(val:I256Val): BytesObject;
 
 /// Extract the highest 64-bits (bits 192-255) from an object containing an u256.
 // @ts-ignore
-@external("i", "l")
+@external("i", "j")
 export declare function obj_to_i256_hi_hi(obj:U256Object): i64;
 
 /// Extract bits 128-191 from an object containing an u256.
 // @ts-ignore
-@external("i", "m")
+@external("i", "k")
 export declare function obj_to_i256_hi_lo(obj:U256Object): u64;
 
 /// Extract bits 64-127 from an object containing an u256.
 // @ts-ignore
-@external("i", "n")
+@external("i", "l")
 export declare function obj_to_i256_lo_hi(obj:U256Object): u64;
 
 /// Extract the lowest 64-bits (bits 0-63) from an object containing an u256.
 // @ts-ignore
-@external("i", "o")
+@external("i", "m")
 export declare function obj_to_i256_lo_lo(obj:U256Object): u64;
 
 /// Performs checked integer addition. Computes `lhs + rhs`, returning `ScError` if overflow occurred.
 // @ts-ignore
-@external("i", "p")
+@external("i", "n")
 export declare function u256_add(lhs:U256Val, rhs: U256Val): U256Val;
 
 /// Performs checked integer subtraction. Computes `lhs - rhs`, returning `ScError` if overflow occurred.
 // @ts-ignore
-@external("i", "q")
+@external("i", "o")
 export declare function u256_sub(lhs:U256Val, rhs: U256Val): U256Val;
 
 /// Performs checked integer multiplication. Computes `lhs * rhs`, returning `ScError` if overflow occurred. 
 // @ts-ignore
-@external("i", "r")
+@external("i", "p")
 export declare function u256_mul(lhs:U256Val, rhs: U256Val): U256Val;
 
 /// Performs checked integer division. Computes `lhs / rhs`, returning `ScError` if `rhs == 0` or overflow occurred. 
 // @ts-ignore
-@external("i", "s")
+@external("i", "q")
 export declare function u256_div(lhs:U256Val, rhs: U256Val): U256Val;
 
 /// Performs checked exponentiation. Computes `lhs.exp(rhs)`, returning `ScError` if overflow occurred. 
 // @ts-ignore
-@external("i", "t")
+@external("i", "r")
 export declare function u256_pow(lhs:U256Val, rhs: U256Val): U256Val;
 
 /// Performs checked shift left. Computes `lhs << rhs`, returning `ScError` if `rhs` is larger than or equal to the number of bits in `lhs`.
 // @ts-ignore
-@external("i", "u")
+@external("i", "s")
 export declare function u256_shl(lhs:U256Val, rhs: U256Val): U256Val;
 
 /// Performs checked shift right. Computes `lhs >> rhs`, returning `ScError` if `rhs` is larger than or equal to the number of bits in `lhs`.
 // @ts-ignore
-@external("i", "v")
+@external("i", "t")
 export declare function u256_shr(lhs:U256Val, rhs: U256Val): U256Val;
 
 /// Performs checked integer addition. Computes `lhs + rhs`, returning `ScError` if overflow occurred.
 // @ts-ignore
-@external("i", "w")
+@external("i", "u")
 export declare function i256_add(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked integer subtraction. Computes `lhs - rhs`, returning `ScError` if overflow occurred. 
 // @ts-ignore
-@external("i", "x")
+@external("i", "v")
 export declare function i256_sub(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked integer multiplication. Computes `lhs * rhs`, returning `ScError` if overflow occurred. 
 // @ts-ignore
-@external("i", "y")
+@external("i", "w")
 export declare function i256_mul(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked integer division. Computes `lhs / rhs`, returning `ScError` if `rhs == 0` or overflow occurred. 
 // @ts-ignore
-@external("i", "z")
+@external("i", "x")
 export declare function i256_div(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked exponentiation. Computes `lhs.exp(rhs)`, returning `ScError` if overflow occurred.
 // @ts-ignore
-@external("i", "A")
+@external("i", "y")
 export declare function i256_pow(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked shift left. Computes `lhs << rhs`, returning `ScError` if `rhs` is larger than or equal to the number of bits in `lhs`.
 // @ts-ignore
-@external("i", "B")
+@external("i", "z")
 export declare function i256_shl(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked shift right. Computes `lhs >> rhs`, returning `ScError` if `rhs` is larger than or equal to the number of bits in `lhs`.
 // @ts-ignore
-@external("i", "C")
+@external("i", "A")
 export declare function i256_shr(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Convert a `u64` to a `Timepoint` object.
 // @ts-ignore
-@external("i", "D")
+@external("i", "B")
 export declare function timepoint_obj_from_u64(v:u64): TimepointObject;
 
 /// Convert a `Timepoint` object to a `u64`.
 // @ts-ignore
-@external("i", "E")
+@external("i", "C")
 export declare function timepoint_obj_to_u64(obj:TimepointObject): u64;
 
 /// Convert a `u64` to a `Duration` object.
 // @ts-ignore
-@external("i", "F")
+@external("i", "D")
 export declare function duration_obj_from_u64(v:u64): DurationObject;
 
 /// Convert a `Duration` object a `u64`.
 // @ts-ignore
-@external("i", "F")
+@external("i", "E")
 export declare function duration_obj_to_u64(obj:DurationObject): u64;
 
 
@@ -331,50 +334,36 @@ export declare function map_len(m:MapObject): U32Val;
 @external("m", "4")
 export declare function map_has(m:MapObject, k:RawVal): BoolVal;
 
-/// Given a key, find the first key less than itself in the map's sorted order.
-/// If such a key does not exist, return an SCStatus containing the error code (TBD).
+/// Get the key from a map at position `i`. If `i` is an invalid position, return ScError.
 // @ts-ignore
 @external("m", "5")
-export declare function map_prev_key(m:MapObject, k:RawVal): RawVal;
+export declare function map_key_by_pos(m:MapObject, i:U32Val): RawVal;
 
-/// Given a key, find the first key greater than itself in the map's sorted order.
-/// If such a key does not exist, return an SCStatus containing the error code (TBD).
+/// Get the value from a map at position `i`. If `i` is an invalid position, return ScError.
 // @ts-ignore
 @external("m", "6")
-export declare function map_next_key(m:MapObject, k:RawVal): RawVal;
-
-/// Find the minimum key from a map.
-/// If the map is empty, return an SCStatus containing the error code (TBD).
-// @ts-ignore
-@external("m", "7")
-export declare function map_min_key(m:MapObject): RawVal;
-
-/// Find the maximum key from a map.
-/// If the map is empty, return an SCStatus containing the error code (TBD).
-// @ts-ignore
-@external("m", "8")
-export declare function map_max_key(m:MapObject): RawVal;
+export declare function map_val_by_pos(m:MapObject, i:U32Val): RawVal;
 
 /// Return a new vector containing all the keys in a map.
 /// The new vector is ordered in the original map's key-sorted order.
 // @ts-ignore
-@external("m", "9")
+@external("m", "7")
 export declare function map_keys(m:MapObject): VecObject;
 
 /// Return a new vector containing all the values in a map.
 /// The new vector is ordered in the original map's key-sorted order.
 // @ts-ignore
-@external("m", "A")
+@external("m", "8")
 export declare function map_values(m:MapObject): VecObject;
 
 /// Return a new map initialized from a set of input slices given by linear-memory addresses and lengths.
 // @ts-ignore
-@external("m", "B")
+@external("m", "9")
 export declare function map_new_from_linear_memory(keys_pos: U32Val, vals_pos :U32Val, len: U32Val): MapObject;
 
 /// Copy the RawVal values of a map, as described by set of input keys, into an array at a given linear-memory address.
 // @ts-ignore
-@external("m", "C")
+@external("m", "a")
 export declare function map_unpack_to_linear_memory(map: MapObject, keys_pos: U32Val, vals_pos: U32Val, len: U32Val): VoidVal;
 
 
@@ -382,12 +371,10 @@ export declare function map_unpack_to_linear_memory(map: MapObject, keys_pos: U3
  * VEC *
  ******************/
 
-/// Creates a new vector with an optional capacity hint `c`.
-/// If `c` is `ScStatic::Void`, no hint is assumed and the new vector is empty.
-/// Otherwise, `c` is parsed as an `u32` that represents the initial capacity of the new vector.
+/// Creates an empty new vector.
 // @ts-ignore
 @external("v", "_")
-export declare function vec_new(c: RawVal): VecObject;
+export declare function vec_new(): VecObject;
 
 /// Update the value at index `i` in the vector. Return the new vector.
 /// Trap if the index is out of bounds.
@@ -446,32 +433,31 @@ export declare function vec_back(v: VecObject): RawVal;
 /// Inserts an element at index `i` within the vector, shifting all elements after it to the right.
 /// Traps if the index is out of bound
 // @ts-ignore
-@external("v", "A")
+@external("v", "a")
 export declare function vec_insert(v: VecObject, i: U32Val, x: RawVal): VecObject;
 
 /// Clone the vector `v1`, then moves all the elements of vector `v2` into it.
 /// Return the new vector. Traps if number of elements in the vector overflows a u32.
 // @ts-ignore
-@external("v", "B")
+@external("v", "b")
 export declare function vec_append(v1: VecObject, v2: VecObject): VecObject;
 
 /// Copy the elements from `start` index until `end` index, exclusive, in the vector and create a new vector from it.
 /// Return the new vector. Traps if the index is out of bound.
 // @ts-ignore
-@external("v", "C")
+@external("v", "c")
 export declare function vec_slice(v: VecObject, start: U32Val, end: U32Val): VecObject;
-
 
 /// Get the index of the first occurrence of a given element in the vector.
 /// Returns the u32 index of the value if it's there. Otherwise, it returns `ScStatic::Void`.
 // @ts-ignore
-@external("v", "D")
+@external("v", "d")
 export declare function vec_first_index_of(v: VecObject, x: RawVal): RawVal;
 
 /// Get the index of the last occurrence of a given element in the vector.
 /// Returns the u32 index of the value if it's there. Otherwise, it returns `ScStatic::Void`.
 // @ts-ignore
-@external("v", "E")
+@external("v", "e")
 export declare function vec_last_index_of(v: VecObject, x:RawVal): RawVal;
 
 /// Binary search a sorted vector for a given element.
@@ -481,17 +467,17 @@ export declare function vec_last_index_of(v: VecObject, x:RawVal): RawVal;
 /// contain the u32 index at which the element would need to be inserted into the vector to
 /// maintain sorted order.
 // @ts-ignore
-@external("v", "F")
+@external("v", "f")
 export declare function vec_binary_search(v: VecObject, x: RawVal): u64;
 
 /// Return a new vec initialized from an input slice of RawVals given by a linear-memory address and length.
 // @ts-ignore
-@external("v", "G")
+@external("v", "g")
 export declare function vec_new_from_linear_memory(vals_pos: U32Val, len: U32Val): VecObject;
 
 /// Copy the RawVals of a vec into an array at a given linear-memory address.
 // @ts-ignore
-@external("v", "H")
+@external("v", "h")
 export declare function vec_unpack_to_linear_memory(vec: VecObject, vals_pos: U32Val, len: U32Val): VoidVal;
 
 
@@ -505,7 +491,7 @@ export declare function vec_unpack_to_linear_memory(vec: VecObject, vals_pos: U3
 /// be set to the passed in value.
 // @ts-ignore
 @external("l", "_")
-export declare function put_contract_data(k:RawVal, v:RawVal, t:StorageType, f:RawVal): VoidVal;
+export declare function put_contract_data(k:RawVal, v:RawVal, t:StorageType): VoidVal;
 
 // @ts-ignore
 @external("l", "0")
@@ -526,7 +512,6 @@ export declare function del_contract_data(k:RawVal, t:StorageType): VoidVal;
 // @ts-ignore
 @external("l", "3")
 export declare function create_contract(deployer:AddressObject, wasm_hash: BytesObject, salt:BytesObject): AddressObject;
-//declare function create_contract_from_contract(wasm_hash:BytesObject, salt:BytesObject): BytesObject;
 
 /// Creates the instance of Stellar Asset contract corresponding to the provided asset. 
 /// `serialized_asset` is `stellar::Asset` XDR serialized to bytes format. 
@@ -549,29 +534,36 @@ export declare function upload_wasm(wasm:BytesObject): BytesObject;
 @external("l", "6")
 export declare function update_current_contract_wasm(hash:BytesObject): VoidVal;
 
-/// Bumps the expiration ledger of the key specified so the entry will live for `min` ledgers from now. 
-/// If the current expiration ledger is already large enough to live at least `min` more ledgers, then nothing happens.
+/// If the entry expiration is below `low_expiration_watermark` ledgers from the current ledger (inclusive), 
+/// then bump the expiration to be `high_expiration_watermark` from the current ledger (inclusive)"
 // @ts-ignore
 @external("l", "7")
-export declare function bump_contract_data(k:RawVal, t:StorageType, min: U32Val): VoidVal;
+export declare function bump_contract_data(k:RawVal, t:StorageType, low_expiration_watermark: U32Val, high_expiration_watermark:U32Val): VoidVal;
 
-/// Bumps the expiration ledger the current contract instance and code (if applicable), 
-/// so they will live for `min` ledgers from now. If the current expiration ledger is already 
-/// large enough (>= last closed ledger + `min` more ledgers), it is untouched.
+/// If expiration for the current contract instance and code (if applicable) is below `low_expiration_watermark` 
+/// ledgers from the current ledger (inclusive), then bump the expiration to be `high_expiration_watermark` 
+/// from the current ledger (inclusive)
 // @ts-ignore
 @external("l", "8")
-export declare function bump_current_contract_instance_and_code(min: U32Val): VoidVal;
+export declare function bump_current_contract_instance_and_code(low_expiration_watermark: U32Val, high_expiration_watermark:U32Val): VoidVal;
+
+/// If expiration of the provided contract instance and code (if applicable) is below `low_expiration_watermark` 
+/// ledgers from the current ledger (inclusive), then bump the expiration to be `high_expiration_watermark` 
+/// from the current ledger (inclusive)
+// @ts-ignore
+@external("l", "9")
+export declare function bump_contract_instance_and_code(contract:AddressObject, low_expiration_watermark: U32Val, high_expiration_watermark:U32Val): VoidVal;
 
 /// Get the id of a contract without creating it. `deployer` is address of the contract deployer. 
 /// `salt` is used to create a unique contract id. Returns the address of the would-be contract.
 // @ts-ignore
-@external("l", "9")
+@external("l", "a")
 export declare function get_contract_id(deployer: AddressObject, salt: BytesObject): AddressObject;
 
 /// Get the id of the Stellar Asset contract corresponding to the provided asset without creating the instance. 
 /// `serialized_asset` is `stellar::Asset` XDR serialized to bytes format. Returns the address of the would-be asset contract.
 // @ts-ignore
-@external("l", "10")
+@external("l", "b")
 export declare function get_asset_contract_id(serialized_asset: BytesObject): AddressObject;
 
 /******************
@@ -662,35 +654,35 @@ export declare function bytes_push(v:BytesObject, u:RawVal): BytesObject;
 /// Removes the last element from the `Bytes` object and returns the new `Bytes`.
 /// Traps if original `Bytes` is empty.
 // @ts-ignore
-@external("b", "A")
+@external("b", "a")
 export declare function bytes_pop(b:BytesObject): BytesObject;
 
 /// Return the first element in the `Bytes` object. Traps if the `Bytes` is empty
 // @ts-ignore
-@external("b", "B")
+@external("b", "b")
 export declare function bytes_front(b:BytesObject): U32Val;
 
 /// Return the last element in the `Bytes` object. Traps if the `Bytes` is empty
 // @ts-ignore
-@external("b", "C")
+@external("b", "c")
 export declare function bytes_back(v:BytesObject): U32Val;
 
 /// Inserts an element at index `i` within the `Bytes` object, shifting all elements after it to the right.
 /// Traps if the index is out of bound
 // @ts-ignore
-@external("b", "D")
+@external("b", "d")
 export declare function bytes_insert(v:BytesObject, i:U32Val, u:U32Val): BytesObject;
 
 /// Clone the `Bytes` object `b1`, then moves all the elements of `Bytes` object `b2` into it.
 /// Return the new `Bytes`. Traps if its length overflows a u32.
 // @ts-ignore
-@external("b", "E")
+@external("b", "e")
 export declare function bytes_append(b1:BytesObject, b2:BytesObject): BytesObject;
 
 /// Copies the elements from `start` index until `end` index, exclusive, in the `Bytes` object and creates a new `Bytes` from it.
 /// Returns the new `Bytes`. Traps if the index is out of bound.
 // @ts-ignore
-@external("b", "F")
+@external("b", "f")
 export declare function bytes_slice(b:BytesObject, start:U32Val, end:U32Val): BytesObject;
 
 /********
@@ -776,23 +768,23 @@ export declare function authorize_as_curr_contract(auth_entires: VecObject): Voi
 /// Copies a slice of bytes from a `Symbol` object specified at offset `s_pos` with length `len` into the linear memory at position `lm_pos`. 
 /// Traps if either the `Symbol` object or the linear memory doesn't have enough bytes.
 // @ts-ignore
-@external("b", "H")
+@external("b", "h")
 export declare function symbol_copy_to_linear_memory(s:SymbolObject, s_pos:U32Val, lm_pos:U32Val, len:U32Val): VoidVal;
 
 /// Constructs a new `Symbol` object initialized with bytes copied from a linear memory slice specified at position `lm_pos` with length `len`.
 // @ts-ignore
-@external("b", "J")
+@external("b", "j")
 export declare function symbol_new_from_linear_memory(lm_pos:U32Val, len:U32Val): SymbolObject;
 
 
 /// Returns length of the `Symbol` object.
 // @ts-ignore
-@external("b", "L")
+@external("b", "l")
 export declare function symbol_len(s:SymbolObject): U32Val;
 
 /// Return the index of a Symbol in an array of linear-memory byte-slices, or trap if not found.
 // @ts-ignore
-@external("b", "M")
+@external("b", "m")
 export declare function symbol_index_in_linear_memory(s:SymbolObject, slices_pos: U32Val, len:U32Val): U32Val;
 
 
@@ -803,17 +795,17 @@ export declare function symbol_index_in_linear_memory(s:SymbolObject, slices_pos
 /// Copies a slice of bytes from a `String` object specified at offset `s_pos` with length `len` into the linear memory at position `lm_pos`.
 /// Traps if either the `String` object or the linear memory doesn't have enough bytes.
 // @ts-ignore
-@external("b", "G")
+@external("b", "g")
 export declare function string_copy_to_linear_memory(s:StringObject, s_pos:U32Val, lm_pos:U32Val, len:U32Val): VoidVal;
 
 /// Constructs a new `String` object initialized with bytes copied from a linear memory slice specified at position `lm_pos` with length `len`.
 // @ts-ignore
-@external("b", "I")
+@external("b", "i")
 export declare function string_new_from_linear_memory(lm_pos:U32Val, len:U32Val): StringObject;
 
 /// Returns length of the `String` object.
 // @ts-ignore
-@external("b", "K")
+@external("b", "k")
 export declare function string_len(s:StringObject): U32Val;
 
 /******************
