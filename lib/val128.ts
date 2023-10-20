@@ -532,7 +532,7 @@ var __reshi: u64 = 0;
 // returns lo part of the given i128 host val. Hi part is stored in __hi.
 // trasps if value does not represent an i128 host value (I128Object or I128SmallVal)
 function getI128Parts(value:I128Val) : u64 {
-    var alo:u64 = 0;
+    let alo:u64 = 0;
     if (isI128Small(value)) {
         alo = toI128Small(value);
         __reshi = 0;
@@ -548,7 +548,7 @@ function getI128Parts(value:I128Val) : u64 {
 // returns lo part of the given u128 host val. Hi part is stored in __hi.
 // trasps if value does not represent an u128 host value (U128Object or U128SmallVal)
 function getU128Parts(value:U128Val) : u64 {
-    var alo:u64 = 0;
+    let alo:u64 = 0;
     if (isU128Small(value)) {
         alo = toU128Small(value);
         __reshi = 0;

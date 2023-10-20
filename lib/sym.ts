@@ -1,6 +1,6 @@
 import { Bytes } from "./bytes";
 import { symbol_copy_to_linear_memory, symbol_index_in_linear_memory, symbol_len, symbol_new_from_linear_memory } from "./env";
-import { SymbolObject, U32Val, VoidVal, toU32, fromU32 } from "./value";
+import { SymbolObject, toU32, fromU32 } from "./value";
 
 export class Sym {
     obj: SymbolObject;

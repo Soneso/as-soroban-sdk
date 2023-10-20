@@ -1,9 +1,9 @@
 import * as context from "./context";
-import { obj_from_i128_pieces, obj_from_i256_pieces, obj_from_i64, obj_from_u128_pieces, 
+import { duration_obj_from_u64, duration_obj_to_u64, obj_from_i128_pieces, obj_from_i256_pieces, obj_from_i64, obj_from_u128_pieces, 
   obj_from_u256_pieces, obj_from_u64, obj_to_i128_hi64, obj_to_i128_lo64, obj_to_i256_hi_hi, 
   obj_to_i256_hi_lo, obj_to_i256_lo_hi, obj_to_i256_lo_lo, obj_to_i64, obj_to_u128_hi64, 
   obj_to_u128_lo64, obj_to_u256_hi_hi, obj_to_u256_hi_lo, obj_to_u256_lo_hi, 
-  obj_to_u256_lo_lo, obj_to_u64 } from "./env";
+  obj_to_u256_lo_lo, obj_to_u64, timepoint_obj_from_u64, timepoint_obj_to_u64 } from "./env";
 
 export type RawVal = u64;
 
@@ -330,7 +330,7 @@ export function toU32(v: U32Val): u32 {
   if (!isU32(v)) {
     context.fail();
   }
-  return getMajor(v) as u32;
+  return getMajor(v);
 }
 
 /**
@@ -363,7 +363,7 @@ export function toI32(v: I32Val): i32 {
   if(!isI32(v)) {
     context.fail();
   }
-  return getMajor(v) as i32;
+  return getMajor(v);
 }
 
 /**
@@ -396,7 +396,7 @@ export function toU64Small(v: U64SmallVal): u64 {
   if(!isU64Small(v)) {
     context.fail();
   }
-  return getBody(v) as u64;
+  return getBody(v);
 }
 
 /**
@@ -459,9 +459,6 @@ export function isTimepointSmall(val: RawVal): bool {
  * @returns the extracted u64.
  */
 export function toTimepointSmall(v: TimepointSmallVal): u64 {
-  if(!isTimepointSmall(v)) {
-    context.fail();
-  }
   return getBody(v);
 }
 
@@ -492,9 +489,6 @@ export function isDurationSmall(val: RawVal): bool {
  * @returns the extracted u64.
  */
 export function toDurationSmall(v: DurationSmallVal): u64 {
-  if(!isDurationSmall(v)) {
-    context.fail();
-  }
   return getBody(v);
 }
 
@@ -528,7 +522,7 @@ export function toU128Small(v: U128SmallVal): u64 {
   if(!isU128Small(v)) {
     context.fail();
   }
-  return getBody(v) as u64;
+  return getBody(v);
 }
 
 /**
@@ -594,7 +588,7 @@ export function toU256Small(v: U256SmallVal): u64 {
   if(!isU256Small(v)) {
     context.fail();
   }
-  return getBody(v) as u64;
+  return getBody(v);
 }
 
 /**
@@ -660,14 +654,14 @@ export function fromSmallSymbolStr(str: string) : SmallSymbolVal {
     context.fail();
   }
 
-  var accum: u64 = 0;
+  let accum: u64 = 0;
   let codeBits:u8 = 6;
-  for (var i=0; i < str.length; i++) {
+  for (let i = 0; i < str.length; i++) {
     let charcode = str.charCodeAt(i);
     if (charcode >= 48 && charcode <= 122){
       let cu8 = charcode as u8;
       accum <<= codeBits;
-      var v:u64 = 0;
+      let v:u64 = 0;
       if (cu8 == 95) { // "_"
         v = 1;
       } else if (cu8 >= 48 && cu8 <= 57) { // 0..9
@@ -697,11 +691,11 @@ export function smallSymbolToString(symbol: SmallSymbolVal) : string {
     if (!isSmallSymbol(symbol)) {
       context.fail();
     }
-    var result:string = "";
+    let result:string = "";
     let codeBits:u8 = 6;
-    var val:u64 = 0;
-    var body = getBody(symbol);
-    for (var i=0; i < 10; i++) {
+    let val:u64 = 0;
+    let body = getBody(symbol);
+    for (let i = 0; i < 10; i++) {
       val = body & 63;
       body = body >> codeBits;
       if (val == 1) {
@@ -753,7 +747,7 @@ export function fromLedgerKeyContractCode(): LedgerKeyContractExecutableVal {
  */
 export function isObject(val: RawVal): bool {
   let tag = getTagU8(val);
-  return tag > (rawValTagObjectCodeLowerBound as u8) && tag < (rawValTagObjectCodeUpperBound as u8);
+  return tag > rawValTagObjectCodeLowerBound && tag < rawValTagObjectCodeUpperBound;
 }
 
 /**
@@ -806,9 +800,6 @@ export function fromU64(val: u64) : U64Object {
  * @returns the extracted unsigned 64-bit integer.
  */
 export function toU64(val: U64Object) : u64 {
-    if(!isU64(val)){
-      context.fail();
-    }
     return obj_to_u64(val);
 }
 
@@ -839,9 +830,6 @@ export function fromI64(v:i64) : I64Object {
  * @returns the extracted signed 64-bit integer.
  */
 export function toI64(val: I64Object) : i64 {
-  if(!isI64(val)){
-    context.fail();
-  }
   return obj_to_i64(val);
 }
 
@@ -858,6 +846,25 @@ export function isTimepoint(val: RawVal) : bool {
   return hasTag(val, rawValTagTimepointObject);
 }
 
+/**
+ * Extracts the timepoint (u64) from a host value that represents a timepoint object.
+ * Traps if the host value doese not represent a timepoint object. To avoid, you can check it with isTimepoint().
+ * @param obj the host value (TimepointObject) to extract the u64 from
+ * @returns the extracted u64.
+ */
+export function toTimepoint(obj: TimepointObject): u64 {
+  return timepoint_obj_to_u64(obj);
+}
+
+/**
+ * Creates a host value that represents a timepoint object.
+ * @param t the timepoint (u64) to be represented by the timepoint object
+ * @returns the created host value (Type: TimepointObject)
+ */
+export function fromTimepoint(t: u64): TimepointObject {
+  return timepoint_obj_from_u64(t);
+}
+
 /// DurationObject refers to a host-side [i64] number encoding a
 /// duration (a count of seconds).
 
@@ -868,6 +875,25 @@ export function isTimepoint(val: RawVal) : bool {
  */
 export function isDuration(val: RawVal) : bool {
   return hasTag(val, rawValTagDurationObject);
+}
+
+/**
+ * Extracts the duration (u64) from a host value that represents a duration object.
+ * Traps if the host value doese not represent a duration object. To avoid, you can check it with isDuration().
+ * @param obj the host value to extract the u64 from
+ * @returns the extracted u64.
+ */
+export function toDuration(obj: DurationObject): u64 {
+  return duration_obj_to_u64(obj);
+}
+
+/**
+ * Creates a host value that represents a duration object.
+ * @param d the duration (u64) to be represented by the duration object
+ * @returns the created host value (Type: DurationObject)
+ */
+export function fromDuration(d: u64): DurationObject {
+  return duration_obj_from_u64(d);
 }
 
 // U128
@@ -908,9 +934,6 @@ export function fromU128Pieces(hi:u64, lo: u64) : U128Object {
  * @returns the extracted unsigned low 64 bits integer.
  */
 export function toU128Low64(val: U128Object) : u64 {
-    if(!isU128Object(val)){
-      context.fail();
-    }
     return obj_to_u128_lo64(val);
 }
 
@@ -921,9 +944,6 @@ export function toU128Low64(val: U128Object) : u64 {
  * @returns the extracted unsigned high 64 bits integer.
  */
 export function toU128High64(val: U128Object) : u64 {
-  if(!isU128Object(val)){
-    context.fail();
-  }
   return obj_to_u128_hi64(val);
 }
 
@@ -965,9 +985,6 @@ export function fromI128Pieces(hi:i64, lo: u64) : I128Object {
  * @returns the extracted unsigned low 64 bits integer.
  */
 export function toI128Low64(val: I128Object) : u64 {
-    if(!isI128Object(val)){
-      context.fail();
-    }
     return obj_to_i128_lo64(val);
 }
 
@@ -978,9 +995,6 @@ export function toI128Low64(val: I128Object) : u64 {
  * @returns the extracted high 64 bits integer.
  */
 export function toI128High64(val: I128Object) : i64 {
-  if(!isI128Object(val)){
-    context.fail();
-  }
   return obj_to_i128_hi64(val);
 }
 
@@ -1025,9 +1039,6 @@ export function fromU256Pieces(hi_hi: u64, hi_lo:u64, lo_hi: u64, lo_lo:u64, ) :
  * @returns the extracted unsigned 64 bits integer.
  */
 export function toU256HiHi(val: U256Object) : u64 {
-  if(!isU256Object(val)){
-    context.fail();
-  }
   return obj_to_u256_hi_hi(val)
 }
 
@@ -1038,9 +1049,6 @@ export function toU256HiHi(val: U256Object) : u64 {
  * @returns the extracted unsigned 64 bits integer.
  */
 export function toU256HiLo(val: U256Object) : u64 {
-  if(!isU256Object(val)){
-    context.fail();
-  }
   return obj_to_u256_hi_lo(val)
 }
 
@@ -1051,9 +1059,6 @@ export function toU256HiLo(val: U256Object) : u64 {
  * @returns the extracted unsigned 64 bits integer.
  */
 export function toU256LoHi(val: U256Object) : u64 {
-  if(!isU256Object(val)){
-    context.fail();
-  }
   return obj_to_u256_lo_hi(val)
 }
 
@@ -1064,9 +1069,6 @@ export function toU256LoHi(val: U256Object) : u64 {
  * @returns the extracted unsigned 64 bits integer.
  */
 export function toU256LoLo(val: U256Object) : u64 {
-  if(!isU256Object(val)){
-    context.fail();
-  }
   return obj_to_u256_lo_lo(val)
 }
 
@@ -1110,9 +1112,6 @@ export function fromI256Pieces(hi_hi: i64, hi_lo:u64, lo_hi: u64, lo_lo:u64, ) :
  * @returns the extracted signed 64 bits integer.
  */
 export function toI256HiHi(val: I256Object) : i64 {
-  if(!isI256Object(val)){
-    context.fail();
-  }
   return obj_to_i256_hi_hi(val)
 }
 
@@ -1123,9 +1122,6 @@ export function toI256HiHi(val: I256Object) : i64 {
  * @returns the extracted unsigned 64 bits integer.
  */
 export function toI256HiLo(val: U256Object) : u64 {
-  if(!isI256Object(val)){
-    context.fail();
-  }
   return obj_to_i256_hi_lo(val)
 }
 
@@ -1136,9 +1132,6 @@ export function toI256HiLo(val: U256Object) : u64 {
  * @returns the extracted unsigned 64 bits integer.
  */
 export function toI256LoHi(val: I256Object) : u64 {
-  if(!isI256Object(val)){
-    context.fail();
-  }
   return obj_to_i256_lo_hi(val)
 }
 
@@ -1149,9 +1142,6 @@ export function toI256LoHi(val: I256Object) : u64 {
  * @returns the extracted unsigned 64 bits integer.
  */
 export function toI256LoLo(val: U256Object) : u64 {
-  if(!isI256Object(val)){
-    context.fail();
-  }
   return obj_to_i256_lo_lo(val)
 }
 

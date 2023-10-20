@@ -25,7 +25,7 @@ export class Bytes {
      */
     static fromString(str: string) : Bytes {
         let result = new Bytes();
-        for (var i=0; i < str.length; i++) {
+        for (let i=0; i < str.length; i++) {
           result.push(str.charCodeAt(i));
         }
         return result;
@@ -43,8 +43,8 @@ export class Bytes {
         if (len == 32) {
             return result;
         }
-        var fill = 32 - len;
-        var filled = new Bytes();
+        let fill = 32 - len;
+        let filled = new Bytes();
         while(fill > 0) {
             filled.push(0);
             fill -= 1;
@@ -65,8 +65,8 @@ export class Bytes {
         if (len == 32) {
             return result;
         }
-        var fill = 32 - len;
-        var filled = new Bytes();
+        let fill = 32 - len;
+        let filled = new Bytes();
         while(fill > 0) {
             filled.push(0);
             fill -= 1;
@@ -83,11 +83,11 @@ export class Bytes {
     static fromHexString(hex: string) : Bytes {
         let result = new Bytes();
         let length =  hex.length;
-        for (var i = 0; i < (length / 2); i++) {
+        for (let i = 0; i < (length / 2); i++) {
             let temp_high = Bytes.charToInt(hex.charCodeAt(i*2));
             let temp_low = Bytes.charToInt(hex.charCodeAt(i*2+1));
             let app = Bytes.appendNumbers(temp_high, temp_low);
-            result.push(app as u32);
+            result.push(app);
         }
         return result;
     }
@@ -271,7 +271,7 @@ export class Bytes {
 
     static appendNumbers(higherNibble:i32, lowerNibble:i32) : i32
     {
-        var myNumber = higherNibble << 4;
+        let myNumber = higherNibble << 4;
         myNumber |= lowerNibble;
         return myNumber;
         // Example: higherNibble = 0x0A, lowerNibble = 0x03;  -> myNumber 0 0xA3

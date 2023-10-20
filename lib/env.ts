@@ -33,17 +33,17 @@ export declare function obj_cmp(a: RawVal, b: RawVal): i64;
 @external("x", "2")
 export declare function contract_event(topics: VecObject, data: RawVal): VoidVal;
 
-/// Return the protocol version of the current ledger as a u32.
+/// Return the protocol version of the current ledger as a U32Val.
 // @ts-ignore
 @external("x", "3")
 export declare function get_ledger_version(): U32Val;
 
-/// Return the sequence number of the current ledger as a u32.
+/// Return the sequence number of the current ledger as a U32Val.
 // @ts-ignore
 @external("x", "4")
 export declare function get_ledger_sequence(): U32Val;
 
-/// Return the timestamp number of the current ledger as a u64.
+/// Return the timestamp number of the current ledger as a U64Val.
 // @ts-ignore
 @external("x", "5")
 export declare function get_ledger_timestamp(): U64Val;

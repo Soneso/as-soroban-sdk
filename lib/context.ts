@@ -1,8 +1,8 @@
 import { Bytes } from "./bytes";
 import { contract_event, fail_with_error, get_current_call_stack, get_current_contract_address, 
     get_invoking_contract, get_ledger_network_id, get_ledger_sequence, get_ledger_timestamp, 
-    get_ledger_version, log_from_linear_memory, obj_cmp, vec_unpack_to_linear_memory } from "./env";
-import { RawVal, BytesObject, VecObject, toU32, toU64, ErrorVal, contractError, 
+    get_ledger_version, get_max_expiration_ledger, log_from_linear_memory, obj_cmp, vec_unpack_to_linear_memory } from "./env";
+import { RawVal, toU32, toU64, ErrorVal, contractError, 
     fromSmallSymbolStr, AddressObject, isU64Small, toU64Small, fromU32} from "./value";
 import { Vec } from "./vec";
 
@@ -104,6 +104,18 @@ export function getLedgerSequence(): u32 {
     return toU32(get_ledger_sequence());
 }
 
+/**
+ * Returns the max ledger sequence that an entry can live to (inclusive).
+ * @returns the max ledger sequence that an entry can live to as u32
+ */
+export function getMaxExpirationLedger(): u32 {
+    return toU32(get_max_expiration_ledger());
+}
+
+/**
+ * Return the timestamp number of the current ledger as a u64.
+ * @returns the timestamp number of the current ledger as a u64.
+ */
 export function getLedgerTimestamp(): u64 {
     let tmp = get_ledger_timestamp();
     if (isU64Small(tmp)) {
@@ -114,10 +126,10 @@ export function getLedgerTimestamp(): u64 {
 
 /**
  * Return the network id (sha256 hash of network passphrase) of the current ledger as `Bytes`. The value is always 32 bytes in length.
- * @returns Return the network id of the current ledger as `Bytes` (type:  BytesObject)
+ * @returns Return the network id of the current ledger as `Bytes`
  */
-export function getLedgerNetworkId(): BytesObject {
-    return get_ledger_network_id();
+export function getLedgerNetworkId(): Bytes {
+    return new Bytes(get_ledger_network_id());
 }
 
 /**
@@ -125,10 +137,10 @@ export function getLedgerNetworkId(): BytesObject {
  * to the current one as a vector of vectors, where the inside
  * vector contains the contract id as Hash, and a function as
  * a Symbol.
- * @returns the full call stack (type: VecObject)
+ * @returns the full call stack
  */
-export function getCurrentCallStack(): VecObject {
-    return get_current_call_stack();
+export function getCurrentCallStack(): Vec {
+    return new Vec(get_current_call_stack());
 }
 
 /**
