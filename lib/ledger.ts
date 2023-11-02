@@ -1,6 +1,7 @@
-import { create_asset_contract, create_contract, del_contract_data, get_contract_data, has_contract_data, 
+import { Bytes } from "./bytes";
+import { bump_contract_data, bump_contract_instance_and_code, bump_current_contract_instance_and_code, create_asset_contract, create_contract, del_contract_data, get_asset_contract_id, get_contract_data, get_contract_id, has_contract_data, 
     put_contract_data, update_current_contract_wasm, upload_wasm } from "./env";
-import { RawVal, toBool, fromSmallSymbolStr, BytesObject, StorageType, AddressObject} from "./value";
+import { RawVal, toBool, fromSmallSymbolStr, StorageType, AddressObject, fromU32} from "./value";
 
 /**
  * Checks if the ledger stores contract data for the given small symbol string key.
@@ -97,12 +98,12 @@ export function hasData(key: RawVal, storageType:StorageType): bool {
  * i.e. this calls `deployer.require_auth` with respective arguments. `wasm_hash` must be a hash of the contract code 
  * that has already been uploaded on this network. `salt` is used to create a unique contract id. Returns the address of the created contract.
  * @param deployer AddressObject deployer.
- * @param wasmHash BytesObject containing the wasm hash of the installed contract to be deployed.
- * @param salt BytesObject containing the salt needed for the new contractID
+ * @param wasmHash bytes containing the wasm hash of the installed contract to be deployed.
+ * @param salt bytes containing the salt needed for the new contractID
  * @returns the address of the created contract.
  */
-export function deployContract(deployer: AddressObject, wasmHash: BytesObject, salt:BytesObject) : AddressObject {
-    return create_contract(deployer, wasmHash, salt);
+export function deployContract(deployer: AddressObject, wasmHash: Bytes, salt:Bytes) : AddressObject {
+    return create_contract(deployer, wasmHash.getHostObject(), salt.getHostObject());
 }
 
 /**
@@ -110,8 +111,8 @@ export function deployContract(deployer: AddressObject, wasmHash: BytesObject, s
  * @param serializedAsset `stellar::Asset` XDR serialized to bytes format
  * @returns the address of the created contract.
  */
-export function createAssetContract(serializedAsset: BytesObject) : AddressObject {
-    return create_asset_contract(serializedAsset);
+export function createAssetContract(serializedAsset: Bytes) : AddressObject {
+    return create_asset_contract(serializedAsset.getHostObject());
 }
 
 /**
@@ -120,8 +121,9 @@ export function createAssetContract(serializedAsset: BytesObject) : AddressObjec
  * @param wasm bytecode
  * @returns wasm hash (wasm id - SHA-256 hash)
  */
-export function uploadWasm(wasm: BytesObject) : BytesObject {
-    return upload_wasm(wasm);
+export function uploadWasm(wasm: Bytes) : Bytes {
+    let res = upload_wasm(wasm.getHostObject())
+    return new Bytes(res);
 }
 
 
@@ -130,9 +132,65 @@ export function uploadWasm(wasm: BytesObject) : BytesObject {
  * Wasm entry corresponding to the hash has to already be present in the ledger. 
  * The update happens only after the current contract invocation has successfully finished, 
  * so this can be safely called in the middle of a function.
- * @param wasmHash BytesObject containing the new wasm hash.
+ * @param wasmHash Bytes containing the new wasm hash.
  * @returns void.
  */
-export function updateCurrentContractWasm(wasmHash: BytesObject) : void {
-    update_current_contract_wasm(wasmHash);
+export function updateCurrentContractWasm(wasmHash: Bytes) : void {
+    update_current_contract_wasm(wasmHash.getHostObject());
+}
+
+/**
+ * If the entry expiration is below `lowExpirationWatermark` ledgers from the current ledger (inclusive), 
+ * then bump the expiration to be `highExpirationWatermark` from the current ledger (inclusive)"
+ * @param k 
+ * @param t 
+ * @param lowExpirationWatermark 
+ * @param highExpirationWatermark 
+ */
+export function bumpContractData(k: RawVal, t:StorageType, lowExpirationWatermark:u32, highExpirationWatermark:u32) : void {
+    bump_contract_data(k,t,fromU32(lowExpirationWatermark), fromU32(highExpirationWatermark));
+}
+
+/**
+ * If expiration for the current contract instance and code (if applicable) is below `lowExpirationWatermark` 
+ * ledgers from the current ledger (inclusive), then bump the expiration to be `highExpirationWatermark` 
+ * from the current ledger (inclusive)
+ * @param lowExpirationWatermark 
+ * @param highExpirationWatermark 
+ */
+export function bumpCurrentContractInstanceAndCode(lowExpirationWatermark:u32, highExpirationWatermark:u32) : void {
+    bump_current_contract_instance_and_code(fromU32(lowExpirationWatermark), fromU32(highExpirationWatermark));
+}
+
+/**
+ * If expiration of the provided contract instance and code (if applicable) is below `lowExpirationWatermark` 
+ * ledgers from the current ledger (inclusive), then bump the expiration to be `high_expiration_watermark` 
+ * from the current ledger (inclusive)
+ * @param contract AddressObject of the contract
+ * @param lowExpirationWatermark 
+ * @param highExpirationWatermark 
+ */
+export function bumpContractInstanceAndCode(contract:AddressObject, lowExpirationWatermark:u32, highExpirationWatermark:u32) : void {
+    bump_contract_instance_and_code(contract, fromU32(lowExpirationWatermark), fromU32(highExpirationWatermark));
+}
+
+/**
+ * Get the id of a contract without creating it. `deployer` is address of the contract deployer. 
+ * `salt` is used to create a unique contract id. Returns the address of the would-be contract.
+ * @param deployer address of the contract deployer
+ * @param salt salt bytes
+ * @returns the address of the would-be contract
+ */
+export function getContractId(deployer:AddressObject, salt:Bytes) : AddressObject {
+    return get_contract_id(deployer, salt.getHostObject());
+}
+
+/**
+ * Get the id of the Stellar Asset contract corresponding to the provided asset without creating the instance. 
+ * `serializedAsset` is `stellar::Asset` XDR serialized to bytes format. Returns the address of the would-be asset contract.
+ * @param serializedAsset `stellar::Asset` XDR serialized to bytes format
+ * @returns the address of the would-be contract
+ */
+export function getAssetContractId(serializedAsset:Bytes) : AddressObject {
+    return get_asset_contract_id(serializedAsset.getHostObject());
 }

@@ -49,7 +49,7 @@ export declare function get_ledger_sequence(): U32Val;
 export declare function get_ledger_timestamp(): U64Val;
 
 /// Returns the full call stack from the first contract call
-/// to the current one as a vector of vectors, where the inside
+/// to the current one as a vector (VecObject) of vectors, where the inside
 /// vector contains the contract id as Hash, and a function as
 /// a Symbol.
 // @ts-ignore
