@@ -1,7 +1,7 @@
 import { Bytes } from "./bytes";
 import { bump_contract_data, bump_contract_instance_and_code, bump_current_contract_instance_and_code, create_asset_contract, create_contract, del_contract_data, get_asset_contract_id, get_contract_data, get_contract_id, has_contract_data, 
     put_contract_data, update_current_contract_wasm, upload_wasm } from "./env";
-import { RawVal, toBool, fromSmallSymbolStr, StorageType, AddressObject, fromU32} from "./value";
+import { Val, toBool, fromSmallSymbolStr, StorageType, AddressObject, fromU32} from "./value";
 
 /**
  * Checks if the ledger stores contract data for the given small symbol string key.
@@ -20,7 +20,7 @@ export function hasDataFor(smallSymbolKey: string, storageType:StorageType): boo
  * @param storageType StorageType
  * @returns true if the ledger has data for the given key
  */
-export function hasData(key: RawVal, storageType:StorageType): bool {
+export function hasData(key: Val, storageType:StorageType): bool {
     return toBool(has_contract_data(key, storageType));
 }
 
@@ -33,7 +33,7 @@ export function hasData(key: RawVal, storageType:StorageType): bool {
  * and none will be set if this is a new entry. Otherwise, `flags` is a `U32Val`. If the value is 0, then all flags are cleared. 
  * If it's not 0, then flags will be set to the passed in value.
  */
- export function putDataFor(smallSymbolKey: string, value: RawVal, storageType: StorageType) : void {
+ export function putDataFor(smallSymbolKey: string, value: Val, storageType: StorageType) : void {
     let keySymbolVal = fromSmallSymbolStr(smallSymbolKey);
     put_contract_data(keySymbolVal, value, storageType);
 }
@@ -47,7 +47,7 @@ export function hasData(key: RawVal, storageType:StorageType): bool {
  * and none will be set if this is a new entry. Otherwise, `flags` is a `U32Val`. If the value is 0, then all flags are cleared. 
  * If it's not 0, then flags will be set to the passed in value.
  */
- export function putData(key: RawVal, value: RawVal, storageType: StorageType) : void {
+ export function putData(key: Val, value: Val, storageType: StorageType) : void {
     put_contract_data(key, value, storageType);
 }
 
@@ -57,7 +57,7 @@ export function hasData(key: RawVal, storageType:StorageType): bool {
  * @param storageType StorageType
  * @return the found value if any.
  */
- export function getDataFor(smallSymbolKey: string, storageType: StorageType): RawVal {
+ export function getDataFor(smallSymbolKey: string, storageType: StorageType): Val {
     let keySymbolVal = fromSmallSymbolStr(smallSymbolKey);
     return get_contract_data(keySymbolVal, storageType);
 }
@@ -68,7 +68,7 @@ export function hasData(key: RawVal, storageType:StorageType): bool {
  * @param storageType StorageType
  * @return the found value if any.
  */
- export function getData(key: RawVal, storageType: StorageType) : RawVal  {
+ export function getData(key: Val, storageType: StorageType) : Val  {
     return get_contract_data(key, storageType);
 }
 
@@ -87,7 +87,7 @@ export function hasData(key: RawVal, storageType:StorageType): bool {
  * @param key any host value.
  * @param storageType StorageType
  */
- export function delData(key: RawVal, storageType: StorageType): void {
+ export function delData(key: Val, storageType: StorageType): void {
     del_contract_data(key, storageType);
 }
 
@@ -147,7 +147,7 @@ export function updateCurrentContractWasm(wasmHash: Bytes) : void {
  * @param lowExpirationWatermark 
  * @param highExpirationWatermark 
  */
-export function bumpContractData(k: RawVal, t:StorageType, lowExpirationWatermark:u32, highExpirationWatermark:u32) : void {
+export function bumpContractData(k: Val, t:StorageType, lowExpirationWatermark:u32, highExpirationWatermark:u32) : void {
     bump_contract_data(k,t,fromU32(lowExpirationWatermark), fromU32(highExpirationWatermark));
 }
 

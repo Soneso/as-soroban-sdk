@@ -1,7 +1,7 @@
 import { map_del, map_get, map_has, map_keys, map_len, map_key_by_pos, map_new, 
     map_new_from_linear_memory, map_val_by_pos, map_put, 
     map_unpack_to_linear_memory, map_values } from "./env";
-import { RawVal, MapObject, toU32, toBool, fromU32 } from "./value";
+import { Val, MapObject, toU32, toBool, fromU32 } from "./value";
 import { Vec } from "./vec";
 
 export class Map {
@@ -23,29 +23,29 @@ export class Map {
     /**
      * Inserts a key/value mapping into the map (in front)
      * If the map already has a mapping for the given key, the previous value is overwritten.
-     * @param key the key of the key/value mapping (type: RawVal)
-     * @param value the value to put (type: RawVal)
+     * @param key the key of the key/value mapping (type: Val)
+     * @param value the value to put (type: Val)
      * @returns void
      */
-    put(key: RawVal, value: RawVal) : void {
+    put(key: Val, value: Val) : void {
         this.obj = map_put(this.obj, key, value);
     }
 
     /**
      * Get the value for a key from a map. Traps if key is not found.
-     * @param key the key to get the value for (type: RawVal)
-     * @returns the value if key found, otherwise traps (type: RawVal)
+     * @param key the key to get the value for (type: Val)
+     * @returns the value if key found, otherwise traps (type: Val)
      */
-    get(key:RawVal) : RawVal {
+    get(key:Val) : Val {
         return map_get(this.obj, key);
     }
 
     /**
      * Remove a key/value mapping from this map if it exists, traps if doesn't.
-     * @param key the key of the key/value mapping to be removed (type: RawVal)
+     * @param key the key of the key/value mapping to be removed (type: Val)
      * @returns void
      */
-    del(key:RawVal) : void {
+    del(key:Val) : void {
         this.obj = map_del(this.obj, key);
     }
 
@@ -59,10 +59,10 @@ export class Map {
 
     /**
      * Test for the presence of a key in this map. Returns true or false
-     * @param key the key to search for (type: RawVal)
+     * @param key the key to search for (type: Val)
      * @returns true if the key was found, false otherwise
      */
-    has(key: RawVal) : bool {
+    has(key: Val) : bool {
         return toBool(map_has(this.obj, key));
     }
 
@@ -71,7 +71,7 @@ export class Map {
      * @param i position
      * @returns the key if found, otherwise an error
      */
-    getKeyByPos(i:u32) : RawVal {
+    getKeyByPos(i:u32) : Val {
         return map_key_by_pos(this.obj, fromU32(i));
     }
 
@@ -98,7 +98,7 @@ export class Map {
      * @param i position
      * @returns the value if found, otherwise an error
      */
-    getValueByPos(i:u32) : RawVal {
+    getValueByPos(i:u32) : Val {
         return map_val_by_pos(this.obj, fromU32(i));
     }
 
@@ -115,7 +115,7 @@ export class Map {
     }
 
     /**
-     * Copy the RawVal values of this map, as described by set of input keys, into an array at a given linear-memory address.
+     * Copy the Val values of this map, as described by set of input keys, into an array at a given linear-memory address.
      * @param keys_pos address of the keys.
      * @param vals_pos address of the vals.
      * @param len lenght.

@@ -1,7 +1,7 @@
 import { bytes_append, bytes_back, bytes_copy_from_linear_memory, bytes_copy_to_linear_memory, 
     bytes_del, bytes_front, bytes_get, bytes_insert, bytes_len, bytes_new, bytes_new_from_linear_memory, 
     bytes_pop, bytes_push, bytes_put, bytes_slice, deserialize_from_bytes, serialize_to_bytes } from "./env";
-import { BytesObject, RawVal, fromU32, toU32 } from "./value";
+import { BytesObject, Val, fromU32, toU32 } from "./value";
 
 export class Bytes {
     obj: BytesObject;
@@ -93,19 +93,19 @@ export class Bytes {
     }
 
     /**
-     * Creates a new Bytes object by serializing a (SC)RawVal into XDR opaque `Bytes` object.
+     * Creates a new Bytes object by serializing a (SC)Val into XDR opaque `Bytes` object.
      * @param v value to serialize 
      * @returns the new Bytes object
      */
-    static serialize(v:RawVal) : Bytes {
+    static serialize(v:Val) : Bytes {
         return new Bytes(serialize_to_bytes(v));
     }
 
     /**
-     * Deserialize this `Bytes` object to get back the (SC)RawVal.
+     * Deserialize this `Bytes` object to get back the (SC)Val.
      * @returns the deserialized value
      */
-    deserialize(): RawVal {
+    deserialize(): Val {
         return deserialize_from_bytes(this.obj);
     }
 
@@ -148,7 +148,7 @@ export class Bytes {
     /**
      * Update the value at index `i` in the `Bytes` object. 
      * @param i the index to be updated
-     * @param value the value to be updated (Type: RawVal)
+     * @param value the value to be updated
      * @returns void. Traps if the index is out of bound. (e.g. if empty)
      */
     put(i:u32, value: u32) : void {

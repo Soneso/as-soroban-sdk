@@ -1,6 +1,6 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v0.2.5](https://img.shields.io/badge/v0.2.5-yellow.svg)
+![v0.3.0](https://img.shields.io/badge/v0.3.0-yellow.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
@@ -105,6 +105,8 @@ You can also use one of our Stellar SDKs to deploy and invoke contracts:
 - [Stellar Flutter SDK](https://github.com/Soneso/stellar_flutter_sdk/blob/master/soroban.md)
 - [Stellar PHP SDK](https://github.com/Soneso/stellar-php-sdk/blob/main/soroban.md)
 
+The above example implementation can be found [here](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word).
+
 
 ## Features and limitations
 
@@ -122,48 +124,58 @@ This Assembly Script Soroban SDK **can** help you with:
 
 ### Value Conversions
 
-When calling a contract function the host will only pass ```u64``` raw values. The raw values can encode different types of values (e.g. `i32`, `u32`, `symbol`, `timestamp`, `bool` etc.) or ```object handles``` such as references to vectors, maps, bytes, strings that live in the host.
+When calling a contract function the host will only pass so called host values. In the SDK code a host value is simply called `Val`. A host value is a 64-bit integer carrying a bit-packed disjoint union of several cases, each identified by a different tag value (e.g. `i32`, `u32`, `symbol`, `timestamp`, `bool` etc. or ```object handles``` such as references to vectors, maps, bytes, strings that live in the host).
 
-The SDK can encode and decode these values. For example converting primitives like i32:
+You can read more about host values and their types in [CAP-0046](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046-01.md#host-value-type).
+
+The SDK can encode and decode host values. For example converting primitives like i32:
 
 ```typescript
 import * as val from "as-soroban-sdk/lib/value";
 
 // primitives
-let xi32 = val.toI32(rawValue);
-let xRaw = val.fromI32(xi32); 
+let xi32 = val.toI32(hostValue);
+let xHostValue = val.fromI32(xi32); 
 
 // static values
-let isTrue = val.fromBool(rawVal);
-let rawBool = val.toBool(isTrue);
+let isTrue = val.fromBool(hostValue);
+let hostValBool = val.toBool(isTrue);
 
 // objects
-let isVecObj = val.isVec(rawVal); 
-// this rawVal (u64) is a object handle referencing an vector object that lives on the host
+let isVecObj = val.isVec(hostValue); 
+// this hostValue is a object handle referencing a vector object that lives on the host
 
 if (isVecObj) {
-    let myVec = new Vec(rawVal); // init a (SDK Type) Vec from the handle.
+    let myVec = new Vec(hostVal); // init a (SDK Type) Vec from the handle.
     myVec.pushFront(val.fromSmallSymbolStr("Hello"));
-    let rawVecObj = myVec.getHostObject();
+    let hostValVecObj = myVec.getHostObject();
 }
 
 // symbols
-let myRawSymbol = val.fromSmallSymbolStr("Hello");
+let myHostValSymbol = val.fromSmallSymbolStr("Hello");
 
 // etc.
 ```
 
 ### Host functions
 
-The host functions defined in [env.json](https://github.com/stellar/rs-soroban-env/blob/main/soroban-env-common/env.json) are functions callable from within the WASM Guest environment. The SDK makes them available to contracts to call in a wrapped form so that contracts have a nicer interface and less abstraction.
+The host functions defined in [env.json](https://github.com/stellar/rs-soroban-env/blob/main/soroban-env-common/env.json) are functions callable from within the WASM Guest environment (where the contract code runs). The SDK makes them available to contracts to call in two versions. First `directly` as defined by [env.ts](https://github.com/Soneso/as-soroban-sdk/blob/main/lib/env.ts) and second in a `wrapped` version so that contracts have a nicer interface and less abstraction.
 
 For example:
 
+1. Directly:
 ```typescript
-function callContractById(id: string, func: string, args: VecObject): RawVal 
+// see lib/env.ts
+export declare function call(contract: AddressObject, func: Symbol, args: VecObject): Val;
 ```
 
-But one can also access them directly via `env.ts`.
+2. Wrapped:
+```typescript
+// see lib/contract.ts
+function callContractById(id: string, func: string, args: Vec): Val 
+```
+
+Depending on the use case, you can decide which version makes more sense in your contract implementation.
 
 ### SDK Types
 
@@ -178,6 +190,7 @@ vec.pushFront(fromSmallSymbolStr("Hello"));
 vec.pushBack(fromSmallSymbolStr("friend"));
 
 return vec.getHostObject();
+// returns the host value referencing the vector object stored in the host
 ```
 
 or a map:
@@ -191,18 +204,20 @@ myMap.put(vec.getHostObject(), fromTrue());
 return myMap.getHostObject();
 ```
 
-### User Defined Errors
+### Errors
 
-Errors are u32 values that are translated into a Status. This SDK helps you to create and parse such errors. For example:
+Errors are host values that are composed of an error type (such as "contract error" or "storage error") and error code (u32). This SDK helps you to create and parse such errors. For example:
 
 ```typescript
-context.failWithErrorCode(AGE_ERR_CODES.TOO_YOUNG);
+// traps with user defined error of type 
+// "contract error" and error code 12 (u32)
+context.failWithErrorCode(12);
 ```
 
 or 
 ```typescript
-if(isError(rawVal) && getErrorType(rawVal) == errorTypeContract) {
-    return fromU32(getErrorCode(rawVal))
+if(isError(hostVal) && getErrorType(hostVal) == errorTypeContract) {
+    return fromU32(getErrorCode(hostVal))
 }
 ```
 
@@ -213,12 +228,12 @@ See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
 
 Contracts should contain a WASM custom section with name `contractspecv0` and containing a serialized stream of `SCSpecEntry`. There should be a `SCSpecEntry` for every function, struct, and union exported by the contract.
 
-The AS Soroban SDK simplifies this by providing the possibility to enter the functions spec in the `contract.json` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
+The AS Soroban SDK simplifies the generation of the custom section by providing the possibility to enter the functions spec in the `contract.json` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
 
 ### Contract meta generation
 Contracts may optionally contain a Wasm custom section with name `contractmetav0` and containing a serialized `SCMetaEntry`. Contracts may store any metadata in the entries that can be used by applications and tooling off-network.
 
-The AssemblyScript Soroban SDK simplifies this by providing the possibility to add meta entries in the `contract.json` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
+The AssemblyScript Soroban SDK simplifies the generation of the custom section by providing the possibility to add meta entries in the `contract.json` file. See also [Understanding contract metadata](https://github.com/Soneso/as-soroban-sdk#understanding-contract-metadata).
 
 
 ### User Defined Types
@@ -353,8 +368,7 @@ Example:
 }
 ```
 
-You must define the contract spec for each function exported by your contract. In the upper example there is only one function named `hello`.
-You must define the name, the arguments and the return value of the function, so that the host environment can execute it.
+You must define the contract spec for each function exported by your contract. In the upper example there is only one function named `hello`. In addition, you must define the name, the arguments and the return value of the function, so that the host environment can execute it.
 
 ```json
 {
@@ -368,13 +382,13 @@ You must define the name, the arguments and the return value of the function, so
 }
 ```
 
-Supported argument types are currently: `val` (any type of host value), `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `u256`, `i256`,`bool`, `symbol`, `string`, `status`, `bytes`, `val`, `void`, `timepoint`, `duration`, `address`, `option[valueType]`, `result[okType, errorType]`, `vec[elementType]`, `map[keyType, valueType]`, `set[elementType]` ,`bytesN[size]`, `udt(name)`, `tuple(value types separated by ;)`. If your function has no arguments, you can pass an empty array.
+Supported argument types are currently: `val` (any type of host value), `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `u256`, `i256`,`bool`, `symbol`, `string`, `status`, `bytes`, `void`, `timepoint`, `duration`, `address`, `option[valueType]`, `result[okType, errorType]`, `vec[elementType]`, `map[keyType, valueType]`, `set[elementType]` ,`bytesN[size]`, `udt(name)`, `tuple(value types separated by ;)`. If your function has no arguments, you can pass an empty array.
 
 Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static raw value. You can obtain it by using ```val.fromVoid()```. For this case you should set ```"returns" : "void"``` or remove `"returns"` in the contract.json.
 
 See also [Contract Spec Generation](https://soroban.stellar.org/docs/reference/sdks/build-your-own-sdk#contract-spec-generation) and [Contract Meta Generation](https://soroban.stellar.org/docs/reference/sdks/build-your-own-sdk#contract-meta-generation)
 
-In addition to `functions`, for more advanced use cases, one can optionally define udt: `structs`, `errors`, `enums` and `unions`. For example:
+In addition to `functions`, for more advanced use cases, one can optionally define udt (user defined types): `structs`, `errors`, `enums` and `unions`. For example:
 
 ```json
 {
@@ -404,20 +418,23 @@ In addition to `functions`, for more advanced use cases, one can optionally defi
 The generation is implemented in [transform.mjs](https://github.com/Soneso/as-soroban-sdk/blob/main/transforms.mjs).
 
 ## Examples
-You can find examples in our [as-soroban-examples](https://github.com/Soneso/as-soroban-examples) repository:
+
+Instead of a tutorial, we have created a series of contract examples with many explanations. It is recommended that you work through the examples in the order shown here. 
+
+You can find contract examples in our [as-soroban-examples](https://github.com/Soneso/as-soroban-examples) repository. 
 
 | Example | Description |
 | :--- | :--- |
 | [add example](https://github.com/Soneso/as-soroban-examples/tree/main/add)| Demonstrates how to write a simple contract, with a single function that takes two i32 inputs and returns their sum as an output. |
-| [hello word example](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word)| Demonstrates how to write a simple contract, with a single function that takes one input and returns it as an output. |
-| [increment example](https://github.com/Soneso/as-soroban-examples/tree/main/increment)| Demonstrates how to write a simple contract that stores data, with a single function that increments an internal counter and returns the value.| 
+| [hello word example](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word)| demonstrates how to write a simple contract, with a single function that takes an input and returns a vector containing multiple host values. |
+| [increment example](https://github.com/Soneso/as-soroban-examples/tree/main/increment)| Demonstrates how to write a simple contract that stores data, with a single function that increments an internal counter and returns the value. It also shows how to manage contract data lifetimes and how to optimize contracts.|
+| [events example](https://github.com/Soneso/as-soroban-examples/tree/main/contract_events)| Demonstrates how to publish events from a contract.|
+| [errors example](https://github.com/Soneso/as-soroban-examples/tree/main/errors)| Demonstrates how to define and generate errors in a contract that invokers of the contract can understand and handle.|
 | [logging example](https://github.com/Soneso/as-soroban-examples/tree/main/logging)| Demonstrates how to log for the purpose of debugging.|
-| [cross contract call example](https://github.com/Soneso/as-soroban-examples/tree/main/cross_contract)| Demonstrates how to call a contract from another contract.|
 | [auth example](https://github.com/Soneso/as-soroban-examples/tree/main/auth)| Demonstrates how to implement authentication and authorization using the [Soroban Host-managed auth framework](https://soroban.stellar.org/docs/learn/authorization).|
+| [cross contract call example](https://github.com/Soneso/as-soroban-examples/tree/main/cross_contract)| Demonstrates how to call a contract's function from another contract.|
 | [deployer example](https://github.com/Soneso/as-soroban-examples/tree/main/deployer)| Demonstrates how to deploy contracts using a contract.|
 | [upgrading contracts example](https://github.com/Soneso/as-soroban-examples/tree/main/upgradeable_contract)| Demonstrates how to upgrade a wasm contract.|
-| [errors example](https://github.com/Soneso/as-soroban-examples/tree/main/errors)| Demonstrates how to define and generate errors in a contract that invokers of the contract can understand and handle.|
-| [events example](https://github.com/Soneso/as-soroban-examples/tree/main/contract_events)| Demonstrates how to publish events from a contract.|
 | [testing example](https://github.com/Soneso/as-soroban-examples/tree/main/testing)| Shows a simple way to test your contract.|
 | [token example](https://github.com/Soneso/as-soroban-examples/tree/main/token)| Demonstrates how to write a token contract that implements the Stellar [token interface](https://soroban.stellar.org/docs/reference/interfaces/token-interface).|
 | [atomic swap example](https://github.com/Soneso/as-soroban-examples/tree/main/atomic-swap)| Swaps two tokens between two authorized parties atomically while following the limits they set. This example demonstrates advanced usage of Soroban auth framework and assumes the reader is familiar with the auth example and with Soroban token usage.|
@@ -430,9 +447,9 @@ More examples can be found in the [test cases](https://github.com/Soneso/as-soro
 
 ## Using as-bignum for working with big numbers
 
-If you need arithmetic and binary operations for working with big numbers such as {i,u}128 or {i,u}256 then there are some possibilities. On the one hand there will probably be host functions for them starting from soroban preview 10. Furthermore we have implemented a couple of functions into this SDK. But the functions from the SDK are limited, work only for positive {i,u}128 and will probably be removed soon. 
+If you need arithmetic and binary operations for working with big numbers such as {i,u}128 or {i,u}256 then there are some possibilities. On the one hand there are host functions available for working with {i,u}256 (see [env.ts](https://github.com/Soneso/as-soroban-sdk/blob/main/lib/env.ts)). Furthermore we have implemented a couple of functions for working with {i,u}128 into this SDK. But the functions from the SDK are limited, work only for positive {i,u}128 and will probably be removed soon. 
 
-A better option is to use the library [as-bignum](https://github.com/MaxGraey/as-bignum/tree/master). However, it does not work with soroban right away, because some functions throw errors, which leads to an import statement in the compiled wasm code, which in turn is not accepted by the Soroban VM:
+A better option for working with {i,u}128 is to use the library [as-bignum](https://github.com/MaxGraey/as-bignum/tree/master). However, it does not work with soroban right away, because some functions throw errors, which leads to an import statement in the compiled wasm code, which in turn is not accepted by the Soroban VM:
 
 ```
 // wat representation
@@ -472,3 +489,5 @@ function myAbort(
 ): void {//...}
 ```
 By doing so, the import statement will not be added to the wasm code during compilation. And when invoking the contract, no `VmError(Instantiation)` will be thrown while using the `as-bignum` functions.
+
+Another option is of course to implement your own arithmetic functions, for example by porting them from as-bignum and removing the throwing of errors.

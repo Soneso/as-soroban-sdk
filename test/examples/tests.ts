@@ -113,13 +113,13 @@ export function eventTest(): val.BoolVal {
 
 }
 
-export function callctr(): val.RawVal {
+export function callctr(): val.Val {
 
   let args = new Vec();
   args.pushBack(val.fromI32(2));
   args.pushBack(val.fromI32(40));
 
-  return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "add", args.getHostObject());
+  return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "add", args);
 
 }
 
@@ -143,7 +143,7 @@ export function auth(user: val.AddressObject): val.MapObject {
 
 }
 
-export function authArgs(user: val.AddressObject, value: val.RawVal): val.MapObject {
+export function authArgs(user: val.AddressObject, value: val.Val): val.MapObject {
 
   let argsVec = new Vec();
   argsVec.pushFront(value);
@@ -170,6 +170,6 @@ export function callctr2(user: val.AddressObject): val.MapObject {
 
   let args = new Vec();
   args.pushFront(user);
-  return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "auth", args.getHostObject());
+  return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "auth", args);
 
 }

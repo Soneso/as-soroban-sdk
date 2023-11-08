@@ -2,7 +2,7 @@ import { Bytes } from "./bytes";
 import { contract_event, fail_with_error, get_current_call_stack, get_current_contract_address, 
     get_invoking_contract, get_ledger_network_id, get_ledger_sequence, get_ledger_timestamp, 
     get_ledger_version, get_max_expiration_ledger, log_from_linear_memory, obj_cmp, vec_unpack_to_linear_memory } from "./env";
-import { RawVal, toU32, toU64, ErrorVal, contractError, 
+import { Val, toU32, toU64, ErrorVal, contractError, 
     fromSmallSymbolStr, AddressObject, isU64Small, toU64Small, fromU32} from "./value";
 import { Vec } from "./vec";
 
@@ -27,10 +27,22 @@ export function logStr(msg: string): void {
 * If you already have data there, consider using `logFromLinearMemory`.
 * @param value the value to log
 */
-export function logValue(value: RawVal): void {
+export function logValue(value: Val): void {
     let vec = new Vec()
     vec.pushBack(value);
     log("", vec);
+}
+
+/**
+* Emit a diagnostic event containing the given message and value.
+* To do so it copies the message and value to linear memory starting from position 0.
+* If you already have data there, consider using `logFromLinearMemory`.
+* @param value the value to log
+*/
+export function logMgsAndValue(msg: string, value: Val): void {
+    let vec = new Vec()
+    vec.pushBack(value);
+    log(msg, vec);
 }
 
 /**
@@ -41,17 +53,23 @@ export function logValue(value: RawVal): void {
  * @param args The values in the Vector.
  */
 export function log(msg: string, vals: Vec): void {
+
+    // Copy message to linear memory
     let msgBytes = Bytes.fromString(msg);
-    let msgLen = msgBytes.len(); //u32
-    msgBytes.copyToLinearMemory(0, 0, msgLen);
+    let msgLen = msgBytes.len();
+    msgBytes.copyToLinearMemory(0, 0, msgLen); // starts at position 0
+
+    // Copy vals to linear memory
     let valsLen = fromU32(vals.len())
     let valsPos = fromU32(msgLen + 1)
     vec_unpack_to_linear_memory(vals.getHostObject(), valsPos, valsLen);
+
+    // Log from linear memory
     log_from_linear_memory(fromU32(0), fromU32(msgLen), valsPos, valsLen);
 }
 
 /**
- * Emit a diagnostic event containing a message and sequence of `RawVal`s from a Vec.
+ * Emit a diagnostic event containing a message and sequence of `Val`s from a Vec.
  * @param msgPos u32 starting position of message in linear memory
  * @param msgLen u32 length of message in linear memory
  * @param valsPos u32 starting position of the values in linear memory
@@ -84,7 +102,7 @@ export function getInvokingContract(): AddressObject {
  * @param b second obj to compare.
  * @returns result  -1 if a<b, 1 if a>b, or 0 if a==b.
  */
-export function compareObj(a: RawVal, b: RawVal): i64 {
+export function compareObj(a: Val, b: Val): i64 {
     return obj_cmp(a, b);
 }
 
@@ -174,18 +192,18 @@ export function failWithError(error: ErrorVal): void {
  * `topics` is expected to be a `Vec` with length <= 4 that CANNOT contain `Vec`, `Map`, or `Bytes` with length > 32
  * Returns nothing on success, and panics on failure
  * @param topics the vector containing the topics.
- * @param data the data value to publish in the event
+ * @param data the data (host) value to publish in the event
  */
-export function publishEvent(topics: Vec, data: RawVal): void {
+export function publishEvent(topics: Vec, data: Val): void {
     contract_event(topics.getHostObject(), data);
 }
 
 /**
  * Lets the host publish a "simple" contract event that has only one topic given as a small symbol.
  * @param topicSymbol the symbol string to be used as a topic. max 9 characters. [_0-9A-Za-z]
- * @param data data to be published in the event.
+ * @param data data (host value) to be published in the event.
  */
-export function publishSimpleEvent(topicSymbol: string, data: RawVal): void {
+export function publishSimpleEvent(topicSymbol: string, data: Val): void {
     let topic = fromSmallSymbolStr(topicSymbol);
     let topics = new Vec();
     topics.pushBack(topic);

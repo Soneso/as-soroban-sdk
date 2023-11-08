@@ -1,7 +1,7 @@
 import { vec_append, vec_back, vec_binary_search, vec_del, vec_first_index_of, vec_front,
      vec_get, vec_insert, vec_last_index_of, vec_len, vec_new, vec_new_from_linear_memory, vec_pop_back,
      vec_pop_front, vec_push_back, vec_push_front, vec_put, vec_slice, vec_unpack_to_linear_memory } from "./env";
-import { VecObject, RawVal, fromU32, toU32} from "./value";
+import { VecObject, Val, fromU32, toU32} from "./value";
 
 export class Vec {
     obj: VecObject;
@@ -23,10 +23,10 @@ export class Vec {
      * Inserts an element at index `i` within the vector, shifting all elements after it to the right.
      * Traps if the index is out of bound. (e.g. if the vector is empty).
      * @param i the index to insert the element to
-     * @param value the element to insert (Type:RawVal).
+     * @param value the element to insert (Type: Val).
      * @returns void
      */
-     insert(i: u32, value: RawVal) : void {
+     insert(i: u32, value: Val) : void {
         this.obj = vec_insert(this.obj, fromU32(i), value);
     }
 
@@ -50,10 +50,10 @@ export class Vec {
 
     /**
      * Pushes a value to the front of the vector.
-     * @param value the value to push (Type: RawVal)
+     * @param value the value to push (Type: Val)
      * @returns void.
      */
-    pushFront(value: RawVal) : void {
+    pushFront(value: Val) : void {
         this.obj = vec_push_front(this.obj, value);
     }
 
@@ -68,10 +68,10 @@ export class Vec {
 
     /**
      * Appends an element to the back of the vector.
-     * @param value the element to be appended (Type: RawVal)
+     * @param value the element to be appended (Type: Val)
      * @returns void
      */
-    pushBack(value: RawVal) : void {
+    pushBack(value: Val) : void {
         this.obj = vec_push_back(this.obj, value);
     }
 
@@ -86,36 +86,36 @@ export class Vec {
 
     /**
      * Returns the first element in the vector. Traps if the vector is empty.
-     * @returns the first element (Type: RawVal)
+     * @returns the first element (Type: Val)
      */
-    front() : RawVal {
+    front() : Val {
         return vec_front(this.obj);
     }
 
     /**
      * Return the last element in the vector. Traps if the vector is empty.
-     * @returns the last element (Type: RawVal)
+     * @returns the last element (Type: Val)
      */
-    back() : RawVal {
+    back() : Val {
         return vec_back(this.obj);
     }
 
     /**
      * Update the value at index `i` in the vector.
      * @param i the index to be updated
-     * @param value the value to be updated (Type: RawVal)
+     * @param value the value to be updated (Type: Val)
      * @returns void. Traps if there is no value at the given index. Traps if the index is out of bound.
      */
-     put(i:u32, value: RawVal) : void {
+     put(i:u32, value: Val) : void {
         this.obj = vec_put(this.obj, fromU32(i), value);
     }
 
     /**
      * Returns the element at index `i` of the vector. Traps if the index is out of bound.
      * @param i the index
-     * @returns the value (Type: RawVal). Traps if the index is out of bound.
+     * @returns the value (Type: Val). Traps if the index is out of bound.
      */
-    get(i:u32) : RawVal {
+    get(i:u32) : Val {
         return vec_get(this.obj, fromU32(i));
     }
 
@@ -141,19 +141,19 @@ export class Vec {
 
     /**
      * Returns the index of the first occurrence of a given element in the vector.
-     * @param value the value to search for (Type: RawVal)
-     * @returns u32 (as RawVal) index of the value if it's there. Otherwise, it returns `ScStatic::Void` (as RawVal).
+     * @param value the value to search for (Type: Val)
+     * @returns u32 (as Val) index of the value if it's there. Otherwise, it returns `ScStatic::Void` (as Val).
      */
-    getFirstIndexOf(value: RawVal) : RawVal {
+    getFirstIndexOf(value: Val) : Val {
         return vec_first_index_of(this.obj, value);
     }
 
     /**
      * Returns the index of the last occurrence of a given element in the vector.
-     * @param value the value to search for (Type: RawVal)
-     * @returns u32 (as RawVal) index of the value if it's there. Otherwise, it returns `ScStatic::Void` (as RawVal).
+     * @param value the value to search for (Type: Val)
+     * @returns u32 (as Val) index of the value if it's there. Otherwise, it returns `ScStatic::Void` (as Val).
      */
-    getLastIndexOf(value: RawVal) : RawVal {
+    getLastIndexOf(value: Val) : Val {
         return vec_last_index_of(this.obj, value);
     }
 
@@ -164,15 +164,15 @@ export class Vec {
      * If it does not exist, the high-32 bits of the return value is 0x0000 and the low-32 bits
      * contain the u32 index at which the element would need to be inserted into the vector to
      * maintain sorted order.
-     * @param value the value to search for (Type: RawVal)
+     * @param value the value to search for (Type: Val)
      * @returns see description.
      */
-    binarySearch(value: RawVal) : u64 {
+    binarySearch(value: Val) : u64 {
         return vec_binary_search(this.obj, value);
     }
 
     /**
-     * Creates a new vec initialized from an input slice of RawVals given by a linear-memory address and length.
+     * Creates a new vec initialized from an input slice of host values (Val's) given by a linear-memory address and length.
      * @param vals_pos address of the vals.
      * @param len lenght. 
      * @returns the new map.
@@ -183,7 +183,7 @@ export class Vec {
     }
     
     /**
-     * Copy the RawVals of a vec into an array at a given linear-memory address.
+     * Copy the host values (Val's) of a vec into an array at a given linear-memory address.
      * @param vals_pos address of the vals.
      * @param len lenght.
      */

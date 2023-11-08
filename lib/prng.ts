@@ -13,7 +13,7 @@ export function prngReseed(seed:Bytes): void {
 
 /**
  * Construct a new BytesObject of the given length filled with bytes drawn from the frame-local PRNG
- * @param length leght to fill.
+ * @param length length to fill.
  * @returns the created bytes.
  */
 export function prngBytesNew(length:u32): Bytes {

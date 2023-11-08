@@ -1,4 +1,4 @@
-import { RawVal, BytesObject, VecObject, ErrorVal, AddressObject, U32Val, VoidVal, 
+import { Val, BytesObject, VecObject, ErrorVal, AddressObject, U32Val, VoidVal, 
     U64Val, U64Object, I64Object, U128Object, I128Object, U256Object, U256Val, I256Object, 
     I256Val, TimepointObject, DurationObject, MapObject, BoolVal, StorageType, Symbol, SymbolObject, StringObject} from "./value";
 
@@ -25,13 +25,13 @@ export declare function get_invoking_contract(): AddressObject;
 /// Returns -1 if a<b, 1 if a>b, or 0 if a==b.
 // @ts-ignore
 @external("x", "1")
-export declare function obj_cmp(a: RawVal, b: RawVal): i64;
+export declare function obj_cmp(a: Val, b: Val): i64;
 
 /// Records a contract event. `topics` is expected to be a `SCVec` with
 /// length <= 4 that CANNOT contain `Vec`, `Map`, or `Bytes` with length > 32
 // @ts-ignore
 @external("x", "2")
-export declare function contract_event(topics: VecObject, data: RawVal): VoidVal;
+export declare function contract_event(topics: VecObject, data: Val): VoidVal;
 
 /// Return the protocol version of the current ledger as a U32Val.
 // @ts-ignore
@@ -312,17 +312,17 @@ export declare function map_new(): MapObject;
 /// If the map already has a mapping for the given key, the previous value is overwritten.
 // @ts-ignore
 @external("m", "0")
-export declare function map_put(m:MapObject, k:RawVal, v:RawVal): MapObject;
+export declare function map_put(m:MapObject, k:Val, v:Val): MapObject;
 
 /// Get the value for a key from a map. Traps if key is not found.
 // @ts-ignore
 @external("m", "1")
-export declare function map_get(m:MapObject, k:RawVal): RawVal;
+export declare function map_get(m:MapObject, k:Val): Val;
 
 /// Remove a key/value mapping from a map if it exists, traps if doesn't.
 // @ts-ignore
 @external("m", "2")
-export declare function map_del(m:MapObject, k:RawVal): MapObject;
+export declare function map_del(m:MapObject, k:Val): MapObject;
 
 /// Get the size of a map.
 // @ts-ignore
@@ -332,17 +332,17 @@ export declare function map_len(m:MapObject): U32Val;
 /// Test for the presence of a key in a map. Returns BoolVal.
 // @ts-ignore
 @external("m", "4")
-export declare function map_has(m:MapObject, k:RawVal): BoolVal;
+export declare function map_has(m:MapObject, k:Val): BoolVal;
 
 /// Get the key from a map at position `i`. If `i` is an invalid position, return ScError.
 // @ts-ignore
 @external("m", "5")
-export declare function map_key_by_pos(m:MapObject, i:U32Val): RawVal;
+export declare function map_key_by_pos(m:MapObject, i:U32Val): Val;
 
 /// Get the value from a map at position `i`. If `i` is an invalid position, return ScError.
 // @ts-ignore
 @external("m", "6")
-export declare function map_val_by_pos(m:MapObject, i:U32Val): RawVal;
+export declare function map_val_by_pos(m:MapObject, i:U32Val): Val;
 
 /// Return a new vector containing all the keys in a map.
 /// The new vector is ordered in the original map's key-sorted order.
@@ -361,7 +361,7 @@ export declare function map_values(m:MapObject): VecObject;
 @external("m", "9")
 export declare function map_new_from_linear_memory(keys_pos: U32Val, vals_pos :U32Val, len: U32Val): MapObject;
 
-/// Copy the RawVal values of a map, as described by set of input keys, into an array at a given linear-memory address.
+/// Copy the Val values of a map, as described by set of input keys, into an array at a given linear-memory address.
 // @ts-ignore
 @external("m", "a")
 export declare function map_unpack_to_linear_memory(map: MapObject, keys_pos: U32Val, vals_pos: U32Val, len: U32Val): VoidVal;
@@ -380,12 +380,12 @@ export declare function vec_new(): VecObject;
 /// Trap if the index is out of bounds.
 // @ts-ignore
 @external("v", "0")
-export declare function vec_put(v: VecObject, i: U32Val, x: RawVal): VecObject;
+export declare function vec_put(v: VecObject, i: U32Val, x: Val): VecObject;
 
 /// Returns the element at index `i` of the vector. Traps if the index is out of bound.
 // @ts-ignore
 @external("v", "1")
-export declare function vec_get(v: VecObject, i: U32Val): RawVal;
+export declare function vec_get(v: VecObject, i: U32Val): Val;
 
 /// Delete an element in a vector at index `i`, shifting all elements after it to the left.
 /// Return the new vector. Traps if the index is out of bound.
@@ -401,7 +401,7 @@ export declare function vec_len(v: VecObject): U32Val;
 /// Push a value to the front of a vector.
 // @ts-ignore
 @external("v", "4")
-export declare function vec_push_front(v: VecObject, x: RawVal): VecObject;
+export declare function vec_push_front(v: VecObject, x: Val): VecObject;
 
 /// Removes the first element from the vector and returns the new vector.
 /// Traps if original vector is empty.
@@ -412,7 +412,7 @@ export declare function vec_pop_front(v: VecObject): VecObject;
 /// Appends an element to the back of the vector.
 // @ts-ignore
 @external("v", "6")
-export declare function vec_push_back(v: VecObject, x: RawVal): VecObject;
+export declare function vec_push_back(v: VecObject, x: Val): VecObject;
 
 /// Removes the last element from the vector and returns the new vector.
 /// Traps if original vector is empty.
@@ -423,18 +423,18 @@ export declare function vec_pop_back(v: VecObject): VecObject;
 /// Return the first element in the vector. Traps if the vector is empty
 // @ts-ignore
 @external("v", "8")
-export declare function vec_front(v: VecObject): RawVal;
+export declare function vec_front(v: VecObject): Val;
 
 /// Return the last element in the vector. Traps if the vector is empty
 // @ts-ignore
 @external("v", "9")
-export declare function vec_back(v: VecObject): RawVal;
+export declare function vec_back(v: VecObject): Val;
 
 /// Inserts an element at index `i` within the vector, shifting all elements after it to the right.
 /// Traps if the index is out of bound
 // @ts-ignore
 @external("v", "a")
-export declare function vec_insert(v: VecObject, i: U32Val, x: RawVal): VecObject;
+export declare function vec_insert(v: VecObject, i: U32Val, x: Val): VecObject;
 
 /// Clone the vector `v1`, then moves all the elements of vector `v2` into it.
 /// Return the new vector. Traps if number of elements in the vector overflows a u32.
@@ -452,13 +452,13 @@ export declare function vec_slice(v: VecObject, start: U32Val, end: U32Val): Vec
 /// Returns the u32 index of the value if it's there. Otherwise, it returns `ScStatic::Void`.
 // @ts-ignore
 @external("v", "d")
-export declare function vec_first_index_of(v: VecObject, x: RawVal): RawVal;
+export declare function vec_first_index_of(v: VecObject, x: Val): Val;
 
 /// Get the index of the last occurrence of a given element in the vector.
 /// Returns the u32 index of the value if it's there. Otherwise, it returns `ScStatic::Void`.
 // @ts-ignore
 @external("v", "e")
-export declare function vec_last_index_of(v: VecObject, x:RawVal): RawVal;
+export declare function vec_last_index_of(v: VecObject, x:Val): Val;
 
 /// Binary search a sorted vector for a given element.
 /// If it exists, the high-32 bits of the return value is 0x0001 and the low-32 bits
@@ -468,14 +468,14 @@ export declare function vec_last_index_of(v: VecObject, x:RawVal): RawVal;
 /// maintain sorted order.
 // @ts-ignore
 @external("v", "f")
-export declare function vec_binary_search(v: VecObject, x: RawVal): u64;
+export declare function vec_binary_search(v: VecObject, x: Val): u64;
 
-/// Return a new vec initialized from an input slice of RawVals given by a linear-memory address and length.
+/// Return a new vec initialized from an input slice of Vals given by a linear-memory address and length.
 // @ts-ignore
 @external("v", "g")
 export declare function vec_new_from_linear_memory(vals_pos: U32Val, len: U32Val): VecObject;
 
-/// Copy the RawVals of a vec into an array at a given linear-memory address.
+/// Copy the Vals of a vec into an array at a given linear-memory address.
 // @ts-ignore
 @external("v", "h")
 export declare function vec_unpack_to_linear_memory(vec: VecObject, vals_pos: U32Val, len: U32Val): VoidVal;
@@ -491,19 +491,19 @@ export declare function vec_unpack_to_linear_memory(vec: VecObject, vals_pos: U3
 /// be set to the passed in value.
 // @ts-ignore
 @external("l", "_")
-export declare function put_contract_data(k:RawVal, v:RawVal, t:StorageType): VoidVal;
+export declare function put_contract_data(k:Val, v:Val, t:StorageType): VoidVal;
 
 // @ts-ignore
 @external("l", "0")
-export declare function has_contract_data(k:RawVal, t:StorageType): BoolVal;
+export declare function has_contract_data(k:Val, t:StorageType): BoolVal;
 
 // @ts-ignore
 @external("l", "1")
-export declare function get_contract_data(k:RawVal, t:StorageType): RawVal;
+export declare function get_contract_data(k:Val, t:StorageType): Val;
 
 // @ts-ignore
 @external("l", "2")
-export declare function del_contract_data(k:RawVal, t:StorageType): VoidVal;
+export declare function del_contract_data(k:Val, t:StorageType): VoidVal;
 
 /// Creates the contract instance on behalf of `deployer`. 
 /// `deployer` must authorize this call via Soroban auth framework, i.e. this calls `deployer.require_auth` with respective arguments. 
@@ -538,7 +538,7 @@ export declare function update_current_contract_wasm(hash:BytesObject): VoidVal;
 /// then bump the expiration to be `high_expiration_watermark` from the current ledger (inclusive)"
 // @ts-ignore
 @external("l", "7")
-export declare function bump_contract_data(k:RawVal, t:StorageType, low_expiration_watermark: U32Val, high_expiration_watermark:U32Val): VoidVal;
+export declare function bump_contract_data(k:Val, t:StorageType, low_expiration_watermark: U32Val, high_expiration_watermark:U32Val): VoidVal;
 
 /// If expiration for the current contract instance and code (if applicable) is below `low_expiration_watermark` 
 /// ledgers from the current ledger (inclusive), then bump the expiration to be `high_expiration_watermark` 
@@ -574,14 +574,14 @@ export declare function get_asset_contract_id(serialized_asset: BytesObject): Ad
 /// If the call is successful, forwards the result of the called function. Traps otherwise.
 // @ts-ignore
 @external("d", "_")
-export declare function call(contract: AddressObject, func: Symbol, args: VecObject): RawVal;
+export declare function call(contract: AddressObject, func: Symbol, args: VecObject): Val;
 
 /// Calls a function in another contract with arguments contained in vector `args`. Returns:
 /// - if successful, result of the called function.
 /// - otherwise, an `ScError` if the called function failed.
 // @ts-ignore
 @external("d", "0")
-export declare function try_call(contract: AddressObject, func: Symbol, args: VecObject): RawVal;
+export declare function try_call(contract: AddressObject, func: Symbol, args: VecObject): Val;
 
 
 
@@ -592,19 +592,19 @@ export declare function try_call(contract: AddressObject, func: Symbol, args: Ve
 /// Serializes an (SC)Val into XDR opaque `Bytes` object.
 // @ts-ignore
 @external("b", "_")
-export declare function serialize_to_bytes(v:RawVal): BytesObject;
+export declare function serialize_to_bytes(v:Val): BytesObject;
 
 /// Deserialize a `Bytes` object to get back the (SC)Val.
 // @ts-ignore
 @external("b", "0")
-export declare function deserialize_from_bytes(b:BytesObject): RawVal;
+export declare function deserialize_from_bytes(b:BytesObject): Val;
 
 /// Copies a slice of bytes from a `Bytes` object specified at offset `b_pos` with
 /// length `len` into the linear memory at position `lm_pos`.
 /// Traps if either the `Bytes` object or the linear memory doesn't have enough bytes.
 // @ts-ignore
 @external("b", "1")
-export declare function bytes_copy_to_linear_memory(b:BytesObject, b_pos:U32Val, lm_pos:U32Val, len:U32Val): RawVal;
+export declare function bytes_copy_to_linear_memory(b:BytesObject, b_pos:U32Val, lm_pos:U32Val, len:U32Val): Val;
 
 /// Copies a segment of the linear memory specified at position `lm_pos` with
 /// length `len`, into a `Bytes` object at offset `b_pos`. The `Bytes` object may
@@ -649,7 +649,7 @@ export declare function bytes_len(v:BytesObject): U32Val;
 /// Appends an element to the back of the `Bytes` object.
 // @ts-ignore
 @external("b", "9")
-export declare function bytes_push(v:BytesObject, u:RawVal): BytesObject;
+export declare function bytes_push(v:BytesObject, u:Val): BytesObject;
 
 /// Removes the last element from the `Bytes` object and returns the new `Bytes`.
 /// Traps if original `Bytes` is empty.
@@ -724,7 +724,7 @@ export declare function require_auth_for_args(address: AddressObject, args:VecOb
 /// Traps if the invocation hasn't been authorized.
 // @ts-ignore
 @external("a", "0")
-export declare function require_auth(address: AddressObject): RawVal;
+export declare function require_auth(address: AddressObject): Val;
 
 /// Converts a provided 32-byte Stellar account public key to the corresponding address. 
 /// This is only useful in the context of cross-chain interoperability. 
@@ -739,16 +739,16 @@ export declare function account_public_key_to_address(pk_bytes: BytesObject): Ad
 export declare function contract_id_to_address(contract_id_bytes: BytesObject): AddressObject;
 
 /// Returns the 32-byte public key of the Stellar account corresponding to the provided Address object. 
-/// If the Address doesn't belong to an account, returns RawVal corresponding to the unit type (`()`).
+/// If the Address doesn't belong to an account, returns Val corresponding to the unit type (`()`).
 // @ts-ignore
 @external("a", "3")
-export declare function address_to_account_public_key(address: AddressObject): RawVal;
+export declare function address_to_account_public_key(address: AddressObject): Val;
 
 /// Returns the 32-byte contract identifier corresponding to the provided Address object. 
-// If the Address doesn't belong to a contract, returns RawVal corresponding to the unit type (`()`).
+// If the Address doesn't belong to a contract, returns Val corresponding to the unit type (`()`).
 // @ts-ignore
 @external("a", "4")
-export declare function address_to_contract_id(address: AddressObject): RawVal;
+export declare function address_to_contract_id(address: AddressObject): Val;
 
 /// Authorizes sub-contract calls for the next contract call on behalf of the current contract. 
 /// Every entry in the argument vector corresponds to `InvokerContractAuthEntry` contract type that 
@@ -817,7 +817,7 @@ export declare function string_len(s:StringObject): U32Val;
 /// roundtrip cost of invoking a host function, i.e. host->Vm->host. 
 // @ts-ignore
 @external("t", "_")
-export declare function dummy0(): RawVal;
+export declare function dummy0(): Val;
 
 
 /******************

@@ -11,7 +11,7 @@ export class Sym {
 
     /**
      * Constructs a new Sym from a given string value. Only this caracters are allowed: [_0-9A-Za-z]
-     * @param val string value (containig only [_0-9A-Za-z])
+     * @param val string value (containig only [_0-9A-Za-z]) up to 32 characters long
      * @returns the new Sym
      */
     static fromSymbolString(val:string) : Sym {
