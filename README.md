@@ -77,33 +77,23 @@ Finally, edit the ```asconfig.json``` file of your project. Replace its content 
 }
 ```
 
-### 4. Compile your contract
+### 4. Build your contract
 
 ```shell
-$ asc assembly/index.ts --target release
+$ npm run asbuild
 ```
 
 You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` folder. You can also find the ```.wat``` file there (Text format of the ```.wasm```).
 
-### 5. Run your contract (sandbox)
+### 5. Run your contract (sandbox / locally)
 
-To run the contract, you must first install the official soroban cli as described here: [stellar soroban cli](https://github.com/stellar/soroban-cli).
+To run the contract locally, you must first install the official `soroban cli` as described in this [setup guid](https://soroban.stellar.org/docs/getting-started/setup). The `soroban cli` needs cargo to be installed. You will not need rust or cargo for implementing smart contracts with this SDK.
 
-```shell
-cargo install --locked --version 20.0.0-rc2 soroban-cli
-```
-
-Run your contract:
+Next, after you installed the `soroban cli`, invoke your contract:
 
 ```shell
 $ soroban -q contract invoke --wasm build/release.wasm --id 1 -- hello --to friend
 ```
-
-You can also use one of our Stellar SDKs to deploy and invoke contracts:
-
-- [Stellar iOS SDK](https://github.com/Soneso/stellar-ios-mac-sdk/blob/master/soroban.md)
-- [Stellar Flutter SDK](https://github.com/Soneso/stellar_flutter_sdk/blob/master/soroban.md)
-- [Stellar PHP SDK](https://github.com/Soneso/stellar-php-sdk/blob/main/soroban.md)
 
 The above example implementation can be found [here](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word).
 
@@ -444,6 +434,16 @@ You can find contract examples in our [as-soroban-examples](https://github.com/S
 | [custom account example](https://github.com/Soneso/as-soroban-examples/tree/main/custom_account)| This example is an advanced auth example which demonstrates how to implement a simple account contract that supports multisig and customizable authorization policies.|
 
 More examples can be found in the [test cases](https://github.com/Soneso/as-soroban-sdk/tree/main/test)
+
+## Deploying smart contracts to a Stellar Network (not locally)
+
+To deploy your smart contract to a Stellar Network such as `futurenet`, `testnet` or `main`, you can make use of the soroban cli as described [here](https://soroban.stellar.org/docs/getting-started/deploy-to-testnet).
+
+You can also use one of our Stellar SDKs to programatically deploy and invoke contracts on the Stellar Network:
+
+- [Stellar iOS SDK](https://github.com/Soneso/stellar-ios-mac-sdk/blob/master/soroban.md)
+- [Stellar Flutter SDK](https://github.com/Soneso/stellar_flutter_sdk/blob/master/soroban.md)
+- [Stellar PHP SDK](https://github.com/Soneso/stellar-php-sdk/blob/main/soroban.md)
 
 ## Using as-bignum for working with big numbers
 
