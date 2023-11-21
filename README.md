@@ -25,7 +25,6 @@ $ npx asinit .
 
 ```shell
 $ npm install as-soroban-sdk
-
 ```
 
 ### 3. Write your contract
@@ -80,7 +79,7 @@ Finally, edit the ```asconfig.json``` file of your project. Replace its content 
 ### 4. Build your contract
 
 ```shell
-$ npm run asbuild
+$ npm run asbuild:release
 ```
 
 You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` folder. You can also find the ```.wat``` file there (Text format of the ```.wasm```).
@@ -95,7 +94,10 @@ Next, after you installed the `soroban cli`, invoke your contract:
 $ soroban -q contract invoke --wasm build/release.wasm --id 1 -- hello --to friend
 ```
 
-The above example implementation can be found [here](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word).
+Hint: When using the `soroban cli` to invoke or deploy a contract locally, the `soroban cli` creates a folder named `.soroban` in the folder where you execute the cli command. The `.soroban` folder is used by the cli to store the contract data locally.
+
+
+The above `hello contract` example implementation can be found as a complete example project [here](https://github.com/Soneso/as-soroban-examples/tree/main/hello_word).
 
 
 ## Features and limitations
