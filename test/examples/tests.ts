@@ -6,6 +6,7 @@ import * as context from '../../lib/context';
 import * as contract from "../../lib/contract";
 import * as address from '../../lib/address';
 import { Bytes } from "../../lib/bytes";
+import { strkey_to_address } from "../../lib/env";
 
 export function hello(to: val.SmallSymbolVal): val.VecObject {
 
@@ -118,8 +119,9 @@ export function callctr(): val.Val {
   let args = new Vec();
   args.pushBack(val.fromI32(2));
   args.pushBack(val.fromI32(40));
-
-  return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "add", args);
+  let b = Bytes.fromString("CDAT3G7LL5YDDPZN4P6LZPLWX7F2SO2I6EO2HZJYQONDHMRUW2THJ6TZ");
+  let addr = strkey_to_address(b.getHostObject());
+  return contract.callContract(addr, "add", args);
 
 }
 
@@ -170,6 +172,8 @@ export function callctr2(user: val.AddressObject): val.MapObject {
 
   let args = new Vec();
   args.pushFront(user);
-  return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "auth", args);
+  let b = Bytes.fromString("CDAT3G7LL5YDDPZN4P6LZPLWX7F2SO2I6EO2HZJYQONDHMRUW2THJ6TZ");
+  let addr = strkey_to_address(b.getHostObject());
+  return contract.callContract(addr, "add", args);
 
 }

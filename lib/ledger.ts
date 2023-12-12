@@ -1,5 +1,6 @@
 import { Bytes } from "./bytes";
-import { bump_contract_data, bump_contract_instance_and_code, bump_current_contract_instance_and_code, create_asset_contract, create_contract, del_contract_data, get_asset_contract_id, get_contract_data, get_contract_id, has_contract_data, 
+import { create_asset_contract, create_contract, del_contract_data, extend_contract_data_ttl, extend_contract_instance_and_code_ttl, 
+    extend_current_contract_instance_and_code_ttl, get_asset_contract_id, get_contract_data, get_contract_id, has_contract_data, 
     put_contract_data, update_current_contract_wasm, upload_wasm } from "./env";
 import { Val, toBool, fromSmallSymbolStr, StorageType, AddressObject, fromU32} from "./value";
 
@@ -140,38 +141,39 @@ export function updateCurrentContractWasm(wasmHash: Bytes) : void {
 }
 
 /**
- * If the entry expiration is below `lowExpirationWatermark` ledgers from the current ledger (inclusive), 
- * then bump the expiration to be `highExpirationWatermark` from the current ledger (inclusive)"
+ * If the entry's TTL is below `threshold` ledgers, 
+ * extend `live_until_ledger_seq` such that TTL == `extend_to`, 
+ * where TTL is defined as live_until_ledger_seq - current ledger
  * @param k 
  * @param t 
- * @param lowExpirationWatermark 
- * @param highExpirationWatermark 
+ * @param threshold 
+ * @param extend_to 
  */
-export function bumpContractData(k: Val, t:StorageType, lowExpirationWatermark:u32, highExpirationWatermark:u32) : void {
-    bump_contract_data(k,t,fromU32(lowExpirationWatermark), fromU32(highExpirationWatermark));
+export function extendContractDataTtl(k: Val, t:StorageType, threshold:u32, extend_to:u32) : void {
+    extend_contract_data_ttl(k,t,fromU32(threshold), fromU32(extend_to));
 }
 
 /**
- * If expiration for the current contract instance and code (if applicable) is below `lowExpirationWatermark` 
- * ledgers from the current ledger (inclusive), then bump the expiration to be `highExpirationWatermark` 
- * from the current ledger (inclusive)
- * @param lowExpirationWatermark 
- * @param highExpirationWatermark 
+ * If the TTL for the current contract instance and code (if applicable) is below `threshold` ledgers, 
+ * extend `live_until_ledger_seq` such that TTL == `extend_to`, 
+ * where TTL is defined as live_until_ledger_seq - current ledger
+ * @param threshold 
+ * @param extend_to 
  */
-export function bumpCurrentContractInstanceAndCode(lowExpirationWatermark:u32, highExpirationWatermark:u32) : void {
-    bump_current_contract_instance_and_code(fromU32(lowExpirationWatermark), fromU32(highExpirationWatermark));
+export function extendCurrentContractInstanceAndCodeTtl(threshold:u32, extend_to:u32) : void {
+    extend_current_contract_instance_and_code_ttl(fromU32(threshold), fromU32(extend_to));
 }
 
 /**
- * If expiration of the provided contract instance and code (if applicable) is below `lowExpirationWatermark` 
- * ledgers from the current ledger (inclusive), then bump the expiration to be `high_expiration_watermark` 
- * from the current ledger (inclusive)
+ * If the TTL for the provided contract instance and code (if applicable) is below `threshold` ledgers, 
+ * extend `live_until_ledger_seq` such that TTL == `extend_to`, 
+ * where TTL is defined as live_until_ledger_seq - current ledger
  * @param contract AddressObject of the contract
- * @param lowExpirationWatermark 
- * @param highExpirationWatermark 
+ * @param threshold 
+ * @param extend_to 
  */
-export function bumpContractInstanceAndCode(contract:AddressObject, lowExpirationWatermark:u32, highExpirationWatermark:u32) : void {
-    bump_contract_instance_and_code(contract, fromU32(lowExpirationWatermark), fromU32(highExpirationWatermark));
+export function extendContractInstanceAndCodeTtl(contract:AddressObject, threshold:u32, extend_to:u32) : void {
+    extend_contract_instance_and_code_ttl(contract, fromU32(threshold), fromU32(extend_to));
 }
 
 /**
