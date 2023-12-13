@@ -49,7 +49,7 @@ export function logging(): val.VoidVal {
 
 export function increment(): val.U32Val {
   let key = "COUNTER";
-  var counter = 0;
+  let counter = 0;
   if (ledger.hasDataFor(key, val.storageTypePersistent)) {
     let dataObj = ledger.getDataFor(key, val.storageTypePersistent);
     counter = val.toU32(dataObj);
@@ -114,15 +114,12 @@ export function eventTest(): val.BoolVal {
 
 }
 
-export function callctr(): val.Val {
+export function callctr(addr: val.AddressObject): val.Val {
 
   let args = new Vec();
   args.pushBack(val.fromI32(2));
   args.pushBack(val.fromI32(40));
-  let b = Bytes.fromString("CDAT3G7LL5YDDPZN4P6LZPLWX7F2SO2I6EO2HZJYQONDHMRUW2THJ6TZ");
-  let addr = strkey_to_address(b.getHostObject());
   return contract.callContract(addr, "add", args);
-
 }
 
 export function auth(user: val.AddressObject): val.MapObject {
@@ -165,15 +162,5 @@ export function authArgs(user: val.AddressObject, value: val.Val): val.MapObject
   let map = new Map();
   map.put(key, counterVal);
   return map.getHostObject();
-
-}
-
-export function callctr2(user: val.AddressObject): val.MapObject {
-
-  let args = new Vec();
-  args.pushFront(user);
-  let b = Bytes.fromString("CDAT3G7LL5YDDPZN4P6LZPLWX7F2SO2I6EO2HZJYQONDHMRUW2THJ6TZ");
-  let addr = strkey_to_address(b.getHostObject());
-  return contract.callContract(addr, "add", args);
 
 }

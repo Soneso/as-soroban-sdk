@@ -154,7 +154,7 @@ export function testObject(): val.BoolVal {
   }
 
   const IA128VAL = -39;
-  var ai128 = val.fromI128Small(IA128VAL);
+  let ai128 = val.fromI128Small(IA128VAL);
   if(!val.isI128Val(ai128) || !val.isI128Small(ai128) || val.toI128Small(ai128) != IA128VAL) {
     return val.fromFalse();
   }

@@ -27,7 +27,7 @@
         },
         {
             "name" : "callctr",
-            "arguments": [],
+            "arguments": [{"name": "addr", "type": "address"}],
             "returns" : "i32"
         },
         {
@@ -54,21 +54,6 @@
                 {"name": "value", "type": "u32"}
             ],
             "returns" : "map[address, u32]"
-        },
-        {
-            "name" : "callctr2",
-            "arguments": [{"name": "user", "type": "address"}],
-            "returns" : "map[address, u32]"
-        },
-        {
-            "name" : "deploy",
-            "arguments": [
-                {"name": "wasm_hash", "type": "bytesN[32]"},
-                {"name": "salt", "type": "bytesN[32]"},
-                {"name": "fn_name", "type": "symbol"},
-                {"name": "args", "type": "vec[i32]"}
-            ],
-            "returns" : "i32"
         }
     ],
     "meta": [
@@ -78,11 +63,11 @@
         },
         {
             "key" : "version",
-            "value" : "0.2.0"
+            "value" : "0.4.0"
         },
         {
             "key" : "description",
-            "value" : "test examples"
+            "value" : "test some examples"
         }
     ]
 }
