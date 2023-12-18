@@ -4,8 +4,10 @@ let assert = require('assert');
 
 const adminSeed = 'SAIPPNG3AGHSK2CLHIYQMVBPHISOOPT64MMW2PQGER47SDCN6C6XFWQM'; 
 const adminId = 'GAYFL6MVOSXY4FYRZ7QSYVBA7RNIW3YVT2TLZAF2UBOUGUCATLSWWKWY';
-const rpcUrl = ' --rpc-url https://rpc-futurenet.stellar.org';
-const networkPassphrase = ' --network-passphrase "Test SDF Future Network ; October 2022"';
+const rpcUrl = ' --rpc-url https://soroban-testnet.stellar.org';
+const networkPassphrase = ' --network-passphrase "Test SDF Network ; September 2015"';
+//const rpcUrl = ' --rpc-url https://rpc-futurenet.stellar.org';
+//const networkPassphrase = ' --network-passphrase "Test SDF Future Network ; October 2022"';
 
 const cmdDeploy = 'soroban contract deploy' + rpcUrl + networkPassphrase;
 const cmdInvoke = 'soroban contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
@@ -16,8 +18,6 @@ const deploySDKTypes = cmdDeploy + ' --wasm test/sdk-types/build/release.wasm';
 const jsonrpcErr = 'error: jsonrpc error:';
 
 async function startTest() {
-
-    await clean();
 
     // build the contract.
     await buildTests();
@@ -34,11 +34,6 @@ async function startTest() {
     console.log('SDK Types contract id: ' + sdkTypesCId);
     await testSdkTypes(sdkTypesCId);
 
-} 
-
-async function clean() {
-    const { error, stdout, stderr } = await exec('rm -rf .soroban');
-    console.log(stdout);
 }
 
 async function buildTests() {
