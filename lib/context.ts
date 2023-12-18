@@ -1,7 +1,7 @@
 import { Bytes } from "./bytes";
-import { contract_event, fail_with_error, get_current_call_stack, get_current_contract_address, 
-    get_invoking_contract, get_ledger_network_id, get_ledger_sequence, get_ledger_timestamp, 
-    get_ledger_version, get_max_expiration_ledger, log_from_linear_memory, obj_cmp, vec_unpack_to_linear_memory } from "./env";
+import { contract_event, fail_with_error, get_current_contract_address,
+    get_ledger_network_id, get_ledger_sequence, get_ledger_timestamp, 
+    get_ledger_version, get_max_live_until_ledger, log_from_linear_memory, obj_cmp, vec_unpack_to_linear_memory } from "./env";
 import { Val, toU32, toU64, ErrorVal, contractError, 
     fromSmallSymbolStr, AddressObject, isU64Small, toU64Small, fromU32} from "./value";
 import { Vec } from "./vec";
@@ -88,15 +88,6 @@ export function getCurrentContractAddress(): AddressObject {
 }
 
 /**
- * Returns the address object of the contract which invoked the running contract. 
- * Traps if the running contract was not invoked by a contract.
- * @returns the invoking contract address as AddressObject
- */
-export function getInvokingContract(): AddressObject {
-    return get_invoking_contract();
-}
-
-/**
  * Compare two objects, or at least one object to a non-object, structurally. Returns -1 if a<b, 1 if a>b, or 0 if a==b.
  * @param a first obj to compare.
  * @param b second obj to compare.
@@ -126,8 +117,8 @@ export function getLedgerSequence(): u32 {
  * Returns the max ledger sequence that an entry can live to (inclusive).
  * @returns the max ledger sequence that an entry can live to as u32
  */
-export function getMaxExpirationLedger(): u32 {
-    return toU32(get_max_expiration_ledger());
+export function getMaxLiveUntilLedger(): u32 {
+    return toU32(get_max_live_until_ledger());
 }
 
 /**
@@ -148,17 +139,6 @@ export function getLedgerTimestamp(): u64 {
  */
 export function getLedgerNetworkId(): Bytes {
     return new Bytes(get_ledger_network_id());
-}
-
-/**
- * Returns the full call stack from the first contract call
- * to the current one as a vector of vectors, where the inside
- * vector contains the contract id as Hash, and a function as
- * a Symbol.
- * @returns the full call stack
- */
-export function getCurrentCallStack(): Vec {
-    return new Vec(get_current_call_stack());
 }
 
 /**

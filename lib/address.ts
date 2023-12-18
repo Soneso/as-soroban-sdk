@@ -1,5 +1,4 @@
-import { Bytes } from "./bytes";
-import { account_public_key_to_address, address_to_account_public_key, address_to_contract_id, authorize_as_curr_contract, contract_id_to_address, require_auth, require_auth_for_args } from "./env";
+import { authorize_as_curr_contract, require_auth, require_auth_for_args } from "./env";
 import { AddressObject, VoidVal } from "./value";
 import { Vec } from "./vec";
 
@@ -25,42 +24,6 @@ export function requireAuth(address: AddressObject): VoidVal {
  */
 export function requireAuthForArgs(address: AddressObject, args:Vec): VoidVal {
     return require_auth_for_args(address, args.getHostObject());
-}
-
-/**
- * Converts a provided 32-byte Stellar account public key to the corresponding address. 
- * @param pk_bytes the public key
- * @returns the address object handle.
- */
-export function accountPublicKeyToAddress(pk_bytes: Bytes): AddressObject {
-    return account_public_key_to_address(pk_bytes.getHostObject());
-}
-
-/**
- * Converts a provided 32-byte contract identifier to a corresponding Address object.
- * @param contract_id_bytes the contract id.
- * @returns the address object handle.
- */
-export function contractIdToAddress(contract_id_bytes: Bytes): AddressObject {
-    return contract_id_to_address(contract_id_bytes.getHostObject());
-}
-
-/**
- * Returns the 32-byte public key of the Stellar account corresponding to the provided Address object. 
- * @param address AddressObject that belongs to an account
- * @returns Bytes containing the 32-byte public key of the Stellar account.
- */
-export function addressToAccountPublicKey(address: AddressObject): Bytes {
-    return new Bytes(address_to_account_public_key(address));
-}
-
-/**
- * Returns the 32-byte contract identifier corresponding to the provided Address object. 
- * @param address AddressObject that belongs to a contract.
- * @returns Bytes containing the 32-byte contract identifier of the Soroban contract.
- */
-export function addressToContractId(address: AddressObject): Bytes {
-    return new Bytes(address_to_contract_id(address));
 }
 
 /**

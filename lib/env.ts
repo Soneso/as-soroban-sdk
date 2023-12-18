@@ -15,51 +15,37 @@ import { Val, BytesObject, VecObject, ErrorVal, AddressObject, U32Val, VoidVal,
 @external("x", "_")
 export declare function log_from_linear_memory(msg_pos: U32Val, msg_len: U32Val, vals_pos: U32Val, vals_len: U32Val): VoidVal;
 
-// Get the address object of the contract which invoked the running contract. 
-// Traps if the running contract was not invoked by a contract.
-// @ts-ignore
-@external("x", "0")
-export declare function get_invoking_contract(): AddressObject;
-
 /// Compare two objects, or at least one object to a non-object, structurally. 
 /// Returns -1 if a<b, 1 if a>b, or 0 if a==b.
 // @ts-ignore
-@external("x", "1")
+@external("x", "0")
 export declare function obj_cmp(a: Val, b: Val): i64;
 
 /// Records a contract event. `topics` is expected to be a `SCVec` with
 /// length <= 4 that CANNOT contain `Vec`, `Map`, or `Bytes` with length > 32
 // @ts-ignore
-@external("x", "2")
+@external("x", "1")
 export declare function contract_event(topics: VecObject, data: Val): VoidVal;
 
 /// Return the protocol version of the current ledger as a U32Val.
 // @ts-ignore
-@external("x", "3")
+@external("x", "2")
 export declare function get_ledger_version(): U32Val;
 
 /// Return the sequence number of the current ledger as a U32Val.
 // @ts-ignore
-@external("x", "4")
+@external("x", "3")
 export declare function get_ledger_sequence(): U32Val;
 
 /// Return the timestamp number of the current ledger as a U64Val.
 // @ts-ignore
-@external("x", "5")
+@external("x", "4")
 export declare function get_ledger_timestamp(): U64Val;
-
-/// Returns the full call stack from the first contract call
-/// to the current one as a vector (VecObject) of vectors, where the inside
-/// vector contains the contract id as Hash, and a function as
-/// a Symbol.
-// @ts-ignore
-@external("x", "6")
-export declare function get_current_call_stack(): VecObject;
 
 /// Causes the currently executing contract to fail immediately with a provided error code, 
 /// which must be of error-type `ScErrorType::Contract`. Does not actually return.
 // @ts-ignore
-@external("x", "7")
+@external("x", "5")
 export declare function fail_with_error(error: ErrorVal): VoidVal;
 
 // Record a debug event. Fmt must be a Bytes. Args must be a
@@ -70,18 +56,18 @@ export declare function fail_with_error(error: ErrorVal): VoidVal;
 
 /// Return the network id (sha256 hash of network passphrase) of the current ledger as `Bytes`. The value is always 32 bytes in length.
 // @ts-ignore
-@external("x", "8")
+@external("x", "6")
 export declare function get_ledger_network_id(): BytesObject;
 
 /// Get the Address object for the current contract.
 // @ts-ignore
-@external("x", "9")
+@external("x", "7")
 export declare function get_current_contract_address(): AddressObject;
 
 /// Returns the max ledger sequence that an entry can live to (inclusive).
 // @ts-ignore
-@external("x", "a")
-export declare function get_max_expiration_ledger(): U32Val;
+@external("x", "8")
+export declare function get_max_live_until_ledger(): U32Val;
 
 /******************
  * INT *
@@ -228,74 +214,84 @@ export declare function u256_mul(lhs:U256Val, rhs: U256Val): U256Val;
 @external("i", "q")
 export declare function u256_div(lhs:U256Val, rhs: U256Val): U256Val;
 
-/// Performs checked exponentiation. Computes `lhs.exp(rhs)`, returning `ScError` if overflow occurred. 
+/// Performs checked Euclidean modulo. Computes `lhs % rhs`, returning `ScError` if `rhs == 0` or overflow occurred.. 
 // @ts-ignore
 @external("i", "r")
+export declare function u256_rem_euclid(lhs:U256Val, rhs: U256Val): U256Val;
+
+/// Performs checked exponentiation. Computes `lhs.exp(rhs)`, returning `ScError` if overflow occurred. 
+// @ts-ignore
+@external("i", "s")
 export declare function u256_pow(lhs:U256Val, rhs: U256Val): U256Val;
 
 /// Performs checked shift left. Computes `lhs << rhs`, returning `ScError` if `rhs` is larger than or equal to the number of bits in `lhs`.
 // @ts-ignore
-@external("i", "s")
+@external("i", "t")
 export declare function u256_shl(lhs:U256Val, rhs: U256Val): U256Val;
 
 /// Performs checked shift right. Computes `lhs >> rhs`, returning `ScError` if `rhs` is larger than or equal to the number of bits in `lhs`.
 // @ts-ignore
-@external("i", "t")
+@external("i", "u")
 export declare function u256_shr(lhs:U256Val, rhs: U256Val): U256Val;
 
 /// Performs checked integer addition. Computes `lhs + rhs`, returning `ScError` if overflow occurred.
 // @ts-ignore
-@external("i", "u")
+@external("i", "v")
 export declare function i256_add(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked integer subtraction. Computes `lhs - rhs`, returning `ScError` if overflow occurred. 
 // @ts-ignore
-@external("i", "v")
+@external("i", "w")
 export declare function i256_sub(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked integer multiplication. Computes `lhs * rhs`, returning `ScError` if overflow occurred. 
 // @ts-ignore
-@external("i", "w")
+@external("i", "x")
 export declare function i256_mul(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked integer division. Computes `lhs / rhs`, returning `ScError` if `rhs == 0` or overflow occurred. 
 // @ts-ignore
-@external("i", "x")
+@external("i", "y")
 export declare function i256_div(lhs:I256Val, rhs: I256Val): I256Val;
+
+/// Performs checked Euclidean modulo. Computes `lhs % rhs`, returning `ScError` if `rhs == 0` or overflow occurred. 
+// @ts-ignore
+@external("i", "z")
+export declare function i256_rem_euclid(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked exponentiation. Computes `lhs.exp(rhs)`, returning `ScError` if overflow occurred.
 // @ts-ignore
-@external("i", "y")
+@external("i", "A")
 export declare function i256_pow(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked shift left. Computes `lhs << rhs`, returning `ScError` if `rhs` is larger than or equal to the number of bits in `lhs`.
 // @ts-ignore
-@external("i", "z")
+@external("i", "B")
 export declare function i256_shl(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Performs checked shift right. Computes `lhs >> rhs`, returning `ScError` if `rhs` is larger than or equal to the number of bits in `lhs`.
 // @ts-ignore
-@external("i", "A")
+@external("i", "C")
 export declare function i256_shr(lhs:I256Val, rhs: I256Val): I256Val;
 
 /// Convert a `u64` to a `Timepoint` object.
 // @ts-ignore
-@external("i", "B")
+@external("i", "D")
 export declare function timepoint_obj_from_u64(v:u64): TimepointObject;
 
 /// Convert a `Timepoint` object to a `u64`.
 // @ts-ignore
-@external("i", "C")
+@external("i", "E")
 export declare function timepoint_obj_to_u64(obj:TimepointObject): u64;
 
 /// Convert a `u64` to a `Duration` object.
 // @ts-ignore
-@external("i", "D")
+@external("i", "F")
 export declare function duration_obj_from_u64(v:u64): DurationObject;
 
 /// Convert a `Duration` object a `u64`.
 // @ts-ignore
-@external("i", "E")
+@external("i", "G")
 export declare function duration_obj_to_u64(obj:DurationObject): u64;
 
 
@@ -461,9 +457,9 @@ export declare function vec_first_index_of(v: VecObject, x: Val): Val;
 export declare function vec_last_index_of(v: VecObject, x:Val): Val;
 
 /// Binary search a sorted vector for a given element.
-/// If it exists, the high-32 bits of the return value is 0x0001 and the low-32 bits
+/// If it exists, the high 32 bits of the return value is 0x0000_0001 and the low 32 bits
 /// contain the u32 index of the element.
-/// If it does not exist, the high-32 bits of the return value is 0x0000 and the low-32 bits
+/// If it does not exist, the high-32 bits of the return value is 0x0000_0000 and the low 32 bits
 /// contain the u32 index at which the element would need to be inserted into the vector to
 /// maintain sorted order.
 // @ts-ignore
@@ -534,25 +530,26 @@ export declare function upload_wasm(wasm:BytesObject): BytesObject;
 @external("l", "6")
 export declare function update_current_contract_wasm(hash:BytesObject): VoidVal;
 
-/// If the entry expiration is below `low_expiration_watermark` ledgers from the current ledger (inclusive), 
-/// then bump the expiration to be `high_expiration_watermark` from the current ledger (inclusive)"
+/// If the entry's TTL is below `threshold` ledgers, 
+/// extend `live_until_ledger_seq` such that TTL == `extend_to`, 
+/// where TTL is defined as live_until_ledger_seq - current ledger"
 // @ts-ignore
 @external("l", "7")
-export declare function bump_contract_data(k:Val, t:StorageType, low_expiration_watermark: U32Val, high_expiration_watermark:U32Val): VoidVal;
+export declare function extend_contract_data_ttl(k:Val, t:StorageType, threshold: U32Val, extend_to:U32Val): VoidVal;
 
-/// If expiration for the current contract instance and code (if applicable) is below `low_expiration_watermark` 
-/// ledgers from the current ledger (inclusive), then bump the expiration to be `high_expiration_watermark` 
-/// from the current ledger (inclusive)
+/// If the TTL for the current contract instance and code (if applicable) is below `threshold` ledgers, 
+/// extend `live_until_ledger_seq` such that TTL == `extend_to`, 
+/// where TTL is defined as live_until_ledger_seq - current ledger
 // @ts-ignore
 @external("l", "8")
-export declare function bump_current_contract_instance_and_code(low_expiration_watermark: U32Val, high_expiration_watermark:U32Val): VoidVal;
+export declare function extend_current_contract_instance_and_code_ttl(threshold: U32Val, extend_to:U32Val): VoidVal;
 
-/// If expiration of the provided contract instance and code (if applicable) is below `low_expiration_watermark` 
-/// ledgers from the current ledger (inclusive), then bump the expiration to be `high_expiration_watermark` 
-/// from the current ledger (inclusive)
+/// If the TTL for the provided contract instance and code (if applicable) is below `threshold` ledgers, 
+/// extend `live_until_ledger_seq` such that TTL == `extend_to`, 
+/// where TTL is defined as live_until_ledger_seq - current ledger
 // @ts-ignore
 @external("l", "9")
-export declare function bump_contract_instance_and_code(contract:AddressObject, low_expiration_watermark: U32Val, high_expiration_watermark:U32Val): VoidVal;
+export declare function extend_contract_instance_and_code_ttl(contract:AddressObject, threshold: U32Val, extend_to:U32Val): VoidVal;
 
 /// Get the id of a contract without creating it. `deployer` is address of the contract deployer. 
 /// `salt` is used to create a unique contract id. Returns the address of the would-be contract.
@@ -726,29 +723,20 @@ export declare function require_auth_for_args(address: AddressObject, args:VecOb
 @external("a", "0")
 export declare function require_auth(address: AddressObject): Val;
 
-/// Converts a provided 32-byte Stellar account public key to the corresponding address. 
-/// This is only useful in the context of cross-chain interoperability. 
-/// Prefer directly using the Address objects whenever possible.
+/// Converts a provided Stellar strkey address of an account or a contract ('G...' or 'C...' respectively) to an address object.
+/// `strkey` can be either `BytesObject` or `StringObject` (the contents should represent the `G.../C...` string in both cases).
+/// Any other valid or invalid strkey (e.g. 'S...') will trigger an error. Prefer directly using the Address objects whenever possible.
+/// This is only useful in the context of custom messaging protocols (e.g. cross-chain).
 // @ts-ignore
 @external("a", "1")
-export declare function account_public_key_to_address(pk_bytes: BytesObject): AddressObject;
+export declare function strkey_to_address(strkey: Val): AddressObject;
 
-/// Converts a provided 32-byte contract identifier to a corresponding Address object.
+/// Converts a provided address to Stellar strkey format ('G...' for account or 'C...' for contract). 
+/// Prefer directly using the Address objects whenever possible. This is only useful in the context 
+/// of custom messaging protocols (e.g. cross-chain).
 // @ts-ignore
 @external("a", "2")
-export declare function contract_id_to_address(contract_id_bytes: BytesObject): AddressObject;
-
-/// Returns the 32-byte public key of the Stellar account corresponding to the provided Address object. 
-/// If the Address doesn't belong to an account, returns Val corresponding to the unit type (`()`).
-// @ts-ignore
-@external("a", "3")
-export declare function address_to_account_public_key(address: AddressObject): Val;
-
-/// Returns the 32-byte contract identifier corresponding to the provided Address object. 
-// If the Address doesn't belong to a contract, returns Val corresponding to the unit type (`()`).
-// @ts-ignore
-@external("a", "4")
-export declare function address_to_contract_id(address: AddressObject): Val;
+export declare function address_to_strkey(address: AddressObject): StringObject;
 
 /// Authorizes sub-contract calls for the next contract call on behalf of the current contract. 
 /// Every entry in the argument vector corresponds to `InvokerContractAuthEntry` contract type that 
@@ -756,7 +744,7 @@ export declare function address_to_contract_id(address: AddressObject): Val;
 /// contain any authorizations for the direct contract call, i.e. if current contract needs to 
 /// call contract function F1 that calls function F2 both of which require auth, only F2 should be present in `auth_entries`.
 // @ts-ignore
-@external("a", "5")
+@external("a", "3")
 export declare function authorize_as_curr_contract(auth_entires: VecObject): VoidVal;
 
 

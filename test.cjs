@@ -1,29 +1,39 @@
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 let assert = require('assert');
-const invokeValConversions = 'soroban contract invoke --id 4 --wasm test/value-conversion/build/release.wasm -- ';
-const invokeExamples = 'soroban contract invoke --id 2 --wasm test/examples/build/release.wasm -- ';
-const installExamples = 'soroban contract install --wasm test/examples/build/release.wasm';
-const invokeSDKTypes = 'soroban contract invoke --id 3 --wasm test/sdk-types/build/release.wasm -- ';
-const createIdentity1 = 'soroban config identity generate acc1 && soroban config identity address acc1';
-const createIdentity2 = 'soroban config identity generate acc2 && soroban config identity address acc2';
+
+const adminSeed = 'SAIPPNG3AGHSK2CLHIYQMVBPHISOOPT64MMW2PQGER47SDCN6C6XFWQM'; 
+const adminId = 'GAYFL6MVOSXY4FYRZ7QSYVBA7RNIW3YVT2TLZAF2UBOUGUCATLSWWKWY';
+const rpcUrl = ' --rpc-url https://soroban-testnet.stellar.org';
+const networkPassphrase = ' --network-passphrase "Test SDF Network ; September 2015"';
+//const rpcUrl = ' --rpc-url https://rpc-futurenet.stellar.org';
+//const networkPassphrase = ' --network-passphrase "Test SDF Future Network ; October 2022"';
+
+const cmdDeploy = 'soroban contract deploy' + rpcUrl + networkPassphrase;
+const cmdInvoke = 'soroban contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
+const cmdVVInvoke = 'soroban --very-verbose contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
+const deployExamples = cmdDeploy  + ' --wasm test/examples/build/release.wasm';
+const deployValConversions = cmdDeploy +  ' --wasm test/value-conversion/build/release.wasm';
+const deploySDKTypes = cmdDeploy + ' --wasm test/sdk-types/build/release.wasm';
+const jsonrpcErr = 'error: jsonrpc error:';
 
 async function startTest() {
 
-    await clean();
-
     // build the contract.
     await buildTests();
+    
+    let valueConversionsCId  = await deployContract(deployValConversions);
+    console.log('Value conversions contract id: ' + valueConversionsCId);
+    await testValueConversion(valueConversionsCId);
 
-    // execute the tests
-    await testValueConversion();
-    await testExamples();
-    await testSdkTypes();
-} 
+    let examplesCId  = await deployContract(deployExamples);
+    console.log('Examples contract id: ' + examplesCId);
+    await testExamples(examplesCId);
 
-async function clean() {
-    const { error, stdout, stderr } = await exec('rm -rf .soroban');
-    console.log(stdout);
+    let sdkTypesCId  = await deployContract(deploySDKTypes);
+    console.log('SDK Types contract id: ' + sdkTypesCId);
+    await testSdkTypes(sdkTypesCId);
+
 }
 
 async function buildTests() {
@@ -38,189 +48,102 @@ async function buildTests() {
     console.log(stdout);
 }
 
-async function testValueConversion() {
+async function deployContract(cmd) {
+    console.log(`deploy contract ...`);
+    try {
+        const { error, stdout, stderr } = await exec(cmd);
+        if (error) {
+            assert.fail(`error: ${error.message}`);
+        }
+        if (stderr) {
+            //assert.fail(`stderr: ${stderr}`);
+        }
+        let cId = stdout.trim();
+        return cId;
+    } catch(error) {
+        if (error.message.includes(jsonrpcErr)) {
+            console.log(`Catched err ` + error);
+            console.log("retrying after 5 seconds")
+            await sleep(5000); 
+            return await deployContract(cmd);
+        } else {
+            assert.fail(`error: ${error.message}`);
+        }
+    }
+}
+
+async function testValueConversion(cid) {
+    let cmd = cmdInvoke + cid;
     console.log(`test value conversions ...`);
-    await testI32();
-    await testU32();
-    await testStatic();
-    await testSmall();
-    await testSmallSymbol();
-    await testObject();
-    await testErrors();
+    await testC(`test I32 ...`, cmd + ' -- testI32', 'true');
+    await testC(`test U32 ...`, cmd + ' -- testU32', 'true');
+    await testC(`test Static ...`, cmd + ' -- testStatic', 'true');
+    await testC(`test Small ...`, cmd + ' -- testSmall', 'true');
+    await testC(`test Small Symbol ...`, cmd + ' -- testSSym', '"test_123"');
+    await testC(`test Object ...`, cmd + ' -- testObject', 'true');
+    await testC(`test Errors ...`, cmd + ' -- testErrors', 'true');
     console.log(`test value conversions -> OK`);
 }
 
-async function testI32() {
-    console.log(`test I32 ...`);
-    const { error, stdout, stderr } = await exec(invokeValConversions + 'testI32');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testU32() {
-    console.log(`test U32 ...`);
-    const { error, stdout, stderr } = await exec(invokeValConversions + 'testU32');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testStatic() {
-    console.log(`test Static ...`);
-    const { error, stdout, stderr } = await exec(invokeValConversions + 'testStatic');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testSmall() {
-    console.log(`test Small ...`);
-    const { error, stdout, stderr } = await exec(invokeValConversions + 'testSmall');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-       //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testObject() {
-    console.log(`test Object ...`);
-    const { error, stdout, stderr } = await exec(invokeValConversions + 'testObject');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testErrors() {
-    console.log(`test Errors ...`);
-    const { error, stdout, stderr } = await exec(invokeValConversions + 'testErrors');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testSmallSymbol() {
-    console.log(`test Small Symbol ...`);
-    const { error, stdout, stderr } = await exec(invokeValConversions + 'testSSym');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), '"test_123"');
-    console.log(`OK`);
-}
-
-async function testExamples() {
+async function testExamples(cid) {
+    let cmd = cmdInvoke + cid;
     console.log(`test examples ...`);
-    
-    await testAddExample();
-    await testHelloExample();
-    await testIncrementExample();
-    await testEventsExample();
-    await testLoggingExample();
-    await testCheckAgeExampleP1();
-    await testCheckAgeExampleP2();
-    await deployExamplesTest()
-    await testCallContractExample();
-    let acc1 = await setUpIdentity1();
-    await testAuthExampleP1(acc1);
-    await testAuthExampleP1(acc1);
-    await testAuthExampleArgs(acc1);
-    await testAuthExampleArgs(acc1);
-    let acc2 = await setUpIdentity2();
-    await testAuthExampleP2(acc2);
-    
+    await testC(`test add ...`, cmd + ' -- add --a 2 --b 40', '42');
+    await testC(`test hello ...`, cmd + ' -- hello --to friend', '["Hello","friend"]');
+    await testC(`test increment (1) ...`, cmd + ' -- increment', '1');
+    await testC(`test increment (2) ...`, cmd + ' -- increment', '2');
+    await testC(`test events ...`, cmd + ' -- eventTest', 'true');
+    await testLoggingExample(cmdVVInvoke + cid);
+    await testC(`test check age (1) ...`, cmd + ' -- checkAge --age 19', '"OK"');
+    await testCheckAge2(cmd);
+    let examples2CId  = await deployContract(deployExamples);
+    await testC(`test call contract ...`, cmd + ' -- callctr --addr '  + examples2CId, '42');
+    await testC('test auth ...', cmd + ' -- auth --user ' + adminId, '{"\\"' + adminId + '\\"":1}');
+    await testC('test auth with args ...', cmd + ' -- authArgs --user ' + adminId +  ' --value 3', '{"\\"' + adminId + '\\"":4}');
     console.log(`test examples -> OK`);
 }
 
-async function testAddExample() {
-    console.log(`test add example ...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'add --a 2 --b 40');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "42");
-    console.log(`OK`);
+async function testSdkTypes(cid) {
+    let cmd = cmdInvoke + cid;
+    console.log(`test sdk types ...`);
+    await testC(`test maps ...`, cmd + ' -- maps', 'true');
+    await testC(`test vectors ...`, cmd + ' -- vecs', 'true');
+    await testC(`test bytes ...`, cmd + ' -- bytes', 'true');
+    await testC(`test symbols ...`, cmd + ' -- symbols', 'true');
+    await testC(`test math128 ...`, cmd + ' -- math128', 'true');
+    console.log(`test sdk types -> OK`);
 }
 
-async function testHelloExample() {
-    console.log(`test hello example ...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'hello --to friend');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
+async function testC(info, cmd, res) {
+    console.log(info);
+    try {
+        const { error, stdout, stderr } = await exec(cmd);
+        if (error) {
+            assert.fail(`error: ${error.message}`);
+        } if (stderr) {
+            //assert.fail(`stderr: ${stderr}`);
+        }
+        assert.equal(stdout.trim(), res);
+        console.log(`OK`);
+    } catch(error) {
+        if (error.message.includes(jsonrpcErr)) {
+            console.log(`Catched err ` + error);
+            console.log("retrying after 5 seconds")
+            await sleep(5000); 
+            return await testC(info, cmd, res);
+        } else {
+            assert.fail(`error: ${error.message}`);
+        }
     }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), '["Hello","friend"]');
-    console.log(`OK`);
 }
 
-async function testIncrementExample() {
-    console.log(`test increment example ...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'increment');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    console.log(stdout.trim());
-    let val = parseInt(stdout.trim())
-    assert(val > 0);
-    console.log(`OK`);
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function testEventsExample() {
-    console.log(`test events example ...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'eventTest');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        // assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testLoggingExample() {
-    console.log(`test logging example ...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'logging');
+async function testLoggingExample(cmd) {
+    console.log(`test logging ...`);
+    const { error, stdout, stderr } = await exec(cmd + ' -- logging');
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
@@ -228,23 +151,10 @@ async function testLoggingExample() {
     console.log(`OK`);
 }
 
-async function testCheckAgeExampleP1() {
-    console.log(`test check age example part 1...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'checkAge --age 19');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), '"OK"');
-    console.log(`OK`);
-}
-
-async function testCheckAgeExampleP2() {
-    console.log(`test check age example part 2...`);
+async function testCheckAge2(cmd) {
+    console.log(`test check age (2) ...`);
     try {
-        const { error, stdout, stderr } = await exec(invokeExamples + 'checkAge --age 10');
+        const { error, stdout, stderr } = await exec(cmd + ' -- checkAge --age 10');
         if (error) {
             assert.fail(`error: ${error.message}`);
         }
@@ -252,188 +162,6 @@ async function testCheckAgeExampleP2() {
         assert(error.message.includes('Error(Contract, #1)'));
         console.log(`OK`);
     }
-}
-
-async function deployExamplesTest() {
-    const { error, stdout, stderr } = await exec('soroban contract deploy --id c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674 --wasm test/examples/build/release.wasm');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    console.log("deployed: " + stdout);
-}
-
-async function testCallContractExample() {
-    console.log(`test call contract example ...`);
-    const { error, stdout, stderr } = await exec(invokeExamples + 'callctr');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "42");
-    console.log(`OK`);
-}
-
-async function setUpIdentity1() {
-    console.log(`setup identity 1 ...`);
-    const { error, stdout, stderr } = await exec(createIdentity1);
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    let acc1 = stdout.trim();
-    return acc1;
-}
-
-async function testAuthExampleP1(acc) {
-    console.log(`test auth example part 1 ...`);
-    
-    let cmd = 'soroban contract invoke --source acc1 --id 2 --wasm test/examples/build/release.wasm -- auth --user ' + acc; 
-    console.log(cmd);
-    const { error, stdout, stderr } = await exec(cmd);
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert(stdout.indexOf(acc) != -1);
-    console.log(`OK`);
-}
-
-async function testAuthExampleArgs(acc) {
-    console.log(`test auth args example ...`);
-    let cmd = 'soroban contract invoke --source acc1 --id 2 --wasm test/examples/build/release.wasm -- authArgs --user ' + acc + ' --value 3'; 
-    const { error, stdout, stderr } = await exec(cmd);
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert(stdout.indexOf(acc) != -1);
-    console.log(`OK`);
-}
-
-async function setUpIdentity2() {
-    console.log(`setup identity 2 ...`);
-    const { error, stdout, stderr } = await exec(createIdentity2);
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    let acc2 = stdout.trim();
-    return acc2;
-}
-
-async function testAuthExampleP2(acc) {
-    try {
-        console.log(`test auth example part 2 ...`);
-        let cmd = 'soroban contract invoke --source acc2 --id 2 --wasm test/examples/build/release.wasm -- callctr2 --user ' + acc; 
-        const { error, stdout, stderr } = await exec(cmd);
-        if (error) {
-            assert.fail(`error: ${error.message}`);
-        }
-      } catch (error) {
-        assert(error.message.indexOf(acc) != -1);
-        console.log(`OK`);
-      }
-}
-
-async function installExamplesContract() {
-    console.log(`install examples contract ...`);
-    const { error, stdout, stderr } = await exec(installExamples);
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    let wasmHash = stdout.trim();
-    return wasmHash;
-}
-
-async function testSdkTypes() {
-    console.log(`test sdk types ...`);
-    await testMaps();
-    await testVectors();
-    await testBytes();
-    await testSymbols();
-    await testMath128();
-    console.log(`test sdk types -> OK`);
-}
-
-async function testMaps() {
-    console.log(`test maps ...`);
-    const { error, stdout, stderr } = await exec(invokeSDKTypes + 'maps');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testVectors() {
-    console.log(`test vectors ...`);
-    const { error, stdout, stderr } = await exec(invokeSDKTypes + 'vecs');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testBytes() {
-    console.log(`test bytes ...`);
-    const { error, stdout, stderr } = await exec(invokeSDKTypes + 'bytes');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testSymbols() {
-    console.log(`test symbols ...`);
-    const { error, stdout, stderr } = await exec(invokeSDKTypes + 'symbols');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
-}
-
-async function testMath128() {
-    console.log(`test math128 ...`);
-    const { error, stdout, stderr } = await exec(invokeSDKTypes + 'math128');
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-    if (stderr) {
-        //assert.fail(`stderr: ${stderr}`);
-    }
-    assert.equal(stdout.trim(), "true");
-    console.log(`OK`);
 }
 
 startTest()

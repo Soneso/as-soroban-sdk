@@ -6,6 +6,7 @@ import * as context from '../../lib/context';
 import * as contract from "../../lib/contract";
 import * as address from '../../lib/address';
 import { Bytes } from "../../lib/bytes";
+import { strkey_to_address } from "../../lib/env";
 
 export function hello(to: val.SmallSymbolVal): val.VecObject {
 
@@ -48,7 +49,7 @@ export function logging(): val.VoidVal {
 
 export function increment(): val.U32Val {
   let key = "COUNTER";
-  var counter = 0;
+  let counter = 0;
   if (ledger.hasDataFor(key, val.storageTypePersistent)) {
     let dataObj = ledger.getDataFor(key, val.storageTypePersistent);
     counter = val.toU32(dataObj);
@@ -113,14 +114,12 @@ export function eventTest(): val.BoolVal {
 
 }
 
-export function callctr(): val.Val {
+export function callctr(addr: val.AddressObject): val.Val {
 
   let args = new Vec();
   args.pushBack(val.fromI32(2));
   args.pushBack(val.fromI32(40));
-
-  return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "add", args);
-
+  return contract.callContract(addr, "add", args);
 }
 
 export function auth(user: val.AddressObject): val.MapObject {
@@ -163,13 +162,5 @@ export function authArgs(user: val.AddressObject, value: val.Val): val.MapObject
   let map = new Map();
   map.put(key, counterVal);
   return map.getHostObject();
-
-}
-
-export function callctr2(user: val.AddressObject): val.MapObject {
-
-  let args = new Vec();
-  args.pushFront(user);
-  return contract.callContractById("c13d9beb5f7031bf2de3fcbcbd76bfcba93b48f11da3e538839a33b234b6a674", "auth", args);
 
 }
