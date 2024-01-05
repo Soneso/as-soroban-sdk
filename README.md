@@ -4,8 +4,6 @@
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
-**This version supports soroban 20.0.2**
-
 ## Quick Start
 
 ### 1. Setup a new project
