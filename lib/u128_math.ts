@@ -106,7 +106,7 @@ export function isZero(vlo: u64, vhi:u64): bool {
  * @returns Low part of the u128 result. The high part is stored in __hi.
  */
 export function add(alo: u64, ahi: u64, blo:u64, bhi:u64): u64 {
-    var lo = alo + blo;
+    let lo = alo + blo;
     __hi = ahi + bhi + u64(lo < alo);
     return lo;
 }
@@ -120,7 +120,7 @@ export function add(alo: u64, ahi: u64, blo:u64, bhi:u64): u64 {
  * @returns Low part of the u128 result. The high part is stored in __hi.
  */
 export function sub(alo: u64, ahi: u64, blo:u64, bhi:u64): u64 {
-    var lo = alo - blo;
+    let lo = alo - blo;
     __hi = ahi - bhi - u64(lo > alo);
     return lo;
 }
@@ -133,7 +133,7 @@ export function sub(alo: u64, ahi: u64, blo:u64, bhi:u64): u64 {
  * @returns Low part of the u128 result. The high part is stored in __hi.
  */
 export function inc(vlo: u64, vhi: u64): u64 {
-  var lo = vlo + 1;
+  let lo = vlo + 1;
   __hi = vhi;
   __hi += u64(lo < vlo);
   return lo;
@@ -146,7 +146,7 @@ export function inc(vlo: u64, vhi: u64): u64 {
 * @returns Low part of the u128 result. The high part is stored in __hi.
 */
 export function dec(vlo: u64, vhi: u64): u64 {
-  var lo = vlo - 1;
+  let lo = vlo - 1;
   __hi = vhi;
   __hi -= u64(lo > vlo);
   return lo;
@@ -161,21 +161,21 @@ export function dec(vlo: u64, vhi: u64): u64 {
  * @returns Low part of the u128 result. The high part is stored in __hi.
  */
 export function mul(alo: u64, ahi: u64, blo:u64, bhi:u64): u64 {
-    var u = alo, v = blo;
-    var w: u64, k: u64;
+    let u = alo, v = blo;
+    let w: u64, k: u64;
 
-    var u1 = u & 0xFFFFFFFF; u >>= 32;
-    var v1 = v & 0xFFFFFFFF; v >>= 32;
-    var t  = u1 * v1;
-    var w1 = t & 0xFFFFFFFF;
+    let u1 = u & 0xFFFFFFFF; u >>= 32;
+    let v1 = v & 0xFFFFFFFF; v >>= 32;
+    let t = u1 * v1;
+    let w1 = t & 0xFFFFFFFF;
 
     t = u * v1 + (t >> 32);
     k = t & 0xFFFFFFFF;
     w = t >> 32;
     t = u1 * v + k;
 
-    var lo  = (t << 32) | w1;
-    var hi  = u  * v + w;
+    let lo  = (t << 32) | w1;
+    let hi  = u  * v + w;
         hi += ahi * blo;
         hi += alo * bhi;
         hi += t >> 32;
@@ -261,15 +261,15 @@ export function shl(vlo: u64, vhi: u64, shift: i32): u64 {
   shift &= 127;
 
   // need for preventing redundant i32 -> u64 extends
-  var shift64 = shift as u64;
+  let shift64 = shift as u64;
 
-  var mod1 = ((((shift64 + 127) | shift64) & 64) >> 6) - 1;
-  var mod2 = (shift64 >> 6) - 1;
+  let mod1 = ((((shift64 + 127) | shift64) & 64) >> 6) - 1;
+  let mod2 = (shift64 >> 6) - 1;
 
   shift64 &= 63;
 
-  var lo = vlo << shift64;
-  var hi = lo & ~mod2;
+  let lo = vlo << shift64;
+  let hi = lo & ~mod2;
 
   hi |= ((vhi << shift64) | ((vlo >> (64 - shift64)) & mod1)) & mod2;
 
@@ -289,15 +289,15 @@ export function shr(vlo: u64, vhi: u64, shift: i32): u64 {
   shift &= 127;
 
   // need for preventing redundant i32 -> u64 extends
-  var shift64 = shift as u64;
+  let shift64 = shift as u64;
 
-  var mod1 = ((((shift64 + 127) | shift64) & 64) >> 6) - 1;
-  var mod2 = (shift64 >> 6) - 1;
+  let mod1 = ((((shift64 + 127) | shift64) & 64) >> 6) - 1;
+  let mod2 = (shift64 >> 6) - 1;
 
   shift64 &= 63;
 
-  var hi = vhi >> shift64;
-  var lo = hi & ~mod2;
+  let hi = vhi >> shift64;
+  let lo = hi & ~mod2;
 
   lo |= ((vlo >> shift64) | ((vhi << (64 - shift64)) & mod1)) & mod2;
 
@@ -312,8 +312,8 @@ export function shr(vlo: u64, vhi: u64, shift: i32): u64 {
  * @returns The result as i32.
  */
 export function clz128(lo: u64, hi: u64): i32 {
-    var mask: u64 = <i64>(hi ^ (hi - 1)) >> 63;
-    return <i32>clz((hi & ~mask) | (lo & mask)) + (<i32>mask & 64);
+  let mask: u64 = <i64>(hi ^ (hi - 1)) >> 63;
+  return <i32>clz((hi & ~mask) | (lo & mask)) + (<i32>mask & 64);
 }
 
 /**
@@ -323,8 +323,8 @@ export function clz128(lo: u64, hi: u64): i32 {
  * @returns The result as i32.
  */
 export function ctz128(lo: u64, hi: u64): i32 {
-    var mask: u64 = <i64>(lo ^ (lo - 1)) >> 63;
-    return <i32>ctz((hi & mask) | (lo & ~mask)) + (<i32>mask & 64);
+  let mask: u64 = <i64>(lo ^ (lo - 1)) >> 63;
+  return <i32>ctz((hi & mask) | (lo & ~mask)) + (<i32>mask & 64);
 }
 
 /**
@@ -424,7 +424,7 @@ export var __divmod_rem_lo:  u64 = 0;
 export var __divmod_rem_hi:  u64 = 0;
 
 export function __udivmod128(alo: u64, ahi: u64, blo: u64, bhi: u64): u64 {
-    var bzn = clz128(blo, bhi); // N
+    let bzn = clz128(blo, bhi); // N
   
     // b == 0
     if (bzn == 128) {
@@ -432,7 +432,7 @@ export function __udivmod128(alo: u64, ahi: u64, blo: u64, bhi: u64): u64 {
     }
   
     // var azn = __clz128(alo, ahi); // M
-    var btz = ctz128(blo, bhi); // N
+    let btz = ctz128(blo, bhi); // N
   
     // a == 0
     if (!(alo | ahi)) {
@@ -478,25 +478,25 @@ export function __udivmod128(alo: u64, ahi: u64, blo: u64, bhi: u64): u64 {
   function __udivmod128core(alo: u64, ahi: u64, blo: u64, bhi: u64): u64 {
 
     // get leading zeros for left alignment
-    var alz = clz128(alo, ahi);
-    var blz = clz128(blo, bhi);
-    var off = blz - alz;
+    let alz = clz128(alo, ahi);
+    let blz = clz128(blo, bhi);
+    let off = blz - alz;
     
-    var nblo  = shl(blo, bhi, off);
-    var nbhi = __hi;
+    let nblo  = shl(blo, bhi, off);
+    let nbhi = __hi;
 
     //var q = u128.Zero;
-    var qlo:u64 = 0;
-    var qhi:u64 = 0;
+    let qlo:u64 = 0;
+    let qhi:u64 = 0;
 
     //var n = a.clone();
-    var nlo = alo;
-    var nhi = ahi;
+    let nlo = alo;
+    let nhi = ahi;
 
     // create a mask with the length of b
     // var mask = u128.One;
-    var masklo:u64 = 1;
-    var maskhi:u64 = 0
+    let masklo:u64 = 1;
+    let maskhi:u64 = 0
     
     //mask <<= 128 - blz;
     masklo = shl(masklo, maskhi, 128 - blz);
@@ -565,17 +565,17 @@ export function __udivmod128(alo: u64, ahi: u64, blo: u64, bhi: u64): u64 {
       return vlo;
     }
     
-    var valuelo = vlo;
-    var valuehi = vhi;
+    let valuelo = vlo;
+    let valuehi = vhi;
 
-    var remlo = vlo;
-    var remhi = vhi;
+    let remlo = vlo;
+    let remhi = vhi;
 
-    var reslo:u64 = 0;
-    var reshi:u64 = 0;
+    let reslo:u64 = 0;
+    let reshi:u64 = 0;
 
-    var poslo = shl(1, 0, (127 - (clz128(vlo, vhi) | 1)));
-    var poshi = __hi;
+    let poslo = shl(1, 0, (127 - (clz128(vlo, vhi) | 1)));
+    let poshi = __hi;
     
     while (!isZero(poslo, poshi)) {
       valuelo = add(reslo, reshi, poslo, poshi);
@@ -605,23 +605,22 @@ export function __udivmod128(alo: u64, ahi: u64, blo: u64, bhi: u64): u64 {
    * @returns low part of the result. Hi part is stored in __hi.
    */
   function sqr(vlo:u64, vhi:u64): u64 { 
-    var u = vlo,
-        v = vhi;
+    let u = vlo, v = vhi;
 
-    var u1 = u & 0xFFFFFFFF;
-    var t  = u1 * u1;
-    var w  = t & 0xFFFFFFFF;
-    var k  = t >> 32;
+    let u1 = u & 0xFFFFFFFF;
+    let t  = u1 * u1;
+    let w  = t & 0xFFFFFFFF;
+    let k  = t >> 32;
 
     u >>= 32;
-    var m = u * u1;
+    let m = u * u1;
     t = m + k;
-    var w1 = t >> 32;
+    let w1 = t >> 32;
 
     t = m + (t & 0xFFFFFFFF);
 
-    var lo = (t << 32) + w;
-    var hi  = u * u;
+    let lo = (t << 32) + w;
+    let hi  = u * u;
         hi += w1 + (t >> 32);
         hi += u * v << 1;
 
@@ -639,16 +638,16 @@ export function __udivmod128(alo: u64, ahi: u64, blo: u64, bhi: u64): u64 {
   export function pow(baselo: u64, basehi:u64, exponent: i32): u64 {
     // any negative exponent produce zero
 
-    var resultlo:u64 = 1;
-    var resulthi:u64 = 0;
+    let resultlo:u64 = 1;
+    let resulthi:u64 = 0;
 
     if (eq(baselo, basehi, resultlo, resulthi)) {
       __hi = resulthi;
       return resultlo;
     }
 
-    var tmplo = baselo;
-    var tmphi = basehi;
+    let tmplo = baselo;
+    let tmphi = basehi;
 
   
     if (exponent <= 1) {
@@ -666,8 +665,8 @@ export function __udivmod128(alo: u64, ahi: u64, blo: u64, bhi: u64): u64 {
     }
 
     if (ASC_SHRINK_LEVEL < 1) {
-      var lo = baselo;
-      var hi = basehi;
+      let lo = baselo;
+      let hi = basehi;
       // if base > u64::max and exp > 1 always return "0"
       if (!lo) {
         __hi = 0;

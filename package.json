@@ -1,6 +1,6 @@
 {
   "name": "as-soroban-sdk",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "AssemblyScript SDK for writing contracts for Soroban.",
   "main": "index.js",
   "types": "./types/index.d.ts",
@@ -13,8 +13,8 @@
   "author": "Christian Rogobete",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/node": "^18.11.0",
-    "assemblyscript": "^0.21.4"
+    "@types/node": "^20.11.25",
+    "assemblyscript": "^0.27.24"
   },
   "dependencies": {
     "js-xdr": "^1.1.3"

@@ -9,7 +9,7 @@ const networkPassphrase = ' --network-passphrase "Test SDF Network ; September 2
 //const rpcUrl = ' --rpc-url https://rpc-futurenet.stellar.org';
 //const networkPassphrase = ' --network-passphrase "Test SDF Future Network ; October 2022"';
 
-const cmdDeploy = 'soroban contract deploy' + rpcUrl + networkPassphrase;
+const cmdDeploy = 'soroban contract deploy' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed ;
 const cmdInvoke = 'soroban contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
 const cmdVVInvoke = 'soroban --very-verbose contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
 const deployExamples = cmdDeploy  + ' --wasm test/examples/build/release.wasm';

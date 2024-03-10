@@ -497,7 +497,7 @@ export function u128sqrt(val:U128Val) : U128Val {
  * @returns result
  */
 export function i128pow(base:I128Val, exponent:i32) : I128Val {
-    if (isNegative(base) || isNegative(base)) {
+    if (isNegative(base)) {
         context.fail();
     }
     let vlo = getI128Parts(base);

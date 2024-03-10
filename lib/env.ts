@@ -22,7 +22,7 @@ export declare function log_from_linear_memory(msg_pos: U32Val, msg_len: U32Val,
 export declare function obj_cmp(a: Val, b: Val): i64;
 
 /// Records a contract event. `topics` is expected to be a `SCVec` with
-/// length <= 4 that CANNOT contain `Vec`, `Map`, or `Bytes` with length > 32
+/// length <= 4 that cannot contain `Vec`, `Map`, or `Bytes` with length > 32
 // @ts-ignore
 @external("x", "1")
 export declare function contract_event(topics: VecObject, data: Val): VoidVal;
@@ -47,12 +47,6 @@ export declare function get_ledger_timestamp(): U64Val;
 // @ts-ignore
 @external("x", "5")
 export declare function fail_with_error(error: ErrorVal): VoidVal;
-
-// Record a debug event. Fmt must be a Bytes. Args must be a
-// Vec. Void is returned.
-// @ts-ignore
-// @external("x", "9")
-// declare function host_log_fmt_values(fmt: BytesObject, args: VecObject): VoidVal;
 
 /// Return the network id (sha256 hash of network passphrase) of the current ledger as `Bytes`. The value is always 32 bytes in length.
 // @ts-ignore
@@ -352,12 +346,16 @@ export declare function map_keys(m:MapObject): VecObject;
 @external("m", "8")
 export declare function map_values(m:MapObject): VecObject;
 
-/// Return a new map initialized from a set of input slices given by linear-memory addresses and lengths.
+/// Return a new map initialized from a pair of equal-length arrays, 
+/// one for keys and one for values, given by a pair of linear-memory 
+/// addresses and a length in Vals.
 // @ts-ignore
 @external("m", "9")
 export declare function map_new_from_linear_memory(keys_pos: U32Val, vals_pos :U32Val, len: U32Val): MapObject;
 
-/// Copy the Val values of a map, as described by set of input keys, into an array at a given linear-memory address.
+/// Copy Vals from `map` to the array `vals_pos`, selecting only the keys
+/// identified by the array `keys_pos`. Both arrays have `len` elements 
+/// and are identified by linear-memory addresses.
 // @ts-ignore
 @external("m", "a")
 export declare function map_unpack_to_linear_memory(map: MapObject, keys_pos: U32Val, vals_pos: U32Val, len: U32Val): VoidVal;
@@ -466,12 +464,12 @@ export declare function vec_last_index_of(v: VecObject, x:Val): Val;
 @external("v", "f")
 export declare function vec_binary_search(v: VecObject, x: Val): u64;
 
-/// Return a new vec initialized from an input slice of Vals given by a linear-memory address and length.
+/// Return a new vec initialized from an input slice of Vals given by a linear-memory address and length in Vals.
 // @ts-ignore
 @external("v", "g")
 export declare function vec_new_from_linear_memory(vals_pos: U32Val, len: U32Val): VecObject;
 
-/// Copy the Vals of a vec into an array at a given linear-memory address.
+/// Copy the Vals of a vec into an array at a given linear-memory address and length in Vals.
 // @ts-ignore
 @external("v", "h")
 export declare function vec_unpack_to_linear_memory(vec: VecObject, vals_pos: U32Val, len: U32Val): VoidVal;
@@ -481,10 +479,6 @@ export declare function vec_unpack_to_linear_memory(vec: VecObject, vals_pos: U3
  * LEDGER *
  ******************/
 
-/// If `f` is `Void`, then there will be no changes to flags for an existing entry, 
-/// and none will be set if this is a new entry. Otherwise, `f` is parsed as a `u32`. 
-/// If the value is 0, then all flags are cleared. If it's not 0, then flags will 
-/// be set to the passed in value.
 // @ts-ignore
 @external("l", "_")
 export declare function put_contract_data(k:Val, v:Val, t:StorageType): VoidVal;

@@ -169,7 +169,8 @@ export function failWithError(error: ErrorVal): void {
 
 /**
  * Lets the host publish a contract event. 
- * `topics` is expected to be a `Vec` with length <= 4 that CANNOT contain `Vec`, `Map`, or `Bytes` with length > 32
+ * `topics` is expected to be a `Vec` with length <= 4 that 
+ * cannot contain `Vec`, `Map`, or `Bytes` with length > 32
  * Returns nothing on success, and panics on failure
  * @param topics the vector containing the topics.
  * @param data the data (host) value to publish in the event

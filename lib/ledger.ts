@@ -144,10 +144,10 @@ export function updateCurrentContractWasm(wasmHash: Bytes) : void {
  * If the entry's TTL is below `threshold` ledgers, 
  * extend `live_until_ledger_seq` such that TTL == `extend_to`, 
  * where TTL is defined as live_until_ledger_seq - current ledger
- * @param k 
- * @param t 
- * @param threshold 
- * @param extend_to 
+ * @param k key - any host value.
+ * @param t storage type
+ * @param threshold treshold
+ * @param extend_to extend to ttl
  */
 export function extendContractDataTtl(k: Val, t:StorageType, threshold:u32, extend_to:u32) : void {
     extend_contract_data_ttl(k,t,fromU32(threshold), fromU32(extend_to));
@@ -157,8 +157,8 @@ export function extendContractDataTtl(k: Val, t:StorageType, threshold:u32, exte
  * If the TTL for the current contract instance and code (if applicable) is below `threshold` ledgers, 
  * extend `live_until_ledger_seq` such that TTL == `extend_to`, 
  * where TTL is defined as live_until_ledger_seq - current ledger
- * @param threshold 
- * @param extend_to 
+ * @param threshold treshold
+ * @param extend_to extend to ttl
  */
 export function extendCurrentContractInstanceAndCodeTtl(threshold:u32, extend_to:u32) : void {
     extend_current_contract_instance_and_code_ttl(fromU32(threshold), fromU32(extend_to));
@@ -169,8 +169,8 @@ export function extendCurrentContractInstanceAndCodeTtl(threshold:u32, extend_to
  * extend `live_until_ledger_seq` such that TTL == `extend_to`, 
  * where TTL is defined as live_until_ledger_seq - current ledger
  * @param contract AddressObject of the contract
- * @param threshold 
- * @param extend_to 
+ * @param threshold treshold
+ * @param extend_to extend to ttl
  */
 export function extendContractInstanceAndCodeTtl(contract:AddressObject, threshold:u32, extend_to:u32) : void {
     extend_contract_instance_and_code_ttl(contract, fromU32(threshold), fromU32(extend_to));

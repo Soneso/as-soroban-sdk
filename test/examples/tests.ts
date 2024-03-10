@@ -6,7 +6,6 @@ import * as context from '../../lib/context';
 import * as contract from "../../lib/contract";
 import * as address from '../../lib/address';
 import { Bytes } from "../../lib/bytes";
-import { strkey_to_address } from "../../lib/env";
 
 export function hello(to: val.SmallSymbolVal): val.VecObject {
 
@@ -127,7 +126,7 @@ export function auth(user: val.AddressObject): val.MapObject {
   address.requireAuth(user);
   
   let key = user;
-  var counter = 0;
+  let counter = 0;
   if (ledger.hasData(key, val.storageTypePersistent)) {
     let dataVal = ledger.getData(key, val.storageTypePersistent);
     counter = val.toU32(dataVal);
@@ -150,7 +149,7 @@ export function authArgs(user: val.AddressObject, value: val.Val): val.MapObject
   address.requireAuthForArgs(user, argsVec);
   
   let key = user;
-  var counter = 0;
+  let counter = 0;
   if (ledger.hasData(key, val.storageTypePersistent)) {
     let dataVal = ledger.getData(key, val.storageTypePersistent);
     counter = val.toU32(dataVal);

@@ -1,5 +1,5 @@
-import { authorize_as_curr_contract, require_auth, require_auth_for_args } from "./env";
-import { AddressObject, VoidVal } from "./value";
+import { address_to_strkey, authorize_as_curr_contract, require_auth, require_auth_for_args } from "./env";
+import { AddressObject, StringObject, VoidVal } from "./value";
 import { Vec } from "./vec";
 
 
@@ -24,6 +24,18 @@ export function requireAuth(address: AddressObject): VoidVal {
  */
 export function requireAuthForArgs(address: AddressObject, args:Vec): VoidVal {
     return require_auth_for_args(address, args.getHostObject());
+}
+
+/**
+ * Converts a provided address to Stellar strkey format 
+ * ('G...' for account or 'C...' for contract). Prefer directly using the Address
+ * objects whenever possible. This is only useful in the context of custom 
+ * messaging protocols (e.g. cross-chain).
+ * @param address 
+ * @returns 
+ */
+export function addressToStrkey(address: AddressObject): StringObject {
+    return address_to_strkey(address);
 }
 
 /**
