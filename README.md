@@ -1,6 +1,6 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v1.0.0](https://img.shields.io/badge/v1.0.0-green.svg)
+![v1.0.1](https://img.shields.io/badge/v1.0.1-green.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
@@ -84,7 +84,7 @@ You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` fol
 
 ### 5. Run your contract
 
-To run the contract, you must first install the official `soroban cli` as described in this [setup guid](https://soroban.stellar.org/docs/getting-started/setup). The `soroban cli` needs cargo to be installed. You will not need rust or cargo for implementing smart contracts with this SDK.
+To run the contract, you must first install the official `soroban cli` as described in this [setup guid](https://developers.stellar.org/docs/smart-contracts/getting-started/setup). The `soroban cli` needs cargo to be installed. You will not need rust or cargo for implementing smart contracts with this SDK.
 
 Next, after you installed the `soroban cli`, deploy your contract to testnet:
 
@@ -119,7 +119,7 @@ The above `hello contract` example implementation can be found as a complete exa
 
 ## Features and limitations
 
-In the [Build your own SDK](https://soroban.stellar.org/docs/SDKs/byo) chapter of the official [Soroban documentation](https://soroban.stellar.org), one can find the requirements for a Soroban SDK.
+In the [Build your own SDK](https://developers.stellar.org/docs/tools/sdks/build-your-own) chapter of the official [Soroban documentation](https://developers.stellar.org/docs/smart-contracts/getting-started/setup), one can find the requirements for a Soroban SDK.
 
 This Assembly Script Soroban SDK **can** help you with:
 - Value Conversions

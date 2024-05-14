@@ -557,6 +557,22 @@ export declare function get_contract_id(deployer: AddressObject, salt: BytesObje
 @external("l", "b")
 export declare function get_asset_contract_id(serialized_asset: BytesObject): AddressObject;
 
+// If the TTL for the provided contract instance is below `threshold` ledgers, extend `live_until_ledger_seq` 
+// such that TTL == `extend_to`, where TTL is defined as live_until_ledger_seq - current ledger. 
+// If attempting to extend past the maximum allowed value (defined as the current ledger + `max_entry_ttl` - 1),
+// the new `live_until_ledger_seq` will be clamped to the max.
+// @ts-ignore
+@external("l", "c")
+export declare function extend_contract_instance_ttl(contract:AddressObject, threshold: U32Val, extend_to:U32Val): VoidVal;
+
+// If the TTL for the provided contract's code (if applicable) is below `threshold` ledgers, extend `live_until_ledger_seq`
+// such that TTL == `extend_to`, where TTL is defined as live_until_ledger_seq - current ledger. 
+// If attempting to extend past the maximum allowed value (defined as the current ledger + `max_entry_ttl` - 1), 
+// the new `live_until_ledger_seq` will be clamped to the max.
+// @ts-ignore
+@external("l", "d")
+export declare function extend_contract_code_ttl(contract:AddressObject, threshold: U32Val, extend_to:U32Val): VoidVal;
+
 /******************
  * CALL *
  ******************/
@@ -697,6 +713,16 @@ export declare function compute_hash_keccak256(x:BytesObject): BytesObject;
 // @ts-ignore
 @external("c", "2")
 export declare function recover_key_ecdsa_secp256k1(msg_digest:BytesObject, signature: BytesObject, recovery_id: U32Val): BytesObject;
+
+// Verifies the `signature` using an ECDSA secp256r1 `public_key` on a 32-byte `msg_digest`. 
+// Warning: The `msg_digest` must be produced by a secure cryptographic hash 
+// function on the message, otherwise the attacker can potentially forge signatures. 
+// The `public_key` is expected to be 65 bytes in length, representing a SEC-1 encoded point in uncompressed format.
+// The `signature` is the ECDSA signature `(r, s)` serialized as fixed-size big endian scalar values, 
+// both `r`, `s` must be non-zero and `s` must be in the lower range.
+// @ts-ignore
+@external("c", "3")
+export declare function verify_sig_ecdsa_secp256r1(public_key:BytesObject, msg_digest:BytesObject, signature: BytesObject): VoidVal;
 
 /******************
  * ADDRESS *

@@ -1,5 +1,6 @@
 import { Bytes } from "./bytes";
-import { create_asset_contract, create_contract, del_contract_data, extend_contract_data_ttl, extend_contract_instance_and_code_ttl, 
+import { create_asset_contract, create_contract, del_contract_data, extend_contract_code_ttl, extend_contract_data_ttl, extend_contract_instance_and_code_ttl, 
+    extend_contract_instance_ttl, 
     extend_current_contract_instance_and_code_ttl, get_asset_contract_id, get_contract_data, get_contract_id, has_contract_data, 
     put_contract_data, update_current_contract_wasm, upload_wasm } from "./env";
 import { Val, toBool, fromSmallSymbolStr, StorageType, AddressObject, fromU32} from "./value";
@@ -195,4 +196,30 @@ export function getContractId(deployer:AddressObject, salt:Bytes) : AddressObjec
  */
 export function getAssetContractId(serializedAsset:Bytes) : AddressObject {
     return get_asset_contract_id(serializedAsset.getHostObject());
+}
+
+/**
+ * If the TTL for the provided contract instance is below `threshold` ledgers, extend `live_until_ledger_seq` 
+ * such that TTL == `extend_to`, where TTL is defined as live_until_ledger_seq - current ledger. 
+ * If attempting to extend past the maximum allowed value (defined as the current ledger + `max_entry_ttl` - 1), 
+ * the new `live_until_ledger_seq` will be clamped to the max.
+ * @param contract AddressObject of the contract
+ * @param threshold treshold
+ * @param extend_to extend to ttl
+ */
+export function extendContractInstanceTtl(contract:AddressObject, threshold:u32, extend_to:u32) : void {
+    extend_contract_instance_ttl(contract, fromU32(threshold), fromU32(extend_to));
+}
+
+/**
+ * If the TTL for the provided contract's code (if applicable) is below `threshold` ledgers, extend `live_until_ledger_seq` 
+ * such that TTL == `extend_to`, where TTL is defined as live_until_ledger_seq - current ledger. 
+ * If attempting to extend past the maximum allowed value (defined as the current ledger + `max_entry_ttl` - 1), 
+ * the new `live_until_ledger_seq` will be clamped to the max.
+ * @param contract AddressObject of the contract
+ * @param threshold treshold
+ * @param extend_to extend to ttl
+ */
+export function extendContractCodeTtl(contract:AddressObject, threshold:u32, extend_to:u32) : void {
+    extend_contract_code_ttl(contract, fromU32(threshold), fromU32(extend_to));
 }
