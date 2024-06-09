@@ -86,6 +86,13 @@ You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` fol
 
 To run the contract, you must first install the official `soroban cli` as described in this [setup guid](https://developers.stellar.org/docs/smart-contracts/getting-started/setup). The `soroban cli` needs cargo to be installed. You will not need rust or cargo for implementing smart contracts with this SDK.
 
+*Hint for testing with protocol version 21:*
+Currently the `soroban-cli` version that supports protocol v.21 is not yet officially launched. Therefore, if you would like to test your contracts with the protocol 21 update (testnet, futurenet), you need to install a soroban cli preview version:
+
+```sh
+cargo install soroban-cli --version 21.0.0-preview.1
+```
+
 Next, after you installed the `soroban cli`, deploy your contract to testnet:
 
 ```sh
