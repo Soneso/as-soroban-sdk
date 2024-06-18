@@ -84,12 +84,12 @@ You can find the generated ```.wasm``` (WebAssembly) file in the ```build``` fol
 
 ### 5. Run your contract
 
-To run the contract, you must first install the official `soroban cli` as described in this [setup guid](https://developers.stellar.org/docs/smart-contracts/getting-started/setup). The `soroban cli` needs cargo to be installed. You will not need rust or cargo for implementing smart contracts with this SDK.
+To run the contract, you must first install the official `stellar cli` as described in this [setup guid](https://developers.stellar.org/docs/smart-contracts/getting-started/setup). The `stellar cli` needs cargo to be installed. You will not need rust or cargo for implementing smart contracts with this SDK.
 
-Next, after you installed the `soroban cli`, deploy your contract to testnet:
+Next, after you installed the `stellar cli`, deploy your contract to testnet:
 
 ```sh
-soroban contract deploy \
+stellar contract deploy \
   --wasm build/release.wasm \
   --source SAIPPNG3AGHSK2CLHIYQMVBPHISOOPT64MMW2PQGER47SDCN6C6XFWQM \
   --rpc-url https://soroban-testnet.stellar.org \
@@ -105,7 +105,7 @@ CC4DZNN2TPLUOAIRBI3CY7TGRFFCCW6GNVVRRQ3QIIBY6TM6M2RVMBMC
 Next let's invoke:
 
 ```sh
-soroban -q contract invoke  \
+stellar -q contract invoke  \
   --source SAIPPNG3AGHSK2CLHIYQMVBPHISOOPT64MMW2PQGER47SDCN6C6XFWQM \
   --rpc-url https://soroban-testnet.stellar.org \
   --network-passphrase "Test SDF Network ; September 2015" \
@@ -281,13 +281,13 @@ However, one can create own user defined types with ease by translating them int
 
 ## Testing
 
-Testing can be done to some extent by using **events** and the **soroban-cli**.
+Testing can be done to some extent by using **events** and the **stellar-cli**.
 
 See the [testing example](https://github.com/Soneso/as-soroban-examples/tree/main/testing) that demonstrates a simple way to test a contract.
 
 ## Logging
 
-You can log for purpose of debugging. Logs are only visible when executing contracts using ```soroban-cli```. Do not use logs elsewhere.
+You can log for purpose of debugging.
 
 ### Log an utf8 string
 
@@ -309,7 +309,18 @@ context.log("Today temperature:", values);
 
 ```
 
-See also: [as-soroban-examples](https://github.com/Soneso/as-soroban-examples)
+Logging emits DIAGNOSTIC events. To fetch the events you can use the `stellar-cli`.
+
+E.g.:
+
+```sh
+stellar events --start-ledger 110284  \
+  --id CCRNSJSJ67TLSCZNT654H3DLMIARINHGQ6LVUBHCJJMJ5T3QCWCSELMG \
+  --rpc-url https://soroban-testnet.stellar.org \
+  --network-passphrase "Test SDF Network ; September 2015"
+```
+
+See also: [logging example](https://github.com/Soneso/as-soroban-examples/tree/main/logging)
 
 ## Publishing events
 

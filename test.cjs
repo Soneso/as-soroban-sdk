@@ -4,18 +4,24 @@ let assert = require('assert');
 
 const adminSeed = 'SAIPPNG3AGHSK2CLHIYQMVBPHISOOPT64MMW2PQGER47SDCN6C6XFWQM'; 
 const adminId = 'GAYFL6MVOSXY4FYRZ7QSYVBA7RNIW3YVT2TLZAF2UBOUGUCATLSWWKWY';
-const rpcUrl = ' --rpc-url https://soroban-testnet.stellar.org';
+const rpcAddress = 'https://soroban-testnet.stellar.org'
+const rpcUrl = ' --rpc-url ' + rpcAddress;
 const networkPassphrase = ' --network-passphrase "Test SDF Network ; September 2015"';
-//const rpcUrl = ' --rpc-url https://rpc-futurenet.stellar.org';
+//const rpcAddress = 'https://soroban-testnet.stellar.org'/
+//const rpcUrl = ' --rpc-url ' + rpcAddress;
 //const networkPassphrase = ' --network-passphrase "Test SDF Future Network ; October 2022"';
 
-const cmdDeploy = 'soroban contract deploy' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed ;
-const cmdInvoke = 'soroban contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
-const cmdVVInvoke = 'soroban --very-verbose contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
+const cmdDeploy = 'stellar contract deploy' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed ;
+const cmdInvoke = 'stellar contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
+// const cmdVVInvoke = 'stellar --very-verbose contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
 const deployExamples = cmdDeploy  + ' --wasm test/examples/build/release.wasm';
 const deployValConversions = cmdDeploy +  ' --wasm test/value-conversion/build/release.wasm';
 const deploySDKTypes = cmdDeploy + ' --wasm test/sdk-types/build/release.wasm';
 const jsonrpcErr = 'error: jsonrpc error:';
+const cmdGetLatestLedger = "curl -X POST \
+-H 'Content-Type: application/json' \
+-d '{\"jsonrpc\":\"2.0\",\"id\":\"id\",\"method\":\"getLatestLedger\"}' \
+" +  rpcAddress;
 
 async function startTest() {
 
@@ -93,7 +99,7 @@ async function testExamples(cid) {
     await testC(`test increment (1) ...`, cmd + ' -- increment', '1');
     await testC(`test increment (2) ...`, cmd + ' -- increment', '2');
     await testC(`test events ...`, cmd + ' -- eventTest', 'true');
-    await testLoggingExample(cmdVVInvoke + cid);
+    await testLoggingExample(cmdInvoke, cid);
     await testC(`test check age (1) ...`, cmd + ' -- checkAge --age 19', '"OK"');
     await testCheckAge2(cmd);
     let examples2CId  = await deployContract(deployExamples);
@@ -141,14 +147,46 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function testLoggingExample(cmd) {
-    console.log(`test logging ...`);
-    const { error, stdout, stderr } = await exec(cmd + ' -- logging');
+async function getLatestLedger() {
+    const { error, stdout, stderr } = await exec(cmdGetLatestLedger);
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
-    assert.equal(true, stderr.includes('today'));
+
+    let latestLedger = stdout.substring(
+        stdout.indexOf("\"sequence\":") + 11, 
+        stdout.lastIndexOf("}}")
+    );
+    
+    return latestLedger;
+}
+
+async function testLoggingExample(cmd, cid) {
+    console.log(`test logging ...`);
+
+    let latestLedger = await getLatestLedger();
+
+    const { error, stdout, stderr } = await exec(cmd + cid + ' -- logging');
+    if (error) {
+        assert.fail(`error: ${error.message}`);
+    }
+
+    await checkLoggingEvents(latestLedger, cid);
+    
     console.log(`OK`);
+}
+
+async function checkLoggingEvents(ledger, cid) {
+    let eventsCmd = 'stellar events --start-ledger ' + ledger + ' --id ' + cid + rpcUrl + networkPassphrase
+
+    console.log("CMD:  " + eventsCmd);
+
+    const { error, stdout, stderr } = await exec(eventsCmd);
+    if (error) {
+        assert.fail(`error: ${error.message}`);
+    }
+
+    assert.equal(true, stdout.includes('today'));
 }
 
 async function testCheckAge2(cmd) {
