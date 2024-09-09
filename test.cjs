@@ -13,15 +13,10 @@ const networkPassphrase = ' --network-passphrase "Test SDF Network ; September 2
 
 const cmdDeploy = 'stellar contract deploy' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed ;
 const cmdInvoke = 'stellar contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
-// const cmdVVInvoke = 'stellar --very-verbose contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
 const deployExamples = cmdDeploy  + ' --wasm test/examples/build/release.wasm';
 const deployValConversions = cmdDeploy +  ' --wasm test/value-conversion/build/release.wasm';
 const deploySDKTypes = cmdDeploy + ' --wasm test/sdk-types/build/release.wasm';
 const jsonrpcErr = 'error: jsonrpc error:';
-const cmdGetLatestLedger = "curl -X POST \
--H 'Content-Type: application/json' \
--d '{\"jsonrpc\":\"2.0\",\"id\":\"id\",\"method\":\"getLatestLedger\"}' \
-" +  rpcAddress;
 
 async function startTest() {
 
@@ -99,7 +94,7 @@ async function testExamples(cid) {
     await testC(`test increment (1) ...`, cmd + ' -- increment', '1');
     await testC(`test increment (2) ...`, cmd + ' -- increment', '2');
     await testC(`test events ...`, cmd + ' -- eventTest', 'true');
-    await testLoggingExample(cmdInvoke, cid);
+    await testLoggingExample(cmd + ' -- logging');
     await testC(`test check age (1) ...`, cmd + ' -- checkAge --age 19', '"OK"');
     await testCheckAge2(cmd);
     let examples2CId  = await deployContract(deployExamples);
@@ -147,46 +142,16 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function getLatestLedger() {
-    const { error, stdout, stderr } = await exec(cmdGetLatestLedger);
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-
-    let latestLedger = stdout.substring(
-        stdout.indexOf("\"sequence\":") + 11, 
-        stdout.lastIndexOf("}}")
-    );
-    
-    return latestLedger;
-}
-
-async function testLoggingExample(cmd, cid) {
+async function testLoggingExample(cmd) {
     console.log(`test logging ...`);
 
-    let latestLedger = await getLatestLedger();
-
-    const { error, stdout, stderr } = await exec(cmd + cid + ' -- logging');
+    const { error, stdout, stderr } = await exec(cmd);
     if (error) {
         assert.fail(`error: ${error.message}`);
     }
 
-    await checkLoggingEvents(latestLedger, cid);
-    
+    assert.equal(true, stderr.includes('today'));
     console.log(`OK`);
-}
-
-async function checkLoggingEvents(ledger, cid) {
-    let eventsCmd = 'stellar events --start-ledger ' + ledger + ' --id ' + cid + rpcUrl + networkPassphrase
-
-    console.log("CMD:  " + eventsCmd);
-
-    const { error, stdout, stderr } = await exec(eventsCmd);
-    if (error) {
-        assert.fail(`error: ${error.message}`);
-    }
-
-    assert.equal(true, stdout.includes('today'));
 }
 
 async function testCheckAge2(cmd) {

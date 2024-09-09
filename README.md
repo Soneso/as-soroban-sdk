@@ -306,18 +306,27 @@ let values = new Vec();
 values.pushBack(val.fromI32(30));
 values.pushBack(val.fromSmallSymbolStr("celsius"));
 context.log("Today temperature:", values);
-
 ```
 
-Logging emits DIAGNOSTIC events. To fetch the events you can use the `stellar-cli`.
+### Log a value only
+```typescript
+import * as context from 'as-soroban-sdk/lib/context';
+
+context.logValue(val.fromI128Pieces(100,100));
+```
+
+
+To see the output of the logging, invoke the contract function with the cli.
 
 E.g.:
 
 ```sh
-stellar events --start-ledger 110284  \
-  --id CCRNSJSJ67TLSCZNT654H3DLMIARINHGQ6LVUBHCJJMJ5T3QCWCSELMG \
-  --rpc-url https://soroban-testnet.stellar.org \
-  --network-passphrase "Test SDF Network ; September 2015"
+stellar contract invoke  \
+--rpc-url https://soroban-testnet.stellar.org  \
+--network-passphrase "Test SDF Network ; September 2015"  \
+--source-account SAIPPNG3AGHSK2CLHIYQMVBPHISOOPT64MMW2PQGER47SDCN6C6XFWQM  \
+--id CBUP4VF23Z2GL5C5B7P6QHSNIE2VL7JOC6CM5HEH7IDQUPWZHRJWZS3P  \
+-- logging
 ```
 
 See also: [logging example](https://github.com/Soneso/as-soroban-examples/tree/main/logging)
