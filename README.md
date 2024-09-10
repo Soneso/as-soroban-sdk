@@ -411,7 +411,7 @@ You must define the contract spec for each function exported by your contract. I
 }
 ```
 
-Supported argument types are currently: `val` (any type of host value), `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `u256`, `i256`,`bool`, `symbol`, `string`, `status`, `bytes`, `void`, `timepoint`, `duration`, `address`, `option[valueType]`, `result[okType, errorType]`, `vec[elementType]`, `map[keyType, valueType]`, `set[elementType]` ,`bytesN[size]`, `udt(name)`, `tuple(value types separated by ;)`. If your function has no arguments, you can pass an empty array.
+Supported argument types are currently: `val` (any type of host value), `u32`, `i32`, `u64`, `i64`, `u128`, `i128`, `u256`, `i256`,`bool`, `symbol`, `string`, `error`, `bytes`, `void`, `timepoint`, `duration`, `address`, `option[valueType]`, `result[okType, errorType]`, `vec[elementType]`, `map[keyType, valueType]`, `set[elementType]` ,`bytesN[size]`, `udt(name)`, `tuple(value types separated by ;)`. If your function has no arguments, you can pass an empty array.
 
 Supported return value types are the same as the supported argument types. If your function has no return value you must return void as a static raw value. You can obtain it by using ```val.fromVoid()```. For this case you should set ```"returns" : "void"``` or remove `"returns"` in the contract.json.
 
