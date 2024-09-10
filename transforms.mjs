@@ -252,8 +252,8 @@ export class SdkTransform extends Transform {
         return xdr.ScSpecTypeDef.scSpecTypeBool();
       case "void":
         return xdr.ScSpecTypeDef.scSpecTypeVoid();
-      case "status":
-        return xdr.ScSpecTypeDef.scSpecTypeStatus();
+      case "error":
+        return xdr.ScSpecTypeDef.scSpecTypeError();
       case "u32":
         return xdr.ScSpecTypeDef.scSpecTypeU32();
       case "i32":
@@ -492,7 +492,7 @@ export class SdkTransform extends Transform {
         scSpecTypeVal: 0,
         scSpecTypeBool: 1,
         scSpecTypeVoid: 2,
-        scSpecTypeStatus: 3,
+        scSpecTypeError: 3,
         scSpecTypeU32: 4,
         scSpecTypeI32: 5,
         scSpecTypeU64: 6,
@@ -558,7 +558,7 @@ export class SdkTransform extends Transform {
           ["scSpecTypeVal", xdr.void()],
           ["scSpecTypeBool", xdr.void()],
           ["scSpecTypeVoid", xdr.void()],
-          ["scSpecTypeStatus", xdr.void()],
+          ["scSpecTypeError", xdr.void()],
           ["scSpecTypeU32", xdr.void()],
           ["scSpecTypeI32", xdr.void()],
           ["scSpecTypeU64", xdr.void()],
