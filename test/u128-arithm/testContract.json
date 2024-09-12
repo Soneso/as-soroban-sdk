@@ -1,0 +1,58 @@
+{
+    "functions": [
+        {
+            "name" : "testU128Add",
+            "arguments": [],
+            "returns" : "bool"
+        },
+        {
+            "name" : "testU128Sub",
+            "arguments": [],
+            "returns" : "bool"
+        },
+        {
+            "name" : "testU128Mul",
+            "arguments": [],
+            "returns" : "bool"
+        },
+        {
+            "name" : "testU128Div",
+            "arguments": [],
+            "returns" : "bool"
+        },
+        {
+            "name" : "testU128RemEuclid",
+            "arguments": [],
+            "returns" : "bool"
+        },
+        {
+            "name" : "testU128Pow",
+            "arguments": [],
+            "returns" : "bool"
+        },
+        {
+            "name" : "testU128Shl",
+            "arguments": [],
+            "returns" : "bool"
+        },
+        {
+            "name" : "testU128Shr",
+            "arguments": [],
+            "returns" : "bool"
+        }
+    ],
+    "meta": [
+        {
+            "key" : "name",
+            "value" : "u128-arithm-test"
+        },
+        {
+            "key" : "version",
+            "value" : "1.0.0"
+        },
+        {
+            "key" : "description",
+            "value" : "test u128 arithmetic operations based on u256 host functions"
+        }
+    ]
+}
