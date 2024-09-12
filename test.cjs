@@ -16,6 +16,7 @@ const cmdInvoke = 'stellar contract invoke' + rpcUrl + networkPassphrase + ' --s
 const deployExamples = cmdDeploy  + ' --wasm test/examples/build/release.wasm';
 const deployValConversions = cmdDeploy +  ' --wasm test/value-conversion/build/release.wasm';
 const deploySDKTypes = cmdDeploy + ' --wasm test/sdk-types/build/release.wasm';
+const deployU128Arithm = cmdDeploy +  ' --wasm test/u128-arithm/build/release.wasm';
 const jsonrpcErr = 'error: jsonrpc error:';
 
 async function startTest() {
@@ -35,6 +36,24 @@ async function startTest() {
     console.log('SDK Types contract id: ' + sdkTypesCId);
     await testSdkTypes(sdkTypesCId);
 
+    let u128ArithmCId  = await deployContract(deployU128Arithm);
+    console.log('U128 arithm contract id: ' + u128ArithmCId);
+    await testU128Arithm(u128ArithmCId);
+}
+
+async function testU128Arithm(cid) {
+    let cmd = cmdInvoke + cid;
+    console.log(cmd);
+    console.log(`test u128 arithmetic operation ...`);
+    await testC(`test u128 add ...`, cmd + ' -- testU128Add', 'true');
+    await testC(`test u128 sub ...`, cmd + ' -- testU128Sub', 'true');
+    await testC(`test u128 mul ...`, cmd + ' -- testU128Mul', 'true');
+    await testC(`test u128 div ...`, cmd + ' -- testU128Div', 'true');
+    await testC(`test u128 rem euclid ...`, cmd + ' -- testU128RemEuclid', 'true');
+    await testC(`test u128 pow ...`, cmd + ' -- testU128Pow', 'true');
+    await testC(`test u128 shl ...`, cmd + ' -- testU128Shl', 'true');
+    await testC(`test u128 shr ...`, cmd + ' -- testU128Shr', 'true');
+    console.log(`test u128 arithmetic operation -> OK`);
 }
 
 async function buildTests() {
@@ -72,6 +91,7 @@ async function deployContract(cmd) {
         }
     }
 }
+
 
 async function testValueConversion(cid) {
     let cmd = cmdInvoke + cid;
@@ -124,6 +144,7 @@ async function testC(info, cmd, res) {
         } if (stderr) {
             //assert.fail(`stderr: ${stderr}`);
         }
+        console.log(stderr);
         assert.equal(stdout.trim(), res);
         console.log(`OK`);
     } catch(error) {

@@ -1,4 +1,4 @@
-// Offers arithmetic helper functions for u128 numbers.
+// Offers arithmetic helper functions for u128 (unsigned integer 128) numbers using bitwise operations.
 // Inspired by: https://github.com/MaxGraey/as-bignum and ported to run on soroban
 
 import * as context from "./context";

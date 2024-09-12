@@ -656,7 +656,7 @@ export declare function bytes_len(v:BytesObject): U32Val;
 /// Appends an element to the back of the `Bytes` object.
 // @ts-ignore
 @external("b", "9")
-export declare function bytes_push(v:BytesObject, u:Val): BytesObject;
+export declare function bytes_push(v:BytesObject, u:U32Val): BytesObject;
 
 /// Removes the last element from the `Bytes` object and returns the new `Bytes`.
 /// Traps if original `Bytes` is empty.
