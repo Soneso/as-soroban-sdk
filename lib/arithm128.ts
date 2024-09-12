@@ -1,6 +1,6 @@
 // Offers arithmetic helper functions for I128Val and U128Val host values.
 // Uses u256 and i256 host functions to make the calculations.
-// Supports positive and negative values.
+// Supports positive values (TODO: negative values).
 
 import * as context from "./context";
 import { i256_add, i256_div, i256_mul, i256_pow, i256_rem_euclid, i256_shl, i256_shr, i256_sub, u256_add, u256_div, u256_mul, u256_pow, u256_rem_euclid, u256_shl, u256_shr } from "./env";
@@ -8,7 +8,6 @@ import { I128Val, I256Val, U128Val, U256Val, U32Val, Val, errorCodeArithDomain, 
     fromI256Small,fromU128Pieces, fromU128Small, fromU256Pieces, fromU256Small, isError, isI128Object, isI128Small, isI256Object, isI256Small, isU128Object, isU128Small, isU256Object, 
     isU256Small, toI128High64, toI128Low64, toI128Small, toI256HiHi, toI256HiLo, toI256LoHi, toI256LoLo, toI256Small, toU128High64, toU128Low64, toU128Small, 
     toU256HiHi, toU256HiLo, toU256LoHi, toU256LoLo, toU256Small} from "./value";
-
 
 /*****************
 Unsigned U128 
@@ -225,7 +224,7 @@ export function i128Div(lhs:I128Val, rhs:I128Val) : Val {
     if (isError(b256)) {
         return b256;
     }
-    let a256 = getI256FromU128(lhs);
+    let a256 = getI256FromI128(lhs);
     let ri256 = i256_div(a256, b256);
     return getI128FromI256(ri256);
 }
@@ -238,7 +237,7 @@ export function i128RemEuclid(lhs:I128Val, rhs:I128Val) : Val {
     if (isError(b256)) {
         return b256;
     }
-    let a256 = getU256FromU128(lhs);
+    let a256 = getI256FromI128(lhs);
     let ri256 = i256_rem_euclid(a256, b256);
     return getI128FromI256(ri256);
 }
@@ -377,16 +376,29 @@ function getU128FromI256(value:I256Val) : Val {
     }
 }
 
+function isNegative(value:I128Val) : bool {
+    if (isI128Small(value)) {
+        return toI128Small(value) < 0;
+    } else if (isI128Object(value)) {
+        return toI128High64(value) < 0;
+    } else {
+        context.fail();
+        return 0;
+    }
+}
+
 function getI256FromI128(value:I128Val) : I256Val {
     if (isI128Small(value)) {
         let smallValue = toI128Small(value);
         if (smallValue < 0) {
+            // TODO: negative values
             return fromError(errorTypeObject, errorCodeArithDomain);
         }
         return fromI256Small(toI128Small(value));
     } else if (isI128Object(value)) {
         let i128hi = toI128High64(value);
         if (i128hi < 0) {
+            // TODO: negative values
             return fromError(errorTypeObject, errorCodeArithDomain);
         }
         let i128lo = toI128Low64(value);
@@ -401,6 +413,7 @@ function getI256FromI128OrErrorIfZero(value:I128Val) : Val {
     if (isI128Small(value)) {
         let small = toI128Small(value);
         if (small <= 0) {
+            // TODO: negative values
             return fromError(errorTypeObject, errorCodeArithDomain);
         }
         return fromI256Small(small);
@@ -408,10 +421,11 @@ function getI256FromI128OrErrorIfZero(value:I128Val) : Val {
     else if (isI128Object(value)) {
         let lo = toI128Low64(value);
         let hi = toI128High64(value);
-        if (hi <= 0 || (lo == 0 && hi == 0)) {
+        if (hi < 0 || (lo == 0 && hi == 0)) {
+            // TODO: negative values
             return fromError(errorTypeObject, errorCodeArithDomain);
         }
-        return fromU256Pieces(0, 0, hi as u64, lo);
+        return fromI256Pieces(0, 0, hi as u64, lo);
     } else {
         context.fail();
         return 0;
@@ -428,6 +442,7 @@ function getI128FromI256(value:I256Val) : Val {
         if (i256hihi == 0 && i256lohi <= (i64.MAX_VALUE as u64)) {
             return fromI128Pieces((i256lohi as i64), toI256LoLo(value));
         } else if (i256hihi == -1 && i256lohi <= ((i64.MIN_VALUE * -1) as u64)) {
+            // TODO: fix this (i256lohi may be different for neg. values)
             return fromI128Pieces((i256lohi as i64) * -1, toI256LoLo(value));
         }
     } 

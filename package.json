@@ -9,7 +9,8 @@
     "asbuild:examplestest": "asc ./test/examples/tests.ts --runtime=stub --exportStart=sdkstart -Osize --converge --target release --outFile ./test/examples/build/release.wasm --textFile ./test/examples/build/release.wat --transform ./test/examples/transform.mjs",
     "asbuild:sdktypes": "asc ./test/sdk-types/tests.ts --runtime=stub --exportStart=sdkstart -Osize --converge --target release --outFile ./test/sdk-types/build/release.wasm --textFile ./test/sdk-types/build/release.wat --transform ./test/sdk-types/transform.mjs",
     "asbuild:u128arithm": "asc ./test/u128-arithm/tests.ts --runtime=stub --exportStart=sdkstart -Osize --converge --target release --outFile ./test/u128-arithm/build/release.wasm --textFile ./test/u128-arithm/build/release.wat --transform ./test/u128-arithm/transform.mjs",
-    "asbuild:tests": "npm run asbuild:valtest && npm run asbuild:examplestest && npm run asbuild:sdktypes && npm run asbuild:u128arithm"
+    "asbuild:i128arithm": "asc ./test/i128-arithm/tests.ts --runtime=stub --exportStart=sdkstart -Osize --converge --target release --outFile ./test/i128-arithm/build/release.wasm --textFile ./test/i128-arithm/build/release.wat --transform ./test/i128-arithm/transform.mjs",
+    "asbuild:tests": "npm run asbuild:valtest && npm run asbuild:examplestest && npm run asbuild:sdktypes && npm run asbuild:u128arithm && npm run asbuild:i128arithm"
   },
   "author": "Christian Rogobete",
   "license": "Apache-2.0",

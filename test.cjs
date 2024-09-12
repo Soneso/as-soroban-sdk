@@ -17,6 +17,7 @@ const deployExamples = cmdDeploy  + ' --wasm test/examples/build/release.wasm';
 const deployValConversions = cmdDeploy +  ' --wasm test/value-conversion/build/release.wasm';
 const deploySDKTypes = cmdDeploy + ' --wasm test/sdk-types/build/release.wasm';
 const deployU128Arithm = cmdDeploy +  ' --wasm test/u128-arithm/build/release.wasm';
+const deployI128Arithm = cmdDeploy +  ' --wasm test/i128-arithm/build/release.wasm';
 const jsonrpcErr = 'error: jsonrpc error:';
 
 async function startTest() {
@@ -39,6 +40,10 @@ async function startTest() {
     let u128ArithmCId  = await deployContract(deployU128Arithm);
     console.log('U128 arithm contract id: ' + u128ArithmCId);
     await testU128Arithm(u128ArithmCId);
+
+    let i128ArithmCId  = await deployContract(deployI128Arithm);
+    console.log('I128 arithm contract id: ' + i128ArithmCId);
+    await testI128Arithm(i128ArithmCId);
 }
 
 async function testU128Arithm(cid) {
@@ -54,6 +59,22 @@ async function testU128Arithm(cid) {
     await testC(`test u128 shl ...`, cmd + ' -- testU128Shl', 'true');
     await testC(`test u128 shr ...`, cmd + ' -- testU128Shr', 'true');
     console.log(`test u128 arithmetic operation -> OK`);
+}
+
+async function testI128Arithm(cid) {
+    let cmd = cmdInvoke + cid;
+    console.log(cmd);
+    console.log(`test pos. i128 arithmetic operation ...`);
+    await testC(`test i128 add ...`, cmd + ' -- testI128Add', 'true');
+    await testC(`test i128 sub ...`, cmd + ' -- testI128Sub', 'true');
+    await testC(`test i128 mul ...`, cmd + ' -- testI128Mul', 'true');
+    await testC(`test i128 div ...`, cmd + ' -- testI128Div', 'true');
+    await testC(`test i128 rem euclid ...`, cmd + ' -- testI128RemEuclid', 'true');
+    await testC(`test i128 pow ...`, cmd + ' -- testI128Pow', 'true');
+    await testC(`test i128 shl ...`, cmd + ' -- testI128Shl', 'true');
+    await testC(`test i128 shr ...`, cmd + ' -- testI128Shr', 'true');
+    
+    console.log(`test pos. i128 arithmetic operation -> OK`);
 }
 
 async function buildTests() {
