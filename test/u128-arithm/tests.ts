@@ -1,7 +1,8 @@
 import {BoolVal, errorCodeArithDomain, errorTypeObject, fromFalse, fromTrue, 
     fromU128Pieces, getErrorCode, getErrorType, isError, isU128Small, toU128Low64,
-    fromU128Small, toU128High64, toU128Small, isU128Object, fromU32} from "../../lib/value";
-import { u128Add, u128Compare, u128Div, u128IsEqual, u128IsGreaterThan, u128IsLowerThan, u128Mul, u128Pow, u128RemEuclid, u128Shl, u128Shr, u128Sub } from "../../lib/arithm128";
+    fromU128Small, toU128High64, toU128Small, isU128Object, fromU32,
+    fromU64} from "../../lib/value";
+import { u128Add, u128Compare, u128Div, u128IsEqual, u128IsGreaterThan, u128IsLowerThan, u128Mul, u128MulDiv, u128Pow, u128RemEuclid, u128Shl, u128Shr, u128Sub } from "../../lib/arithm128";
 import * as context from "../../lib/context";
 import { Vec } from "../../lib/vec";
 import * as u128 from "../../lib/u128_math";
@@ -34,7 +35,7 @@ export function testU128Add():BoolVal {
 
     // obj + obj
     lhs = fromU128Pieces(1, u64Max);
-    rhs =  fromU128Pieces(10, 1);
+    rhs = fromU128Pieces(10, 1);
     res = u128Add(lhs, rhs);
     if (isU128Object(res)) {
         let lo = toU128Low64(res);
@@ -157,7 +158,7 @@ export function testU128Mul():BoolVal {
     }
 
     
-    // obj + obj
+    // obj * obj
     lhs = fromU128Pieces(0, 75057594000000000);
     rhs =  fromU128Pieces(0, 75057594000000000);
     res = u128Mul(lhs, rhs);
@@ -172,16 +173,37 @@ export function testU128Mul():BoolVal {
         let b_hi = u128.__hi;
 
         /*let vals = new Vec();
-        vals.pushBack(fromU64(lo));
-        vals.pushBack(fromU64(hi));
+        vals.pushBack(res);
         vals.pushBack(fromU64(b_lo));
         vals.pushBack(fromU64(b_hi));
         context.log("cmp ", vals);*/
 
-        if (!u128.eq(b_lo, b_hi, lo, hi)) {
+        if (!u128IsEqual(res, fromU128Pieces(b_hi, b_lo))) {
             return falseVal;
         }
 
+    } else {
+        return falseVal;
+    }
+
+    // obj * obj / obj (muldiv)
+    let number = fromU128Pieces(0, 75057594000000000);
+    let nominator =  fromU128Pieces(1000, 75057594000000000);
+    let denominator =  fromU128Pieces(0, 300);
+    res = u128MulDiv(number, nominator, denominator);
+    if (isU128Object(res)) {
+        let lo = toU128Low64(res);
+        let hi = toU128High64(res);
+        if (lo != 13897278342510149632 || hi != 250192998001224598) {
+            return falseVal;
+        }
+        
+        let b_lo = u128.muldiv(75057594000000000, 0, 75057594000000000, 1000, 300, 0);
+        let b_hi = u128.__hi;
+
+        if (!u128IsEqual(res, fromU128Pieces(b_hi, b_lo))) {
+            return falseVal;
+        }
     } else {
         return falseVal;
     }

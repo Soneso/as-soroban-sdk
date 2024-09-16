@@ -84,6 +84,37 @@ export function u128Div(lhs:U128Val, rhs:U128Val) : Val {
     return getU128FromU256(ru256);
 }
 
+/**
+ * Multiplies and devides u128 numbers without overflow in multiplication part (number * numerator / denominator).
+ * Traps if not U128Val (U128Object or U128SmallVal) values.
+ * @param number number to multiply with numerator U128Val.
+ * @param numerator numerator to be multiplied with number U128Val.
+ * @param denominator denominator U128Val.
+ * @returns U128Val as the result of number * numerator / denominator or `Error` (errorTypeObject, errorCodeArithDomain) on overflow. 
+ */
+export function u128MulDiv(number:U128Val, numerator:U128Val, denominator: U128Val) : Val {
+    let number256 = getU256FromU128(number);
+    let numerator256 = getU256FromU128(numerator);
+    let denominator256 = getU256FromU128OrErrorIfZero(denominator);
+    let ru256 = u256_div(u256_mul(number256, numerator256), denominator256);
+    return getU128FromU256(ru256);
+}
+
+/**
+ * Multiplies and devides u128 numbers without overflow in multiplication part (number * numerator / denominator). 
+ * Traps if not U128Val (U128Object or U128SmallVal) values.
+ * @param number number to multiply with numerator U128Val.
+ * @param numerator numerator to be multiplied with number U128Val.
+ * @param denominator denominator U128Val.
+ * @returns U256Val as the result of number * numerator / denominator or `Error` (errorTypeObject, errorCodeArithDomain) on overflow. 
+ */
+export function u128MulDivToU256(number:U128Val, numerator:U128Val, denominator: U128Val) : U256Val {
+    let number256 = getU256FromU128(number);
+    let numerator256 = getU256FromU128(numerator);
+    let denominator256 = getU256FromU128OrErrorIfZero(denominator);
+    return u256_div(u256_mul(number256, numerator256), denominator256);
+}
+
 // Performs checked unsigned integer Euclidean modulo. Computes `lhs % rhs`, 
 // returning U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if rhs == 0. 
 // Uses the u256_rem_euclid host function to perform the modulo.
@@ -228,6 +259,37 @@ export function i128Div(lhs:I128Val, rhs:I128Val) : Val {
     let a256 = getI256FromI128(lhs);
     let ri256 = i256_div(a256, b256);
     return getI128FromI256(ri256);
+}
+
+/**
+ * Multiplies and devides i128 numbers without overflow in multiplication part (number * numerator / denominator).
+ * Traps if not I128Val (I128Object or I128SmallVal) values.
+ * @param number number to multiply with numerator I128Val.
+ * @param numerator numerator to be multiplied with number I128Val.
+ * @param denominator denominator I128Val.
+ * @returns I128Val as the result of number * numerator / denominator  or `Error` (errorTypeObject, errorCodeArithDomain) on overflow. 
+ */
+export function i128MulDiv(number:I128Val, numerator:I128Val, denominator: I128Val) : Val {
+    let number256 = getI256FromI128(number);
+    let numerator256 = getI256FromI128(numerator);
+    let denominator256 = getI256FromI128OrErrorIfZero(denominator);
+    let ru256 = i256_div(i256_mul(number256, numerator256), denominator256);
+    return getI128FromI256(ru256);
+}
+
+/**
+ * Multiplies and devides i128 numbers without overflow in multiplication part (number * numerator / denominator).
+ * Traps if not I128Val (I128Object or I128SmallVal) values.
+ * @param number number to multiply with numerator I128Val.
+ * @param numerator numerator to be multiplied with number I128Val.
+ * @param denominator denominator I128Val.
+ * @returns I256Val as the result of number * numerator / denominator  or `Error` (errorTypeObject, errorCodeArithDomain) on overflow. 
+ */
+export function i128MulDivToI256(number:I128Val, numerator:I128Val, denominator: I128Val) : I256Val {
+    let number256 = getI256FromI128(number);
+    let numerator256 = getI256FromI128(numerator);
+    let denominator256 = getI256FromI128OrErrorIfZero(denominator);
+    return i256_div(i256_mul(number256, numerator256), denominator256);
 }
 
 // Performs checked signed integer Euclidean modulo. Computes `lhs % rhs`, 

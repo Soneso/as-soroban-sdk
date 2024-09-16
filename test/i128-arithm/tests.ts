@@ -2,7 +2,7 @@ import {BoolVal, errorCodeArithDomain, errorTypeObject, fromFalse, fromTrue,
     fromI128Pieces, getErrorCode, getErrorType, isError, isI128Small, 
     fromI128Small, toI128Small, isI128Object, toI128Low64,toI128High64,
     fromU32} from "../../lib/value";
-import { i128Add, i128Compare, i128Div, i128IsEqual, i128IsGreaterThan, i128IsLowerThan, i128Mul, i128Pow, i128RemEuclid, i128Shl, i128Shr, i128Sub, isI128Negative } from "../../lib/arithm128";
+import { i128Add, i128Compare, i128Div, i128IsEqual, i128IsGreaterThan, i128IsLowerThan, i128Mul, i128MulDiv, i128Pow, i128RemEuclid, i128Shl, i128Shr, i128Sub, isI128Negative } from "../../lib/arithm128";
 import * as u128 from "../../lib/u128_math";
 
 export function testI128Add():BoolVal {
@@ -319,6 +319,28 @@ export function testI128Mul():BoolVal {
         let hi = toI128High64(lhs);
         if (lo != resLo || hi != resHi) {
             return falseVal; 
+        }
+    } else {
+        return falseVal;
+    }
+
+    // obj * obj / obj (muldiv)
+    let number = fromI128Pieces(0, 75057594000000000);
+    let nominator =  fromI128Pieces(1000, 75057594000000000);
+    let denominator =  fromI128Pieces(0, 300);
+    res = i128MulDiv(number, nominator, denominator);
+    if (isI128Object(res)) {
+        let lo = toI128Low64(res);
+        let hi = toI128High64(res);
+        if (lo != 13897278342510149632 || hi != 250192998001224598) {
+            return falseVal;
+        }
+        
+        let b_lo = u128.muldiv(75057594000000000, 0, 75057594000000000, 1000, 300, 0);
+        let b_hi = u128.__hi;
+
+        if (!i128IsEqual(res, fromI128Pieces(b_hi, b_lo))) {
+            return falseVal;
         }
     } else {
         return falseVal;

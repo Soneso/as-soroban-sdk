@@ -428,8 +428,9 @@ export function u128div(a:U128Val, b:U128Val) : U128Val {
  * Supports positive values.
  * Traps if not I128Val (I128Object or I128SmallVal) values.
  * Traps if any of the given values are negative. To avoid, use "isNegative()".
- * @param a first I128Val.
- * @param b second I128Val.
+ * @param number number to multiply with numerator I128Val.
+ * @param numerator numerator to multiply with number I128Val.
+ * @param denominator I128Val.
  * @returns I128Val as the result of number * numerator / denominator.
  */
 export function i128muldiv(number:I128Val, numerator:I128Val, denominator: I128Val) : I128Val {
@@ -450,9 +451,10 @@ export function i128muldiv(number:I128Val, numerator:I128Val, denominator: I128V
 /**
  * Multiplies and devides u128 numbers without overflow in multiplication part (number * numerator / denominator).
  * Traps if not U128Val (U128Object or U128SmallVal) values.
- * @param a first I128Val.
- * @param b second I128Val.
- * @returns U128Val as the result of a / b
+ * @param number number to multiply with numerator U128Val.
+ * @param numerator numerator to multiply with number U128Val.
+ * @param denominator U128Val.
+ * @returns U128Val as the result of number * numerator / denominator.
  */
 export function u128muldiv(number:U128Val, numerator:U128Val, denominator: U128Val) : U128Val {
 
