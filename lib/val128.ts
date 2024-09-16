@@ -15,7 +15,7 @@ import { I128Val, U128Val, fromI128Pieces, fromI128Small, fromU128Pieces, fromU1
  * @param value the I128Val to check.
  * @returns true if negative otherwise false.
  */
-function isNegative(value:I128Val) : bool {
+export function isNegative(value:I128Val) : bool {
     if (isI128Small(value)) {
         return toI128Small(value) < 0;
     } else if (isI128Object(value)) {
@@ -25,6 +25,10 @@ function isNegative(value:I128Val) : bool {
         return 0;
     }
 }
+/*export function isNegative(value:I128Val) : bool {
+    let alo = getI128Parts(value);
+    return lt(alo, __reshi, 0, 0);
+}*/
 
 /**
  * Checks if first given I128Val is lower then - operator('<') - second I128Val.
