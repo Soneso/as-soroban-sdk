@@ -2,7 +2,7 @@ import {BoolVal, errorCodeArithDomain, errorTypeObject, fromFalse, fromTrue,
     fromI128Pieces, getErrorCode, getErrorType, isError, isI128Small, 
     fromI128Small, toI128Small, isI128Object, toI128Low64,toI128High64,
     fromU32} from "../../lib/value";
-import { i128Add, i128Div, i128Mul, i128Pow, i128RemEuclid, i128Shl, i128Shr, i128Sub } from "../../lib/arithm128";
+import { i128Add, i128Compare, i128Div, i128IsEqual, i128IsGreaterThan, i128IsLowerThan, i128Mul, i128Pow, i128RemEuclid, i128Shl, i128Shr, i128Sub, isI128Negative } from "../../lib/arithm128";
 import * as u128 from "../../lib/u128_math";
 
 export function testI128Add():BoolVal {
@@ -621,6 +621,169 @@ export function testI128Shr():BoolVal {
         getErrorCode(res) != errorCodeArithDomain) {
             return falseVal;
     }*/
+
+    return fromTrue();
+}
+
+export function testI128Util():BoolVal {
+    let falseVal = fromFalse();
+
+    if (!isI128Negative(fromI128Small(-8))) {
+        return falseVal;
+    }
+    if (!isI128Negative(fromI128Pieces(-1,1))) {
+        return falseVal;
+    }
+    if (isI128Negative(fromI128Pieces(1,1))) {
+        return falseVal;
+    }
+    if (isI128Negative(fromI128Small(8))) {
+        return falseVal;
+    }
+
+    if (i128Compare(fromI128Small(8), fromI128Small(8)) != 0) {
+        return falseVal;
+    }
+    if (!i128IsEqual(fromI128Small(8), fromI128Small(8))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Small(7), fromI128Small(8)) != -1) {
+        return falseVal;
+    }
+    if (i128IsEqual(fromI128Small(7), fromI128Small(8))) {
+        return falseVal;
+    }
+    if (i128IsGreaterThan(fromI128Small(7), fromI128Small(8))) {
+        return falseVal;
+    }
+    if (!i128IsLowerThan(fromI128Small(7), fromI128Small(8))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Small(9), fromI128Small(8)) != 1) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Small(-8), fromI128Small(-8)) != 0) {
+        return falseVal;
+    }
+    if (!i128IsEqual(fromI128Small(-8), fromI128Small(-8))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Small(-7), fromI128Small(-8)) != 1) {
+        return falseVal;
+    }
+    if (!i128IsGreaterThan(fromI128Small(-7), fromI128Small(-8))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Small(-9), fromI128Small(-8)) != -1) {
+        return falseVal;
+    }
+    if (!i128IsLowerThan(fromI128Small(-9), fromI128Small(-8))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Small(-9), fromI128Small(8)) != -1) {
+        return falseVal;
+    }
+    if (!i128IsLowerThan(fromI128Small(-9), fromI128Small(8))) {
+        return falseVal;
+    }
+
+    if (i128Compare(fromI128Pieces(1,5), fromI128Pieces(1,5)) != 0) {
+        return falseVal;
+    }
+    if (!i128IsEqual(fromI128Pieces(1,5), fromI128Pieces(1,5))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Pieces(1,4), fromI128Pieces(1,5)) != -1) {
+        return falseVal;
+    }
+    if (!i128IsLowerThan(fromI128Pieces(1,4), fromI128Pieces(1,5))) {
+        return falseVal;
+    }
+    if (i128IsGreaterThan(fromI128Pieces(1,4), fromI128Pieces(1,5))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Pieces(1,6), fromI128Pieces(1,5)) != 1) {
+        return falseVal;
+    }
+    if (!i128IsGreaterThan(fromI128Pieces(1,6), fromI128Pieces(1,5))) {
+        return falseVal;
+    }
+    if (i128IsLowerThan(fromI128Pieces(1,6), fromI128Pieces(1,5))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Pieces(-1,5), fromI128Pieces(-1,5)) != 0) {
+        return falseVal;
+    }
+    if (!i128IsEqual(fromI128Pieces(-1,5), fromI128Pieces(-1,5))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Pieces(-1,5), fromI128Pieces(-1,4)) != 1) {
+        return falseVal;
+    }
+    if (i128IsLowerThan(fromI128Pieces(-1,5), fromI128Pieces(-1,4))) {
+        return falseVal;
+    }
+    if (!i128IsGreaterThan(fromI128Pieces(-1,5), fromI128Pieces(-1,4))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Pieces(-1,5), fromI128Pieces(-1,6)) != -1) {
+        return falseVal;
+    }
+    if (!i128IsLowerThan(fromI128Pieces(-1,5), fromI128Pieces(-1,6))) {
+        return falseVal;
+    }
+    if (i128IsGreaterThan(fromI128Pieces(-1,5), fromI128Pieces(-1,6))) {
+        return falseVal;
+    }
+
+    if (i128Compare(fromI128Pieces(1,5), fromI128Small(8)) != 1) {
+        return falseVal;
+    }
+    if (i128IsEqual(fromI128Pieces(1,5), fromI128Small(8))) {
+        return falseVal;
+    }
+    if (!i128IsLowerThan(fromI128Pieces(-1,5), fromI128Small(8))) {
+        return falseVal;
+    }
+    if (i128IsGreaterThan(fromI128Pieces(-1,5), fromI128Small(8))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Pieces(1,5), fromI128Small(-8)) != 1) {
+        return falseVal;
+    }
+    if (i128IsEqual(fromI128Pieces(1,5), fromI128Small(-8))) {
+        return falseVal;
+    }
+    if (!i128IsLowerThan(fromI128Pieces(-1,5), fromI128Small(-8))) {
+        return falseVal;
+    }
+    if (i128IsGreaterThan(fromI128Pieces(-1,5), fromI128Small(-8))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Pieces(-1,5), fromI128Small(8)) != -1) {
+        return falseVal;
+    }
+    if (i128IsEqual(fromI128Pieces(-1,5), fromI128Small(8))) {
+        return falseVal;
+    }
+    if (!i128IsLowerThan(fromI128Pieces(-1,5), fromI128Small(8))) {
+        return falseVal;
+    }
+    if (i128IsGreaterThan(fromI128Pieces(-1,5), fromI128Small(8))) {
+        return falseVal;
+    }
+    if (i128Compare(fromI128Pieces(-1,5), fromI128Small(-8)) != -1) {
+        return falseVal;
+    }
+    if (i128IsEqual(fromI128Pieces(-1,5), fromI128Small(-8))) {
+        return falseVal;
+    }
+    if (!i128IsLowerThan(fromI128Pieces(-1,5), fromI128Small(-8))) {
+        return falseVal;
+    }
+    if (i128IsGreaterThan(fromI128Pieces(-1,5), fromI128Small(-8))) {
+        return falseVal;
+    }
 
     return fromTrue();
 }

@@ -4,7 +4,7 @@
 
 import { Bytes } from "./bytes";
 import * as context from "./context";
-import { i256_add, i256_div, i256_mul, i256_pow, i256_rem_euclid, i256_shl, i256_shr, i256_sub, i256_val_from_be_bytes, i256_val_to_be_bytes, u256_add, u256_div, u256_mul, u256_pow, u256_rem_euclid, u256_shl, u256_shr } from "./env";
+import { i256_add, i256_div, i256_mul, i256_pow, i256_rem_euclid, i256_shl, i256_shr, i256_sub, i256_val_from_be_bytes, i256_val_to_be_bytes, obj_cmp, u256_add, u256_div, u256_mul, u256_pow, u256_rem_euclid, u256_shl, u256_shr } from "./env";
 import { BytesObject, I128Object, I128Val, I256Val, U128Val, U256Val, U32Val, Val, errorCodeArithDomain, errorTypeObject, fromError, fromI128Pieces, fromI128Small, fromI256Pieces,
     fromI256Small,fromU128Pieces, fromU128Small, fromU256Pieces, fromU256Small, isError, isI128Object, isI128Small, isI256Object, isI256Small, isU128Object, isU128Small, isU256Object, 
     isU256Small, toI128High64, toI128Low64, toI128Small, toI256HiHi, toI256HiLo, toI256LoHi, toI256LoLo, toI256Small, toU128High64, toU128Low64, toU128Small, 
@@ -298,9 +298,13 @@ export function i128ShrToI256(lhs:U128Val, rhs:U32Val) : Val {
     return i256_shr(a256, rhs);
 }
 
+/*****************
+UTIL
+*****************/
+
 // Returns true if the given I128Val is negative, otherwise flase.
 // Traps if the given value is not I128Val
-function isNegative(value:I128Val) : bool {
+export function isI128Negative(value:I128Val) : bool {
     if (isI128Small(value)) {
         return toI128Small(value) < 0;
     } else if (isI128Object(value)) {
@@ -309,6 +313,82 @@ function isNegative(value:I128Val) : bool {
         context.fail();
         return 0;
     }
+}
+
+// Compares two U128Val. 
+// Returns -1 if a<b, 1 if a>b, or 0 if a==b.
+// Traps if any of the given values is not U128Val.
+export function u128Compare(a:U128Val, b:U128Val) : i64 {
+    if (isU128Small(a) && isU128Small(b)) {
+        let sa = toU128Small(a);
+        let sb = toU128Small(b);
+
+        // Returns -1 if a<b, 1 if a>b, or 0 if a==b.
+        if (sa < sb) {
+            return -1;
+        } else if (sa > sb) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    return obj_cmp(a, b);
+}
+
+// Returns true if a > b
+// Traps if any of the given values is not U128Val.
+export function u128IsGreaterThan(a:U128Val, b:U128Val) : bool {
+    return u128Compare(a,b) == 1;
+}
+
+// Returns true if a < b
+// Traps if any of the given values is not U128Val.
+export function u128IsLowerThan(a:U128Val, b:U128Val) : bool {
+    return u128Compare(a,b) == -1;
+}
+
+// Returns true if a == b
+// Traps if any of the given values is not U128Val.
+export function u128IsEqual(a:U128Val, b:U128Val) : bool {
+    return u128Compare(a,b) == 0;
+}
+
+// Compares two I128Val. 
+// Returns -1 if a<b, 1 if a>b, or 0 if a==b.
+// Traps if any of the given values is not I128Val.
+export function i128Compare(a:I128Val, b:I128Val) : i64 {
+    if (isI128Small(a) && isI128Small(b)) {
+        let sa = toI128Small(a);
+        let sb = toI128Small(b);
+
+        // Returns -1 if a<b, 1 if a>b, or 0 if a==b.
+        if (sa < sb) {
+            return -1;
+        } else if (sa > sb) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    return obj_cmp(a, b);
+}
+
+// Returns true if a > b
+// Traps if any of the given values is not I128Val.
+export function i128IsGreaterThan(a:I128Val, b:I128Val) : bool {
+    return i128Compare(a, b) == 1;
+}
+
+// Returns true if a < b
+// Traps if any of the given values is not I128Val.
+export function i128IsLowerThan(a:I128Val, b:I128Val) : bool {
+    return i128Compare(a, b) == -1;
+}
+
+// Returns true if a < b
+// Traps if any of the given values is not I128Val.
+export function i128IsEqual(a:I128Val, b:I128Val) : bool {
+    return i128Compare(a, b) == 0;
 }
 
 /*****************

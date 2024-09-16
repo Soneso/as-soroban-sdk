@@ -58,6 +58,7 @@ async function testU128Arithm(cid) {
     await testC(`test u128 pow ...`, cmd + ' -- testU128Pow', 'true');
     await testC(`test u128 shl ...`, cmd + ' -- testU128Shl', 'true');
     await testC(`test u128 shr ...`, cmd + ' -- testU128Shr', 'true');
+    await testC(`test u128 util ...`, cmd + ' -- testU128Util', 'true');
     console.log(`test u128 arithmetic operation -> OK`);
 }
 
@@ -73,6 +74,7 @@ async function testI128Arithm(cid) {
     await testC(`test i128 pow ...`, cmd + ' -- testI128Pow', 'true');
     await testC(`test i128 shl ...`, cmd + ' -- testI128Shl', 'true');
     await testC(`test i128 shr ...`, cmd + ' -- testI128Shr', 'true');
+    await testC(`test i128 util ...`, cmd + ' -- testI128Util', 'true');
     
     console.log(`test pos. i128 arithmetic operation -> OK`);
 }

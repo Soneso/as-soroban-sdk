@@ -39,6 +39,11 @@
             "name" : "testI128Shr",
             "arguments": [],
             "returns" : "bool"
+        },
+        {
+            "name" : "testI128Util",
+            "arguments": [],
+            "returns" : "bool"
         }
     ],
     "meta": [
