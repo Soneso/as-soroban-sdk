@@ -14,9 +14,13 @@ import { BytesObject, I128Object, I128Val, I256Val, U128Val, U256Val, U32Val, Va
 Unsigned U128 
 *****************/
 
-// Performs checked unsigned integer addition. Computes `lhs + rhs`, 
-// returning U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
-// Uses the u256_add host function to perform the addition.
+/**
+ * Performs checked unsigned integer addition. Computes `lhs + rhs`.
+ * Uses the u256_add host function to perform the addition.
+ * @param lhs U128Val left value to add
+ * @param rhs U128Val right value to add
+ * @returns U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
+ */
 export function u128Add(lhs:U128Val, rhs:U128Val) : Val {
     let a256 = getU256FromU128(lhs);
     let b256 = getU256FromU128(rhs);
@@ -24,18 +28,26 @@ export function u128Add(lhs:U128Val, rhs:U128Val) : Val {
     return getU128FromU256(ru256);
 }
 
-// Performs unsigned integer addition. Computes `lhs + rhs`, 
-// returning U256Val (U256Small or U256Object) so that no overflow can occur.
-// Uses the u256_add host function to perform the addition.
+/**
+ * Performs unsigned integer addition. Computes `lhs + rhs`. 
+ * Uses the u256_add host function to perform the addition.
+ * @param lhs U128Val left value to add
+ * @param rhs U128Val right value to add
+ * @returns U256Val (U256Small or U256Object) so that no overflow can occur.
+ */
 export function u128AddToU256(lhs:U128Val, rhs:U128Val) : U256Val {
     let a256 = getU256FromU128(lhs);
     let b256 = getU256FromU128(rhs);
     return u256_add(a256, b256);
 }
 
-// Performs checked unsigned integer subtraction. Computes `lhs - rhs`, 
-// returning U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if underflow occurred (result < 0).
-// Uses the i256_sub host function to perform the subtraction.
+/**
+ * Performs checked unsigned integer subtraction. Computes `lhs - rhs`.
+ * Uses the i256_sub host function to perform the subtraction. 
+ * @param lhs U128Val value to substract from
+ * @param rhs U128Val value to be substracted
+ * @returns U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if underflow occurred (result < 0).
+ */
 export function u128Sub(lhs:U128Val, rhs:U128Val) : Val {
     let a256 = getI256FromU128(lhs);
     let b256 = getI256FromU128(rhs);
@@ -43,18 +55,26 @@ export function u128Sub(lhs:U128Val, rhs:U128Val) : Val {
     return getU128FromI256(ri256);
 }
 
-// Performs unsigned integer subtraction. Computes `lhs - rhs`, 
-// returning I256Val (I256Small or I256Object) so that no underflow can occur.
-// Uses the i256_sub host function to perform the subtraction.
+/**
+ * Performs unsigned integer subtraction. Computes `lhs - rhs`. 
+ * Uses the i256_sub host function to perform the subtraction. 
+ * @param lhs U128Val value to substract from
+ * @param rhs U128Val value to be substracted
+ * @returns I256Val (I256Small or I256Object) so that no underflow can occur.
+ */
 export function u128SubToI256(lhs:U128Val, rhs:U128Val) : I256Val {
     let a256 = getI256FromU128(lhs);
     let b256 = getI256FromU128(rhs);
     return i256_sub(a256, b256);
 }
 
-// Performs checked unsigned integer multiplication. Computes `lhs * rhs`, 
-// returning U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
-// Uses the u256_mul host function to perform the multiplication.
+/**
+ * Performs checked unsigned integer multiplication. Computes `lhs * rhs`.
+ * Uses the u256_mul host function to perform the multiplication.
+ * @param lhs U128Val left value to be multiplied
+ * @param rhs U128Val right value to be multiplied
+ * @returns U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred.
+ */
 export function u128Mul(lhs:U128Val, rhs:U128Val) : Val {
     let a256 = getU256FromU128(lhs);
     let b256 = getU256FromU128(rhs);
@@ -62,18 +82,26 @@ export function u128Mul(lhs:U128Val, rhs:U128Val) : Val {
     return getU128FromU256(ru256);
 }
 
-// Performs unsigned integer multiplication. Computes `lhs * rhs`, 
-// returning U256Val (U256Small or U256Object) so that no overflow can occur.
-// Uses the u256_mul host function to perform the multiplication.
+/**
+ * Performs unsigned integer multiplication. Computes `lhs * rhs`.
+ * Uses the u256_mul host function to perform the multiplication.
+ * @param lhs U128Val left value to be multiplied
+ * @param rhs U128Val right value to be multiplied
+ * @returns U256Val (U256Small or U256Object) so that no overflow can occur.
+ */
 export function u128MulToU256(lhs:U128Val, rhs:U128Val) : U256Val {
     let a256 = getU256FromU128(lhs);
     let b256 = getU256FromU128(rhs);
     return u256_mul(a256, b256);
 }
 
-// Performs checked unsigned integer division. Computes `lhs / rhs`, 
-// returning U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if rhs == 0. 
-// Uses the u256_div host function to perform the division.
+/**
+ * Performs checked unsigned integer division. Computes `lhs / rhs`.
+ * Uses the u256_div host function to perform the division.
+ * @param lhs U128Val value to be devided
+ * @param rhs U128Val value to devide by
+ * @returns U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if rhs == 0. 
+ */
 export function u128Div(lhs:U128Val, rhs:U128Val) : Val {
     let b256 = getU256FromU128OrErrorIfZero(rhs);
     if (isError(b256)) {
@@ -115,9 +143,13 @@ export function u128MulDivToU256(number:U128Val, numerator:U128Val, denominator:
     return u256_div(u256_mul(number256, numerator256), denominator256);
 }
 
-// Performs checked unsigned integer Euclidean modulo. Computes `lhs % rhs`, 
-// returning U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if rhs == 0. 
-// Uses the u256_rem_euclid host function to perform the modulo.
+/**
+ * Performs checked unsigned integer Euclidean modulo. Computes `lhs % rhs`.
+ * Uses the u256_rem_euclid host function to perform the modulo.
+ * @param lhs U128Val left value
+ * @param rhs U128Val right value 
+ * @returns U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if rhs == 0. 
+ */
 export function u128RemEuclid(lhs:U128Val, rhs:U128Val) : Val {
     let b256 = getU256FromU128OrErrorIfZero(rhs);
     if (isError(b256)) {
@@ -128,18 +160,27 @@ export function u128RemEuclid(lhs:U128Val, rhs:U128Val) : Val {
     return getU128FromU256(ru256);
 }
 
-// Performs checked unsigned integer exponentiation. Computes `lhs.exp(rhs)`, 
-// returning U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
-// Uses the u256_pow host function to perform the exponentiation.
+
+/**
+ * Performs checked unsigned integer exponentiation. Computes `lhs.exp(rhs)`
+ * Uses the u256_pow host function to perform the exponentiation. 
+ * @param lhs U128Val left value (base)
+ * @param rhs U128Val right value (exponent)
+ * @returns U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
+ */
 export function u128Pow(lhs:U128Val, rhs:U32Val) : Val {
     let a256 = getU256FromU128(lhs);
     let ru256 = u256_pow(a256, rhs);
     return getU128FromU256(ru256);
 }
 
-// Performs unsigned integer exponentiation. Computes `lhs.exp(rhs)`, 
-// returning U256Val (U256Small or U256Object). Traps if u256 overflow occurs.
-// Uses the u256_pow host function to perform the exponentiation.
+/**
+ * Performs unsigned integer exponentiation. Computes `lhs.exp(rhs)`.
+ * Uses the u256_pow host function to perform the exponentiation.
+ * @param lhs U128Val left value (base)
+ * @param rhs U128Val right value (exponent)
+ * @returns U256Val (U256Small or U256Object). Traps if u256 overflow occurs.
+ */
 export function u128PowToU256(lhs:U128Val, rhs:U32Val) : U256Val {
     let a256 = getU256FromU128(lhs);
     return u256_pow(a256, rhs);
@@ -149,51 +190,71 @@ export function u128PowToU256(lhs:U128Val, rhs:U32Val) : U256Val {
 // returning U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
 // Uses the u256_shl host function to perform the shift left. 
 // Traps if u256_shl error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+/**
+ * Performs checked unsigned integer shift left. Computes `lhs << rhs`.
+ * Uses the u256_shl host function to perform the shift left.
+ * Traps if u256_shl error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)  
+ * @param lhs U128Val value to shift left
+ * @param rhs U32Val shift left by this value
+ * @returns U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
+ */
 export function u128Shl(lhs:U128Val, rhs:U32Val) : Val {
     let a256 = getU256FromU128(lhs);
     let ru256 = u256_shl(a256, rhs);
     return getU128FromU256(ru256);
 }
 
-// Performs unsigned integer shift left. Computes `lhs << rhs`, 
-// returning U256Val (U256Small or U256Object). Traps if u256 overflow occurs.
-// Uses the u256_shl host function to perform the shift left. 
-// Traps if u256_shl error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+/**
+ * Performs unsigned integer shift left. Computes `lhs << rhs`.
+ * Uses the u256_shl host function to perform the shift left.
+ * Traps if u256_shl error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+ * @param lhs U128Val value to shift left
+ * @param rhs U32Val shift left by this value
+ * @returns U256Val (U256Small or U256Object). Traps if u256 overflow occurs.
+ */
 export function u128ShlToU256(lhs:U128Val, rhs:U32Val) : Val {
     let a256 = getU256FromU128(lhs);
     return u256_shl(a256, rhs);
 }
 
-// Performs checked unsigned integer shift right. Computes `lhs >> rhs`, 
-// returning U128Val (U128Small or U128Object).
-// Uses the u256_shr host function to perform the shift right. 
-// Traps if u256_shr error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+/**
+ * Performs checked unsigned integer shift right. Computes `lhs >> rhs`.
+ * Uses the u256_shr host function to perform the shift right.
+ * Traps if u256_shr error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+ * @param lhs U128Val value to shift right
+ * @param rhs U32Val shift right by this value
+ * @returns U128Val (U128Small or U128Object).
+ */
 export function u128Shr(lhs:U128Val, rhs:U32Val) : Val {
     let a256 = getU256FromU128(lhs);
     let ru256 = u256_shr(a256, rhs);
     return getU128FromU256(ru256);
 }
 
-// Performs unsigned integer shift right. Computes `lhs >> rhs`, 
-// returning U256Val (U256Small or U256Object). 
-// Uses the u256_shr host function to perform the shift right. 
-// Traps if u256_shr error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+/**
+ * Performs unsigned integer shift right. Computes `lhs >> rhs`.
+ * Uses the u256_shr host function to perform the shift right.
+ * Traps if u256_shr error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`) 
+ * @param lhs U128Val value to shift right
+ * @param rhs U32Val shift right by this value
+ * @returns U256Val (U256Small or U256Object). 
+ */
 export function u128ShrToU256(lhs:U128Val, rhs:U32Val) : Val {
     let a256 = getU256FromU128(lhs);
     return u256_shr(a256, rhs);
 }
 
-
 /********************************************************************
 Signed I128 positive and negative
 ********************************************************************/
 
-// Performs checked signed integer addition. Computes `lhs + rhs`, 
-// returning `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
-// Uses the i256_add host function to perform the addition.
-// Performs checked unsigned integer addition. Computes `lhs + rhs`, 
-// returning U128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
-// Uses the u256_add host function to perform the addition.
+/**
+ * Performs checked signed integer addition. Computes `lhs + rhs`.
+ * Uses the i256_add host function to perform the addition.
+ * @param lhs I256Val left value to add
+ * @param rhs I256Val right value to add
+ * @returns I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
+ */
 export function i128Add(lhs:I128Val, rhs:I128Val) : Val {
     let a256 = getI256FromI128(lhs);
     let b256 = getI256FromI128(rhs);
@@ -201,18 +262,26 @@ export function i128Add(lhs:I128Val, rhs:I128Val) : Val {
     return getI128FromI256(ru256);
 }
 
-// Performs signed integer addition. Computes `lhs + rhs`, 
-// returning I256Val (I256Small or I256Object) so that no overflow can occur.
-// Uses the i256_add host function to perform the addition.
+/**
+ * Performs signed integer addition. Computes `lhs + rhs`.
+ * Uses the i256_add host function to perform the addition.
+ * @param lhs I256Val left value to add
+ * @param rhs I256Val right value to add
+ * @returns I256Val (I256Small or I256Object) so that no overflow can occur.
+ */
 export function i128AddToI256(lhs:I128Val, rhs:I128Val) : I256Val {
     let a256 = getI256FromI128(lhs);
     let b256 = getI256FromI128(rhs);
     return i256_add(a256, b256);
 }
 
-// Performs checked signed integer subtraction. Computes `lhs - rhs`, 
-// returning I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred.
-// Uses the i256_sub host function to perform the subtraction.
+/**
+ * Performs checked signed integer subtraction. Computes `lhs - rhs`.
+ * Uses the i256_sub host function to perform the subtraction.
+ * @param lhs I256Val value to substract from
+ * @param rhs I256Val value to be substracted
+ * @returns I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred.
+ */
 export function i128Sub(lhs:I128Val, rhs:I128Val) : Val {
     let a256 = getI256FromI128(lhs);
     let b256 = getI256FromI128(rhs);
@@ -220,18 +289,26 @@ export function i128Sub(lhs:I128Val, rhs:I128Val) : Val {
     return getI128FromI256(ru256);
 }
 
-// Performs signed integer subtraction. Computes `lhs - rhs`, 
-// returning I256Val (I256Small or I256Object) so that no overflow can occur.
-// Uses the i256_sub host function to perform the subtraction.
+/**
+ * Performs signed integer subtraction. Computes `lhs - rhs`.
+ * Uses the i256_sub host function to perform the subtraction.
+ * @param lhs I256Val value to substract from
+ * @param rhs I256Val value to be substracted
+ * @returns I256Val (I256Small or I256Object) so that no overflow can occur.
+ */
 export function i128SubToI256(lhs:I128Val, rhs:I128Val) : I256Val {
     let a256 = getI256FromI128(lhs);
     let b256 = getI256FromI128(rhs);
     return i256_sub(a256, b256);
 }
 
-// Performs checked signed integer multiplication. Computes `lhs * rhs`, 
-// returning I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
-// Uses the i256_mul host function to perform the multiplication.
+/**
+ * Performs checked signed integer multiplication. Computes `lhs * rhs`.
+ * Uses the i256_mul host function to perform the multiplication.
+ * @param lhs I256Val value to be multiplied
+ * @param rhs I256Val value to multiply with
+ * @returns I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
+ */
 export function i128Mul(lhs:I128Val, rhs:I128Val) : Val {
     let a256 = getI256FromI128(lhs);
     let b256 = getI256FromI128(rhs);
@@ -239,18 +316,26 @@ export function i128Mul(lhs:I128Val, rhs:I128Val) : Val {
     return getI128FromI256(ru256);
 }
 
-// Performs signed integer multiplication. Computes `lhs * rhs`, 
-// returning I256Val (I256Small or I256Object) so that no overflow can occur.
-// Uses the i256_mul host function to perform the multiplication.
+/**
+ * Performs signed integer multiplication. Computes `lhs * rhs`.
+ * Uses the i256_mul host function to perform the multiplication.
+ * @param lhs I256Val value to be multiplied
+ * @param rhs I256Val value to multiply with
+ * @returns I256Val (I256Small or I256Object) so that no overflow can occur.
+ */
 export function i128MulToI256(lhs:I128Val, rhs:I128Val) : I256Val {
     let a256 = getI256FromI128(lhs);
     let b256 = getI256FromI128(rhs);
     return i256_mul(a256, b256);
 }
 
-// Performs checked signed integer division. Computes `lhs / rhs`, 
-// returning I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if rhs == 0. 
-// Uses the i256_div host function to perform the division.
+/**
+ * Performs checked signed integer division. Computes `lhs / rhs`.
+ * Uses the i256_div host function to perform the division.
+ * @param lhs I256Val value to be devided
+ * @param rhs I256Val value to devide by
+ * @returns I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if rhs == 0. 
+ */
 export function i128Div(lhs:I128Val, rhs:I128Val) : Val {
     let b256 = getI256FromI128OrErrorIfZero(rhs);
     if (isError(b256)) {
@@ -292,9 +377,13 @@ export function i128MulDivToI256(number:I128Val, numerator:I128Val, denominator:
     return i256_div(i256_mul(number256, numerator256), denominator256);
 }
 
-// Performs checked signed integer Euclidean modulo. Computes `lhs % rhs`, 
-// returning I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if rhs == 0. 
-// Uses the i256_rem_euclid host function to perform the modulo.
+/**
+ * Performs checked signed integer Euclidean modulo. Computes `lhs % rhs`
+ * Uses the i256_rem_euclid host function to perform the modulo.
+ * @param lhs I256Val base value
+ * @param rhs I256Val mod value
+ * @returns I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if rhs == 0. 
+ */
 export function i128RemEuclid(lhs:I128Val, rhs:I128Val) : Val {
     let b256 = getI256FromI128OrErrorIfZero(rhs);
     if (isError(b256)) {
@@ -305,56 +394,79 @@ export function i128RemEuclid(lhs:I128Val, rhs:I128Val) : Val {
     return getI128FromI256(ri256);
 }
 
-// Performs checked signed integer exponentiation. Computes `lhs.exp(rhs)`, 
-// returning I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
-// Uses the i256_pow host function to perform the exponentiation.
+/**
+ * Performs checked signed integer exponentiation. Computes `lhs.exp(rhs)`.
+ * Uses the i256_pow host function to perform the exponentiation.
+ * @param lhs I256Val base value
+ * @param rhs I256Val exponent value
+ * @returns I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
+ */
 export function i128Pow(lhs:I128Val, rhs:U32Val) : Val {
     let a256 = getI256FromI128(lhs);
     let ri256 = i256_pow(a256, rhs);
     return getI128FromI256(ri256);
 }
 
-// Performs signed integer exponentiation. Computes `lhs.exp(rhs)`, 
-// returning I256Val (I256Small or I256Object). Traps if i256 overflow occurs.
-// Uses the i256_pow host function to perform the exponentiation.
+/**
+ * Performs signed integer exponentiation. Computes `lhs.exp(rhs)`.
+ * Uses the i256_pow host function to perform the exponentiation. 
+ * @param lhs I256Val base value
+ * @param rhs I256Val exponent value
+ * @returns I256Val (I256Small or I256Object). Traps if i256 overflow occurs.
+ */
 export function i128PowToI256(lhs:I128Val, rhs:U32Val) : I256Val {
     let a256 = getI256FromI128(lhs);
     return i256_pow(a256, rhs);
 }
 
-// Performs checked signed integer shift left. Computes `lhs << rhs`, 
-// returning `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
-// Uses the i256_shl host function to perform the shift left. 
-// Traps if i256_shl error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+/**
+ * Performs checked signed integer shift left. Computes `lhs << rhs`.
+ * Uses the i256_shl host function to perform the shift left. 
+ * @param lhs I256Val value to shift left
+ * @param rhs U32Val value to shift left by
+ * @returns I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
+ */
 export function i128Shl(lhs:I128Val, rhs:U32Val) : Val {
     let a256 = getI256FromI128(lhs);
     let ri256 = i256_shl(a256, rhs);
     return getI128FromI256(ri256);
 }
 
-// Performs signed integer shift left. Computes `lhs << rhs`, 
-// returning I256Val (I256Small or I256Object). Traps if i256 overflow occurs.
-// Uses the i256_shl host function to perform the shift left. 
-// Traps if i256_shl error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+/**
+ * Performs signed integer shift left. Computes `lhs << rhs`, 
+ * Uses the i256_shl host function to perform the shift left. 
+ * Traps if i256 overflow occurs.
+ * @param lhs I256Val value to shift left
+ * @param rhs U32Val value to shift left by
+ * @returns I256Val (I256Small or I256Object)
+ */
 export function i128ShlToI256(lhs:I128Val, rhs:U32Val) : Val {
     let a256 = getI256FromI128(lhs);
     return i256_shl(a256, rhs);
 }
 
-// Performs checked signed integer shift right. Computes `lhs >> rhs`, 
-// returning `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
-// Uses the i256_shr host function to perform the shift right. 
-// Traps if i256_shr error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+/**
+ * Performs checked signed integer shift right. Computes `lhs >> rhs`.
+ * Uses the i256_shr host function to perform the shift right.
+ * Traps if i256_shr error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+ * @param lhs I256Val value to shift right
+ * @param rhs U32Val value to shift right by
+ * @returns I128Val or `Error` (errorTypeObject, errorCodeArithDomain) if overflow occurred. 
+ */
 export function i128Shr(lhs:I128Val, rhs:U32Val) : Val {
     let a256 = getI256FromI128(lhs);
     let ri256 = i256_shr(a256, rhs);
     return getI128FromI256(ri256);
 }
 
-// Performs signed integer shift right. Computes `lhs >> rhs`, 
-// returning I256Val (I256Small or I256Object). 
-// Uses the i256_shr host function to perform the shift right. 
-// Traps if i256_shr error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+/**
+ * Performs signed integer shift right. Computes `lhs >> rhs`.
+ * Uses the i256_shr host function to perform the shift right.
+ * Traps if i256_shr error occurs (if `rhs` is larger than or equal to the number of bits in `lhs`)
+ * @param lhs I256Val value to shift right
+ * @param rhs U32Val value to shift right by
+ * @returns I256Val (I256Small or I256Object)
+ */
 export function i128ShrToI256(lhs:U128Val, rhs:U32Val) : Val {
     let a256 = getI256FromI128(lhs);
     return i256_shr(a256, rhs);
@@ -364,8 +476,11 @@ export function i128ShrToI256(lhs:U128Val, rhs:U32Val) : Val {
 UTIL
 *****************/
 
-// Returns true if the given I128Val is negative, otherwise flase.
-// Traps if the given value is not I128Val
+/**
+ * Returns true if the given I128Val is negative, otherwise flase.
+ * @param value I128Val value to check if it is < 0
+ * @returns true if the given value < 0, otherwise false.
+ */
 export function isI128Negative(value:I128Val) : bool {
     if (isI128Small(value)) {
         return toI128Small(value) < 0;
@@ -377,9 +492,13 @@ export function isI128Negative(value:I128Val) : bool {
     }
 }
 
-// Compares two U128Val. 
-// Returns -1 if a<b, 1 if a>b, or 0 if a==b.
-// Traps if any of the given values is not U128Val.
+/**
+ * Compares two U128Val. Returns -1 if a<b, 1 if a>b, or 0 if a==b.
+ * Traps if any of the given values is not U128Val.
+ * @param a U128Val first value
+ * @param b U128Val second value
+ * @returns -1 if a<b, 1 if a>b, or 0 if a==b.
+ */
 export function u128Compare(a:U128Val, b:U128Val) : i64 {
     if (isU128Small(a) && isU128Small(b)) {
         let sa = toU128Small(a);
@@ -397,27 +516,46 @@ export function u128Compare(a:U128Val, b:U128Val) : i64 {
     return obj_cmp(a, b);
 }
 
-// Returns true if a > b
-// Traps if any of the given values is not U128Val.
+/**
+ * Checks if a U128Val value (a) is greater then another U128Val (b).
+ * Returns true if a > b. Traps if any of the given values is not U128Val.
+ * @param a U128Val value to check if it is greater then b
+ * @param b U128Val value to check if it is smaller then a
+ * @returns Returns true if a > b, otherwise false.
+ */
 export function u128IsGreaterThan(a:U128Val, b:U128Val) : bool {
     return u128Compare(a,b) == 1;
 }
 
-// Returns true if a < b
-// Traps if any of the given values is not U128Val.
+/**
+ * Checks if a U128Val value (a) is smaller then another U128Val (b).
+ * Returns true if a < b. Traps if any of the given values is not U128Val.
+ * @param a U128Val value to check if it is lower/smaller then b
+ * @param b U128Val value to check if it is greater then a
+ * @returns Returns true if a < b, otherwise false
+ */
 export function u128IsLowerThan(a:U128Val, b:U128Val) : bool {
     return u128Compare(a,b) == -1;
 }
 
-// Returns true if a == b
-// Traps if any of the given values is not U128Val.
+/**
+ * Checks if a U128Val value (a) is equal to another U128Val (b).
+ * Returns true if a == b. Traps if any of the given values is not U128Val.
+ * @param a U128Val value to check if it is equal to b
+ * @param b U128Val value to check if it is equal to a
+ * @returns Returns true if a == b, otherwise false
+ */
 export function u128IsEqual(a:U128Val, b:U128Val) : bool {
     return u128Compare(a,b) == 0;
 }
 
-// Compares two I128Val. 
-// Returns -1 if a<b, 1 if a>b, or 0 if a==b.
-// Traps if any of the given values is not I128Val.
+/**
+ * Compares two I128Val. Returns -1 if a<b, 1 if a>b, or 0 if a==b.
+ * Traps if any of the given values is not I128Val.
+ * @param a I128Val first value
+ * @param b I128Val second value
+ * @returns -1 if a<b, 1 if a>b, or 0 if a==b.
+ */
 export function i128Compare(a:I128Val, b:I128Val) : i64 {
     if (isI128Small(a) && isI128Small(b)) {
         let sa = toI128Small(a);
@@ -435,20 +573,35 @@ export function i128Compare(a:I128Val, b:I128Val) : i64 {
     return obj_cmp(a, b);
 }
 
-// Returns true if a > b
-// Traps if any of the given values is not I128Val.
+/**
+ * Checks if a I128Val value (a) is greater then another I128Val (b).
+ * Returns true if a > b. Traps if any of the given values is not I128Val.
+ * @param a I128Val value to check if it is greater then b
+ * @param b I128Val value to check if it is smaller then a
+ * @returns Returns true if a > b, otherwise false.
+ */
 export function i128IsGreaterThan(a:I128Val, b:I128Val) : bool {
     return i128Compare(a, b) == 1;
 }
 
-// Returns true if a < b
-// Traps if any of the given values is not I128Val.
+/**
+ * Checks if a I128Val value (a) is smaller then another I128Val (b).
+ * Returns true if a < b. Traps if any of the given values is not I128Val.
+ * @param a I128Val value to check if it is lower/smaller then b
+ * @param b I128Val value to check if it is greater then a
+ * @returns Returns true if a < b, otherwise false
+ */
 export function i128IsLowerThan(a:I128Val, b:I128Val) : bool {
     return i128Compare(a, b) == -1;
 }
 
-// Returns true if a < b
-// Traps if any of the given values is not I128Val.
+/**
+ * Checks if a I128Val value (a) is equal to another I128Val (b).
+ * Returns true if a == b. Traps if any of the given values is not I128Val.
+ * @param a I128Val value to check if it is equal to b
+ * @param b I128Val value to check if it is equal to a
+ * @returns Returns true if a == b, otherwise false
+ */
 export function i128IsEqual(a:I128Val, b:I128Val) : bool {
     return i128Compare(a, b) == 0;
 }
