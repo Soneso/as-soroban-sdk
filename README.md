@@ -1,6 +1,6 @@
 # [Stellar Soroban SDK for AssemblyScript](https://github.com/Soneso/as-soroban-sdk)
 
-![v1.0.1](https://img.shields.io/badge/v1.0.1-green.svg)
+![v1.1.0](https://img.shields.io/badge/v1.1.0-green.svg)
 
 This AssemblyScript SDK is for writing contracts for [Soroban](https://soroban.stellar.org). Soroban is a smart contracts platform from Stellar that is designed with purpose and built to perform.
 
@@ -387,7 +387,7 @@ Example:
         },
         {
             "key" : "version",
-            "value" : "1.0.0"
+            "value" : "1.1.0"
         },
         {
             "key" : "description",
@@ -485,11 +485,23 @@ You can also use one of our Stellar SDKs to programatically deploy and invoke co
 - [Stellar Flutter SDK](https://github.com/Soneso/stellar_flutter_sdk/blob/master/soroban.md)
 - [Stellar PHP SDK](https://github.com/Soneso/stellar-php-sdk/blob/main/soroban.md)
 
-## Using as-bignum for working with big numbers
+## Working with big numbers
 
-If you need arithmetic and binary operations for working with big numbers such as {i,u}128 or {i,u}256 then there are some possibilities. On the one hand there are host functions available for working with {i,u}256 (see [env.ts](https://github.com/Soneso/as-soroban-sdk/blob/main/lib/env.ts)). Furthermore we have implemented a couple of functions for working with {i,u}128 into this SDK. But the functions from the SDK are limited, work only for positive {i,u}128 and will probably be removed soon. 
+If you need arithmetic and binary operations for working with big numbers such as {i,u}128 or {i,u}256 then there are some possibilities. 
 
-A better option for working with {i,u}128 is to use the library [as-bignum](https://github.com/MaxGraey/as-bignum/tree/master). However, it does not work with soroban right away, because some functions throw errors, which leads to an import statement in the compiled wasm code, which in turn is not accepted by the Soroban VM:
+### Recommended for 256 bit numbers
+
+There are host functions available for working with {i,u}256 (see [env.ts](https://github.com/Soneso/as-soroban-sdk/blob/main/lib/env.ts)). 
+
+### Recommended for 128 bit numbers
+
+For working with {i,u}128 we have implemented [arithm128.ts](https://github.com/Soneso/as-soroban-sdk/blob/main/lib/arithm128.ts) which offers many functions for working with **positive and negative** 128 bit numbers. They use the {i,u}256 functions on the host environment to perform the calculations. This is the recommended way to work with 128 bit numbers. All examples that need 128 bit numbers such as the token contract example are using the functions from [arithm128.ts](https://github.com/Soneso/as-soroban-sdk/blob/main/lib/arithm128.ts).
+
+### Other posibilities for 128 bit numbers
+
+We have also implemented a couple of functions for working with {i,u}128 that are based of binary operations, performing the calculations in the guest environment. But this functions are limited, work **only for positive** {i,u}128 and may consume more ressources. They are inspired by [as-bignum](https://github.com/MaxGraey/as-bignum/tree/master) and ported to work with soroban. You can find them in [val128.ts](https://github.com/Soneso/as-soroban-sdk/blob/main/lib/val128.ts). In some cases they may be needed, e.g. where an implementation in [arithm128.ts](https://github.com/Soneso/as-soroban-sdk/blob/main/lib/arithm128.ts) is missing (e.g. `sqrt`). It is not recommended to use the [val128.ts](https://github.com/Soneso/as-soroban-sdk/blob/main/lib/val128.ts) functions. However, if you need to do so, we recommend that you test your contract thoroughly.
+
+Another option for working with {i,u}128 is to use the library [as-bignum](https://github.com/MaxGraey/as-bignum/tree/master). However, it does not work with soroban right away, because some functions throw errors, which leads to an import statement in the compiled wasm code, which in turn is not accepted by the Soroban VM:
 
 ```
 // wat representation

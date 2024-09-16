@@ -7,7 +7,7 @@ const META_NAME = "contractmetav0";
 const SPEC_NAME = "contractspecv0";
 const CONTRACT_JSON = "./contract.json";
 const SDK_VERSION_META_KEY = "assdkver" 
-const SDK_VERSION = "1.0.1";
+const SDK_VERSION = "1.1.0";
 const HOST_FUNCTIONS_VERSION = 0;
 
 
