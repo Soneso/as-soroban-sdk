@@ -1,4 +1,7 @@
 // Offers arithmetic helper functions for positive I128Val and U128Val host values.
+// Supports only positive values. Uses u128_math.ts => bitwise operations.
+// If you are looking for I128Val and U128Val arithmetic helpers using
+// host functions see: arithm128.ts.
 
 import * as context from "./context";
 import { ge, gt, le, lt, eq, isZero, add, __hi, sub, mul, div, muldiv, sqrt, pow, ord } from "./u128_math";
@@ -12,9 +15,15 @@ import { I128Val, U128Val, fromI128Pieces, fromI128Small, fromU128Pieces, fromU1
  * @param value the I128Val to check.
  * @returns true if negative otherwise false.
  */
-export function isNegative(value:I128Val) : bool {
-    let alo = getI128Parts(value);
-    return lt(alo, __reshi, 0, 0);
+function isNegative(value:I128Val) : bool {
+    if (isI128Small(value)) {
+        return toI128Small(value) < 0;
+    } else if (isI128Object(value)) {
+        return toI128High64(value) < 0;
+    } else {
+        context.fail();
+        return 0;
+    }
 }
 
 /**

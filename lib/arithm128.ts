@@ -1,10 +1,11 @@
 // Offers arithmetic helper functions for I128Val and U128Val host values.
 // Uses u256 and i256 host functions to make the calculations.
-// Supports positive values (TODO: negative values).
+// Supports positive and negative values
 
+import { Bytes } from "./bytes";
 import * as context from "./context";
-import { i256_add, i256_div, i256_mul, i256_pow, i256_rem_euclid, i256_shl, i256_shr, i256_sub, u256_add, u256_div, u256_mul, u256_pow, u256_rem_euclid, u256_shl, u256_shr } from "./env";
-import { I128Val, I256Val, U128Val, U256Val, U32Val, Val, errorCodeArithDomain, errorTypeObject, fromError, fromI128Pieces, fromI128Small, fromI256Pieces,
+import { i256_add, i256_div, i256_mul, i256_pow, i256_rem_euclid, i256_shl, i256_shr, i256_sub, i256_val_from_be_bytes, i256_val_to_be_bytes, u256_add, u256_div, u256_mul, u256_pow, u256_rem_euclid, u256_shl, u256_shr } from "./env";
+import { BytesObject, I128Object, I128Val, I256Val, U128Val, U256Val, U32Val, Val, errorCodeArithDomain, errorTypeObject, fromError, fromI128Pieces, fromI128Small, fromI256Pieces,
     fromI256Small,fromU128Pieces, fromU128Small, fromU256Pieces, fromU256Small, isError, isI128Object, isI128Small, isI256Object, isI256Small, isU128Object, isU128Small, isU256Object, 
     isU256Small, toI128High64, toI128Low64, toI128Small, toI256HiHi, toI256HiLo, toI256LoHi, toI256LoLo, toI256Small, toU128High64, toU128Low64, toU128Small, 
     toU256HiHi, toU256HiLo, toU256LoHi, toU256LoLo, toU256Small} from "./value";
@@ -153,7 +154,7 @@ export function u128ShrToU256(lhs:U128Val, rhs:U32Val) : Val {
 
 
 /********************************************************************
-Signed I128 (only positive values allowed at this time)
+Signed I128 positive and negative
 ********************************************************************/
 
 // Performs checked signed integer addition. Computes `lhs + rhs`, 
@@ -297,6 +298,19 @@ export function i128ShrToI256(lhs:U128Val, rhs:U32Val) : Val {
     return i256_shr(a256, rhs);
 }
 
+// Returns true if the given I128Val is negative, otherwise flase.
+// Traps if the given value is not I128Val
+function isNegative(value:I128Val) : bool {
+    if (isI128Small(value)) {
+        return toI128Small(value) < 0;
+    } else if (isI128Object(value)) {
+        return toI128High64(value) < 0;
+    } else {
+        context.fail();
+        return 0;
+    }
+}
+
 /*****************
 HELPERS
 *****************/
@@ -376,56 +390,59 @@ function getU128FromI256(value:I256Val) : Val {
     }
 }
 
-function isNegative(value:I128Val) : bool {
+function getI256FromI128(value:I128Val) : I256Val {
     if (isI128Small(value)) {
-        return toI128Small(value) < 0;
+        return fromI256Small(toI128Small(value));
     } else if (isI128Object(value)) {
-        return toI128High64(value) < 0;
+        let i256Bytes = i128ObjectToI256BeBytes(value);
+        return i256_val_from_be_bytes(i256Bytes);
     } else {
         context.fail();
         return 0;
     }
 }
 
-function getI256FromI128(value:I128Val) : I256Val {
-    if (isI128Small(value)) {
-        let smallValue = toI128Small(value);
-        if (smallValue < 0) {
-            // TODO: negative values
-            return fromError(errorTypeObject, errorCodeArithDomain);
-        }
-        return fromI256Small(toI128Small(value));
-    } else if (isI128Object(value)) {
-        let i128hi = toI128High64(value);
+function i128ObjectToI256BeBytes(value:I128Object) : BytesObject {
+    let i128hi = toI128High64(value);
+    let i256Bytes = new Bytes();
+    for (let i = 0; i < 16; ++i) {
         if (i128hi < 0) {
-            // TODO: negative values
-            return fromError(errorTypeObject, errorCodeArithDomain);
+            i256Bytes.push(0xFF);
+        } else {
+            i256Bytes.push(0);
         }
-        let i128lo = toI128Low64(value);
-        return fromI256Pieces(0, 0, i128hi as u64, i128lo);
-    } else {
-        context.fail();
-        return 0;
     }
+    let i128HiBeBytes = bswap<i64>(i128hi);
+    for (let i = 0; i < 8; ++i) {
+        i256Bytes.push(i128HiBeBytes as u8);
+        i128HiBeBytes = (i128HiBeBytes >> 8)
+        
+    }
+    let i128lo = toI128Low64(value);
+    let i128LoBeBytes = bswap<u64>(i128lo);
+    for (let i = 0; i < 8; ++i) {
+        i256Bytes.push(i128LoBeBytes as u8);
+        i128LoBeBytes = (i128LoBeBytes >> 8)
+    }
+    return i256Bytes.getHostObject();
 }
 
 function getI256FromI128OrErrorIfZero(value:I128Val) : Val {
     if (isI128Small(value)) {
         let small = toI128Small(value);
-        if (small <= 0) {
-            // TODO: negative values
+        if (small == 0) {
             return fromError(errorTypeObject, errorCodeArithDomain);
         }
         return fromI256Small(small);
     }
     else if (isI128Object(value)) {
-        let lo = toI128Low64(value);
-        let hi = toI128High64(value);
-        if (hi < 0 || (lo == 0 && hi == 0)) {
-            // TODO: negative values
+        let i128lo = toI128Low64(value);
+        let i128hi = toI128High64(value);
+        if (i128lo == 0 && i128hi == 0) {
             return fromError(errorTypeObject, errorCodeArithDomain);
         }
-        return fromI256Pieces(0, 0, hi as u64, lo);
+        let i256Bytes = i128ObjectToI256BeBytes(value);
+        return i256_val_from_be_bytes(i256Bytes);
     } else {
         context.fail();
         return 0;
@@ -436,16 +453,25 @@ function getI128FromI256(value:I256Val) : Val {
     if(isI256Small(value)) {
         let rlo = toI256Small(value);
         return fromI128Small(rlo);
-    } else if (isI256Object(value) && toI256HiLo(value) == 0) {
-        let i256lohi = toI256LoHi(value);
+    } else if (isI256Object(value)) {
         let i256hihi = toI256HiHi(value);
-        if (i256hihi == 0 && i256lohi <= (i64.MAX_VALUE as u64)) {
-            return fromI128Pieces((i256lohi as i64), toI256LoLo(value));
-        } else if (i256hihi == -1 && i256lohi <= ((i64.MIN_VALUE * -1) as u64)) {
-            // TODO: fix this (i256lohi may be different for neg. values)
-            return fromI128Pieces((i256lohi as i64) * -1, toI256LoLo(value));
+        let i128BEBytes = (new Bytes(i256_val_to_be_bytes(value))).slice(16,32);
+        let hi:i64 = 0;
+        for (let i = 0; i < 8; ++i) {
+            hi <<= 8; 
+            let val = i128BEBytes.get(i);
+            hi |= val;
+
+        }
+        let lo:u64 = 0;
+        for (let i = 8; i < 16; ++i) {
+            lo <<= 8;
+            let val = i128BEBytes.get(i);
+            lo |= val;
+        }
+        if ((i256hihi == 0 && hi >= 0) || (i256hihi == -1 && hi < 0)) {
+            return fromI128Pieces(hi, lo);
         }
     } 
     return fromError(errorTypeObject, errorCodeArithDomain);
-
 }

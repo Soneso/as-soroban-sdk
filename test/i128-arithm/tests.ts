@@ -1,14 +1,8 @@
 import {BoolVal, errorCodeArithDomain, errorTypeObject, fromFalse, fromTrue, 
     fromI128Pieces, getErrorCode, getErrorType, isError, isI128Small, 
-    fromI128Small,
-    toI128Small,
-    isI128Object,
-    toI128Low64,
-    toI128High64,
+    fromI128Small, toI128Small, isI128Object, toI128Low64,toI128High64,
     fromU32} from "../../lib/value";
 import { i128Add, i128Div, i128Mul, i128Pow, i128RemEuclid, i128Shl, i128Shr, i128Sub } from "../../lib/arithm128";
-import * as context from "../../lib/context";
-import { Vec } from "../../lib/vec";
 import * as u128 from "../../lib/u128_math";
 
 export function testI128Add():BoolVal {
@@ -22,6 +16,21 @@ export function testI128Add():BoolVal {
         return falseVal;
     }
 
+    // small + ( - small)
+    rhs = fromI128Small(-4);
+    res = i128Add(lhs, rhs);
+    if (!isI128Small(res) || toI128Small(res) != -2) {
+        return falseVal;
+    }
+
+    // (- small) + ( - small)
+    lhs = fromI128Small(-2);
+    rhs = fromI128Small(-4);
+    res = i128Add(lhs, rhs);
+    if (!isI128Small(res) || toI128Small(res) != -6) {
+        return falseVal;
+    }
+
     // @ts-ignore
     const i64Max = i64.MAX_VALUE;
 
@@ -29,6 +38,7 @@ export function testI128Add():BoolVal {
     const u64Max = u64.MAX_VALUE;
 
     // small + obj
+    rhs = fromI128Small(2);
     lhs = fromI128Pieces(i64Max, 10)
     res = i128Add(lhs, rhs);
     if (isI128Object(res)) {
@@ -41,9 +51,54 @@ export function testI128Add():BoolVal {
         return falseVal;
     }
 
+    // - small + obj
+    rhs = fromI128Small(-2);
+    lhs = fromI128Pieces(i64Max, 10)
+    res = i128Add(lhs, rhs);
+    if (isI128Object(res)) {
+        let lo = toI128Low64(res);
+        let hi = toI128High64(res);
+        if (lo != 8 || hi != i64Max) {
+            return falseVal; 
+        }
+    } else {
+        return falseVal;
+    }
+
+    // @ts-ignore
+    const i64Min = i64.MIN_VALUE;
+
+    // small + -obj
+    rhs = fromI128Small(2);
+    lhs = fromI128Pieces(i64Min, 10)
+    res = i128Add(lhs, rhs);
+    if (isI128Object(res)) {
+        let lo = toI128Low64(res);
+        let hi = toI128High64(res);
+        if (lo != 12 || hi != i64Min) {
+            return falseVal; 
+        }
+    } else {
+        return falseVal;
+    }
+
+    // -small + -obj
+    rhs = fromI128Small(-2);
+    lhs = fromI128Pieces(i64Min, 10)
+    res = i128Add(lhs, rhs);
+    if (isI128Object(res)) {
+        let lo = toI128Low64(res);
+        let hi = toI128High64(res);
+        if (lo != 8 || hi != i64Min) {
+            return falseVal; 
+        }
+    } else {
+        return falseVal;
+    }
+
     // obj + obj
     lhs = fromI128Pieces(1, u64Max);
-    rhs =  fromI128Pieces(10, 1);
+    rhs = fromI128Pieces(10, 1);
     res = i128Add(lhs, rhs);
     if (isI128Object(res)) {
         let lo = toI128Low64(res);
@@ -55,9 +110,37 @@ export function testI128Add():BoolVal {
         return falseVal;
     }
 
+    // obj + -obj
+    lhs = fromI128Pieces(1, u64Max);
+    rhs = fromI128Pieces(-10, 1);
+    res = i128Add(lhs, rhs);
+    if (isI128Object(res)) {
+        let lo = toI128Low64(res);
+        let hi = toI128High64(res);
+        if (lo != 0 || hi != -8) {
+            return falseVal; 
+        }
+    } else {
+        return falseVal;
+    }
+
+    // obj + -obj
+    lhs = fromI128Pieces(1, u64Max - 2);
+    rhs = fromI128Pieces(-1, u64Max - 2);
+    res = i128Add(lhs, rhs);
+    if (isI128Object(res)) {
+        let lo = toI128Low64(res);
+        let hi = toI128High64(res);
+        if (lo != u64Max - 5 || hi != 1) {
+            return falseVal; 
+        }
+    } else {
+        return falseVal;
+    }
+
     // overflow
     lhs = fromI128Pieces(i64Max, u64Max);
-    res = i128Add(lhs, rhs);
+    res = i128Add(lhs, fromI128Small(1));
     if(!isError(res) || 
         getErrorType(res) != errorTypeObject ||
         getErrorCode(res) != errorCodeArithDomain) {
@@ -78,11 +161,35 @@ export function testI128Sub():BoolVal {
         return falseVal;
     }
 
+    // small - ( - small)
+    rhs = fromI128Small(-4);
+    res = i128Sub(lhs, rhs);
+    if (!isI128Small(res) || toI128Small(res) != 8) {
+        return falseVal;
+    }
+
+    // (- small) - ( - small)
+    lhs = fromI128Small(-2);
+    rhs = fromI128Small(-4);
+    res = i128Sub(lhs, rhs);
+    if (!isI128Small(res) || toI128Small(res) != 2) {
+        return falseVal;
+    }
+
+    // small - small neg res
+    lhs =  fromI128Small(4);
+    rhs =  fromI128Small(8);
+    res = i128Sub(lhs, rhs);
+    if (!isI128Small(res) || toI128Small(res) != -4) {
+        return falseVal;
+    }
+
     // @ts-ignore
     const i64Max = i64.MAX_VALUE;
     
     // obj - small
     lhs = fromI128Pieces(i64Max, 10)
+    rhs =  fromI128Small(2);
     res = i128Sub(lhs, rhs);
     if (isI128Object(res)) {
         let lo = toI128Low64(res);
@@ -93,6 +200,21 @@ export function testI128Sub():BoolVal {
     } else {
         return falseVal;
     }
+
+    // obj - (-small)
+    lhs = fromI128Pieces(i64Max, 10)
+    rhs =  fromI128Small(-2);
+    res = i128Sub(lhs, rhs);
+    if (isI128Object(res)) {
+        let lo = toI128Low64(res);
+        let hi = toI128High64(res);
+        if (lo != 12 || hi != i64Max) {
+            return falseVal; 
+        }
+    } else {
+        return falseVal;
+    }
+        
     
     // obj - obj
     lhs = fromI128Pieces(10, i64Max);
@@ -107,8 +229,21 @@ export function testI128Sub():BoolVal {
     } else {
         return falseVal;
     }
+   
+    
+    // @ts-ignore
+    const u64Max = u64.MAX_VALUE;
+
+    // obj - obj neg result
+    lhs = fromI128Pieces(1, u64Max - 2);
+    rhs = fromI128Pieces(1, u64Max);
+    res = i128Sub(lhs, rhs);
+    if (!isI128Small(res) || toI128Small(res) != -2) {
+        return falseVal;
+    }
 
     return fromTrue();
+ 
 }
 
 export function testI128Mul():BoolVal {
@@ -121,9 +256,17 @@ export function testI128Mul():BoolVal {
     if (!isI128Small(res) || toI128Small(res) != 4) {
         return falseVal;
     }
+
+    // small * -small
+    rhs =  fromI128Small(-2);
+    res = i128Mul(lhs, rhs);
+    if (!isI128Small(res) || toI128Small(res) != -4) {
+        return falseVal;
+    }
     
     // small * obj
     lhs = fromI128Pieces(10, 10)
+    rhs =  fromI128Small(2);
     res = i128Mul(lhs, rhs);
     if (isI128Object(res)) {
         let lo = toI128Low64(res);
@@ -135,8 +278,24 @@ export function testI128Mul():BoolVal {
         return falseVal;
     }
 
+    // obj * (-small)
+    lhs = fromI128Pieces(10, 10)
+    rhs =  fromI128Small(-2);
+    res = i128Mul(lhs, rhs);
+    res = i128Div(res, rhs);
+    if (isI128Object(res)) {
+        let resLo = toI128Low64(res);
+        let resHi = toI128High64(res);
+        let lo = toI128Low64(lhs);
+        let hi = toI128High64(lhs);
+        if (lo != resLo || hi != resHi) {
+            return falseVal; 
+        }
+    } else {
+        return falseVal;
+    }
     
-    // obj + obj
+    // obj * obj
     lhs = fromI128Pieces(0, 75057594000000000);
     rhs =  fromI128Pieces(0, 75057594000000000);
     res = i128Mul(lhs, rhs);
@@ -146,21 +305,21 @@ export function testI128Mul():BoolVal {
         if (lo != 219342094686224384 || hi != 305400367379626) {
             return falseVal;
         }
-        
-        let b_lo = u128.mul(75057594000000000, 0, 75057594000000000, 0);
-        let b_hi = u128.__hi;
+    } else {
+        return falseVal;
+    }
 
-        /*let vals = new Vec();
-        vals.pushBack(fromU64(lo));
-        vals.pushBack(fromU64(hi));
-        vals.pushBack(fromU64(b_lo));
-        vals.pushBack(fromU64(b_hi));
-        context.log("cmp ", vals);*/
-
-        if (!u128.eq(b_lo, b_hi, lo, hi)) {
-            return falseVal;
+    rhs = fromI128Pieces(-1, 75057594000000000);
+    res = i128Mul(lhs, rhs);
+    res = i128Div(res, rhs);
+    if (isI128Object(res)) {
+        let resLo = toI128Low64(res);
+        let resHi = toI128High64(res);
+        let lo = toI128Low64(lhs);
+        let hi = toI128High64(lhs);
+        if (lo != resLo || hi != resHi) {
+            return falseVal; 
         }
-
     } else {
         return falseVal;
     }
@@ -193,14 +352,39 @@ export function testI128Div():BoolVal {
     if (!isI128Small(res) || toI128Small(res) != 2) {
         return falseVal;
     }
+
+    // small / -small
+    rhs =  fromI128Small(-2);
+    res = i128Div(lhs, rhs);
+    if (!isI128Small(res) || toI128Small(res) != -2) {
+        return falseVal;
+    }
     
     // obj / small
     lhs = fromI128Pieces(10, 10)
+    rhs =  fromI128Small(2);
     res = i128Div(lhs, rhs);
     if (isI128Object(res)) {
         let lo = toI128Low64(res);
         let hi = toI128High64(res);
         if (lo != 5 || hi != 5) {
+            return falseVal; 
+        }
+    } else {
+        return falseVal;
+    }
+
+    // obj / (-small)
+    lhs = fromI128Pieces(10, 10)
+    rhs =  fromI128Small(-2);
+    res = i128Div(lhs, rhs);
+    res = i128Mul(res, rhs);
+    if (isI128Object(res)) {
+        let resLo = toI128Low64(res);
+        let resHi = toI128High64(res);
+        let lo = toI128Low64(lhs);
+        let hi = toI128High64(lhs);
+        if (lo != resLo || hi != resHi) {
             return falseVal; 
         }
     } else {
@@ -220,6 +404,20 @@ export function testI128Div():BoolVal {
         let lo = toI128Low64(res);
         let hi = toI128High64(res);
         if (lo != 16305608318443096371 || hi != 122) {
+            return falseVal;
+        }
+    } else {
+        return falseVal;
+    }
+
+    // obj / -obj
+    lhs = fromI128Pieces(i64Max, u64Max);
+    rhs = fromI128Pieces(-1, 200);
+    res = i128Div(lhs, rhs);
+    if (isI128Object(res)) {
+        let lo = toI128Low64(res);
+        let hi = toI128High64(res);
+        if (lo != 9223372036854775708 || hi != -1) {
             return falseVal;
         }
     } else {
@@ -250,14 +448,28 @@ export function testI128RemEuclid():BoolVal {
         return falseVal;
     }
 
-    // obj % small
+    // small % -small
+    rhs =  fromI128Small(-3);
+    res = i128RemEuclid(lhs, rhs);
+    if (!isI128Small(res) || toI128Small(res) != 1) {
+        return falseVal;
+    }
+
+    // obj % -small
     lhs = fromI128Pieces(0, 7505759400002)
     res = i128RemEuclid(lhs, rhs);
     if (!isI128Small(res) || toI128Small(res) != 2) {
         return falseVal;
     }
-    
-    
+
+    // obj % small
+    lhs = fromI128Pieces(0, 7505759400002)
+    rhs =  fromI128Small(3);
+    res = i128RemEuclid(lhs, rhs);
+    if (!isI128Small(res) || toI128Small(res) != 2) {
+        return falseVal;
+    }
+
     // obj % obj
     lhs = fromI128Pieces(0, 75057594000000015);
     rhs = fromI128Pieces(0, 75057594000000000);
@@ -307,13 +519,6 @@ export function testI128Pow():BoolVal {
         
         let b_lo = u128.pow(75057594000000000, 0, 2);
         let b_hi = u128.__hi;
-
-        /*let vals = new Vec();
-        vals.pushBack(fromU64(lo));
-        vals.pushBack(fromU64(hi));
-        vals.pushBack(fromU64(b_lo));
-        vals.pushBack(fromU64(b_hi));
-        context.log("cmp ", vals);*/
 
         if (!u128.eq(b_lo, b_hi, lo, hi)) {
             return falseVal;
@@ -392,8 +597,6 @@ export function testI128Shr():BoolVal {
     if (!isI128Small(res) || toI128Small(res) != 2) {
         return falseVal;
     }
-    // @ts-ignore
-    const u64Max = u64.MAX_VALUE;
         
     // obj << small
     lhs = fromI128Pieces(4, 3071999961161793536);
