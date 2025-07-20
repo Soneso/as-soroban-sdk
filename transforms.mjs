@@ -7,7 +7,7 @@ const META_NAME = "contractmetav0";
 const SPEC_NAME = "contractspecv0";
 const CONTRACT_JSON = "./contract.json";
 const SDK_VERSION_META_KEY = "assdkver" 
-const SDK_VERSION = "1.1.0";
+const SDK_VERSION = "1.2.0";
 const HOST_FUNCTIONS_VERSION = 0;
 
 
@@ -282,6 +282,8 @@ export class SdkTransform extends Transform {
         return xdr.ScSpecTypeDef.scSpecTypeSymbol();
       case "address":
         return xdr.ScSpecTypeDef.scSpecTypeAddress();
+      case "muxedAddress":
+        return xdr.ScSpecTypeDef.scSpecTypeMuxedAddress();
     }
 
 
@@ -507,6 +509,7 @@ export class SdkTransform extends Transform {
         scSpecTypeString: 16,
         scSpecTypeSymbol: 17,
         scSpecTypeAddress: 19,
+        scSpecTypeMuxedAddress: 20,
         scSpecTypeOption: 1000,
         scSpecTypeResult: 1001,
         scSpecTypeVec: 1002,
@@ -573,6 +576,7 @@ export class SdkTransform extends Transform {
           ["scSpecTypeString", xdr.void()],
           ["scSpecTypeSymbol", xdr.void()],
           ["scSpecTypeAddress", xdr.void()],
+          ["scSpecTypeMuxedAddress", xdr.void()],
           ["scSpecTypeOption", "option"],
           ["scSpecTypeResult", "result"],
           ["scSpecTypeVec", "vec"],

@@ -1,4 +1,4 @@
-import { Val, BytesObject, VecObject, ErrorVal, AddressObject, U32Val, VoidVal, 
+import { Val, BytesObject, VecObject, ErrorVal, AddressObject, MuxedAddressObject, U32Val, VoidVal, 
     U64Val, U64Object, I64Object, U128Object, I128Object, U256Object, U256Val, I256Object, 
     I256Val, TimepointObject, DurationObject, MapObject, BoolVal, StorageType, Symbol, SymbolObject, StringObject} from "./value";
 
@@ -573,6 +573,16 @@ export declare function extend_contract_instance_ttl(contract:AddressObject, thr
 @external("l", "d")
 export declare function extend_contract_code_ttl(contract:AddressObject, threshold: U32Val, extend_to:U32Val): VoidVal;
 
+// Creates the contract instance on behalf of `deployer`. Created contract must be created from a Wasm that has a constructor.
+// `deployer` must authorize this call via Soroban auth framework, i.e. this calls `deployer.require_auth` with respective arguments.
+// `wasm_hash` must be a hash of the contract code that has already been uploaded on this network. 
+// `salt` is used to create a unique contract id. 
+// `constructor_args` are forwarded into created contract's constructor (`__constructor`) function. 
+// Returns the address of the created contract.
+// @ts-ignore
+@external("l", "e")
+export declare function create_contract_with_constructor(deployer:AddressObject, wasm_hash: BytesObject, salt:BytesObject, constructor_args:VecObject): AddressObject;
+
 /******************
  * CALL *
  ******************/
@@ -724,6 +734,125 @@ export declare function recover_key_ecdsa_secp256k1(msg_digest:BytesObject, sign
 @external("c", "3")
 export declare function verify_sig_ecdsa_secp256r1(public_key:BytesObject, msg_digest:BytesObject, signature: BytesObject): VoidVal;
 
+/// Checks if the input G1 point is in the correct subgroup. (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "4")
+export declare function bls12_381_check_g1_is_in_subgroup(point:BytesObject): BoolVal;
+
+/// Adds two BLS12-381 G1 points given in bytes format and returns the resulting G1 point in bytes format.
+/// G1 serialization format: `concat(be_bytes(X), be_bytes(Y))` and the most significant three bits of 
+/// X encodes flags, i.e.  bits(X) = [compression_flag, infinity_flag, sort_flag, bit_3, .. bit_383]. 
+/// This function does NOT perform subgroup check on the inputs. (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "5")
+export declare function bls12_381_g1_add(point1:BytesObject, point2:BytesObject): BytesObject;
+
+/// Multiplies a BLS12-381 G1 point by a scalar (Fr), and returns the resulting G1 point in bytes format. (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "6")
+export declare function bls12_381_g1_mul(point:BytesObject, scalar:U256Val): BytesObject;
+
+/// Performs multi-scalar-multiplication (inner product) on a vector of BLS12-381 G1 points (`Vec<BytesObject>`) 
+/// by a vector of scalars (`Vec<U256Val>`), and returns the resulting G1 point in bytes format. (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "7")
+export declare function bls12_381_g1_msm(vp:VecObject, vs:VecObject): BytesObject;
+
+/// Maps a BLS12-381 field element (Fp) to G1 point. The input is a BytesObject 
+/// containing Fp serialized in big-endian order (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "8")
+export declare function bls12_381_map_fp_to_g1(fp:BytesObject): BytesObject;
+
+/// Hashes a message to a BLS12-381 G1 point, with implementation following the specification in 
+/// [Hashing to Elliptic Curves](https://datatracker.ietf.org/doc/html/rfc9380) (ciphersuite 'BLS12381G1_XMD:SHA-256_SSWU_RO_').
+///  `dst` is the domain separation tag that will be concatenated with the `msg` during hashing, 
+/// it is intended to keep hashing inputs of different applications separate. 
+/// It is required `0 < len(dst_bytes) < 256`. DST **must** be chosen with care to avoid compromising the application's security properties.
+///  Refer to section 3.1 in the RFC on requirements of DST. (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "9")
+export declare function bls12_381_hash_to_g1(msg:BytesObject, dst:BytesObject): BytesObject;
+
+/// Checks if the input G2 point is in the correct subgroup. (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "a")
+export declare function bls12_381_check_g2_is_in_subgroup(point:BytesObject): BoolVal;
+
+/// Adds two BLS12-381 G2 points given in bytes format and returns the resulting G2 point in bytes format. 
+/// G2 serialization format: concat(be_bytes(X_c1), be_bytes(X_c0), be_bytes(Y_c1), be_bytes(Y_c0)), 
+/// and the most significant three bits of X_c1 are flags i.e. bits(X_c1) = [compression_flag, infinity_flag, sort_flag, bit_3, .. bit_383].
+/// This function does NOT perform subgroup check on the inputs. (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "b")
+export declare function bls12_381_g2_add(point1:BytesObject, point2:BytesObject): BytesObject;
+
+/// Multiplies a BLS12-381 G2 point by a scalar (Fr), and returns the resulting G2 point in bytes format. (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "c")
+export declare function bls12_381_g2_mul(point:BytesObject, scalar:U256Val): BytesObject;
+
+/// Performs multi-scalar-multiplication (inner product) on a vector of BLS12-381 G2 points (`Vec<BytesObject>`) 
+// by a vector of scalars (`Vec<U256Val>`) , and returns the resulting G2 point in bytes format. (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "d")
+export declare function bls12_381_g2_msm(vp:VecObject, vs:VecObject): BytesObject;
+
+/// Maps a BLS12-381 quadratic extension field element (Fp2) to G2 point.
+/// Fp2 serialization format: concat(be_bytes(c1), be_bytes(c0)) 
+/// (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "e")
+export declare function bls12_381_map_fp2_to_g2(fp2:BytesObject): BytesObject;
+
+/// Hashes a message to a BLS12-381 G2 point, with implementation following the specification 
+/// in [Hashing to Elliptic Curves](https://datatracker.ietf.org/doc/html/rfc9380) 
+/// (ciphersuite 'BLS12381G2_XMD:SHA-256_SSWU_RO_'). 
+/// `dst` is the domain separation tag that will be concatenated with the `msg` during hashing, 
+/// it is intended to keep hashing inputs of different applications separate. 
+/// It is required `0 < len(dst_bytes) < 256`. DST **must** be chosen with care to avoid compromising
+/// the application's security properties. Refer to section 3.1 in the RFC on requirements of DST.
+/// (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "f")
+export declare function bls12_381_hash_to_g2(msg:BytesObject, dst:BytesObject): BytesObject;
+
+/// Performs pairing operation on a vector of `G1` (`Vec<BytesObject>`)  and a vector of `G2` points (`Vec<BytesObject>`) ,
+/// return true if the result equals `1_fp12` (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "g")
+export declare function bls12_381_multi_pairing_check(vp1:VecObject, vp2:VecObject): BoolVal;
+
+/// Performs addition `(lhs + rhs) mod r` between two BLS12-381 scalar elements (Fr), 
+/// where r is the subgroup order (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "h")
+export declare function bls12_381_fr_add(lhs:U256Val, rhs:U256Val): U256Val;
+
+/// Performs subtraction `(lhs - rhs) mod r` between two BLS12-381 scalar elements (Fr), 
+/// where r is the subgroup order (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "i")
+export declare function bls12_381_fr_sub(lhs:U256Val, rhs:U256Val): U256Val;
+
+/// Performs multiplication `(lhs * rhs) mod r` between two BLS12-381 scalar elements (Fr), 
+/// where r is the subgroup order (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "j")
+export declare function bls12_381_fr_mul(lhs:U256Val, rhs:U256Val): U256Val;
+
+/// Performs exponentiation of a BLS12-381 scalar element (Fr) with a u64 exponent 
+/// i.e. `lhs.exp(rhs) mod r`, where r is the subgroup order (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "k")
+export declare function bls12_381_fr_pow(lhs:U256Val, rhs:U256Val): U256Val;
+
+/// Performs inversion of a BLS12-381 scalar element (Fr) modulo r (the subgroup order)
+///  (min_supported_protocol: 22)
+// @ts-ignore
+@external("c", "l")
+export declare function bls12_381_fr_inv(lhs:U256Val): U256Val;
+
 /******************
  * ADDRESS *
  ******************/
@@ -767,6 +896,28 @@ export declare function address_to_strkey(address: AddressObject): StringObject;
 @external("a", "3")
 export declare function authorize_as_curr_contract(auth_entires: VecObject): VoidVal;
 
+/// Returns the address corresponding to the provided MuxedAddressObject as a new AddressObject. 
+/// Note, that MuxedAddressObject consists of the address and multiplexing id, 
+/// so this conversion just strips the multiplexing id from the input muxed address.
+/// (min_supported_protocol: 23)
+// @ts-ignore
+@external("a", "4")
+export declare function get_address_from_muxed_address(muxed_address: MuxedAddressObject): AddressObject;
+
+/// Returns the multiplexing id corresponding to the provided MuxedAddressObject as a U64Val.
+/// (min_supported_protocol: 23)
+// @ts-ignore
+@external("a", "5")
+export declare function get_id_from_muxed_address(muxed_address: MuxedAddressObject): U64Val;
+
+/// Returns the executable corresponding to the provided address. When the address does not exist on-chain, 
+/// returns `Void` value. When it does exist, returns a value of `AddressExecutable` contract type. 
+/// It is an enum with `Wasm` value and the corresponding Wasm hash for the Wasm contracts, 
+/// `StellarAsset` value for Stellar Asset contract instances, and `Account` value for the 'classic' (G-) accounts.
+/// (min_supported_protocol: 23)
+// @ts-ignore
+@external("a", "6")
+export declare function get_address_executable(address: AddressObject): Val;
 
 /*****************
 * SYMBOLS *
@@ -815,6 +966,19 @@ export declare function string_new_from_linear_memory(lm_pos:U32Val, len:U32Val)
 // @ts-ignore
 @external("b", "k")
 export declare function string_len(s:StringObject): U32Val;
+
+/// Converts the provided string to bytes with exactly the same contents. (min_supported_protocol: 23)
+// @ts-ignore
+@external("b", "n")
+export declare function string_to_bytes(str:StringObject): BytesObject;
+
+/// Converts the provided bytes array to string with exactly the same contents. 
+/// No encoding checks are performed and thus the output string's encoding should be interpreted 
+/// by the consumer of the string. (min_supported_protocol: 23)
+// @ts-ignore
+@external("b", "o")
+export declare function bytes_to_string(bytes:BytesObject): StringObject;
+
 
 /******************
  * TEST *

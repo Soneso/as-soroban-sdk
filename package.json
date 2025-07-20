@@ -1,6 +1,6 @@
 {
   "name": "as-soroban-sdk",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "AssemblyScript SDK for writing contracts for Soroban.",
   "main": "index.js",
   "types": "./types/index.d.ts",
@@ -16,7 +16,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/node": "^20.11.25",
-    "assemblyscript": "^0.27.24"
+    "assemblyscript": "^0.28.3"
   },
   "dependencies": {
     "js-xdr": "^1.1.3"

@@ -12,7 +12,7 @@ const networkPassphrase = ' --network-passphrase "Test SDF Network ; September 2
 //const networkPassphrase = ' --network-passphrase "Test SDF Future Network ; October 2022"';
 
 const cmdDeploy = 'stellar contract deploy' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed ;
-const cmdInvoke = 'stellar contract invoke' + rpcUrl + networkPassphrase + ' --source-account ' + adminSeed + ' --id ';
+const cmdInvoke = 'stellar contract invoke' + rpcUrl + networkPassphrase + ' --send=yes --source-account ' + adminSeed + ' --id ';
 const deployExamples = cmdDeploy  + ' --wasm test/examples/build/release.wasm';
 const deployValConversions = cmdDeploy +  ' --wasm test/value-conversion/build/release.wasm';
 const deploySDKTypes = cmdDeploy + ' --wasm test/sdk-types/build/release.wasm';

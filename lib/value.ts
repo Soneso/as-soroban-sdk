@@ -53,7 +53,7 @@ export type VecObject = ObjectVal;
 export type MapObject = ObjectVal;
 export type ContractExecutableObject = ObjectVal;
 export type AddressObject = ObjectVal;
-export type LedgerKeyNonceObject = ObjectVal;
+export type MuxedAddressObject = ObjectVal;
 
 // Tags
 type valTag = u8;
@@ -180,12 +180,10 @@ const valTagMapObject: valTag = 76;
 /// Tag for a [Val] that refers to a host-side address object.
 const valTagAddressObject: valTag = 77;
 
-/// Tag for a [Val] that corresponds to
-/// [stellar_xdr::ScVal::LedgerKeyNonce] and refers to a host-side
-/// address object that specifies which address it's the nonce for.
-const valTagLedgerKeyNonceObject: valTag = 79;
+/// Tag for a [Val] that refers to a host-side muxed address object.
+const valTagMuxedAddressObject: valTag = 78;
 
-const valTagObjectCodeUpperBound: valTag = 80;
+const valTagObjectCodeUpperBound: valTag = 79;
 
 const valTagBad: valTag = 0x7f;
 
@@ -1212,12 +1210,12 @@ export function isAddressObject(val: Val) : bool {
 }
 
 /**
- * Checks if the given host value represents an object that contains a nonce key.
+ * Checks if the given host value represents an object that contains a muxed address.
  * @param val host value to check.
- * @returns true if the host value represents an object that contains a nonce key. Otherwise false.
+ * @returns true if the host value represents an object that contains a muxed address. Otherwise false.
  */
-export function isLedgerKeyNonceObject(val: Val) : bool {
-  return hasTag(val, valTagLedgerKeyNonceObject);
+export function isMuxedAddressObject(val: Val) : bool {
+  return hasTag(val, valTagMuxedAddressObject);
 }
 
 /**
