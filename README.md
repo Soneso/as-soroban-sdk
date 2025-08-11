@@ -543,3 +543,6 @@ function myAbort(
 By doing so, the import statement will not be added to the wasm code during compilation. And when invoking the contract, no `VmError(Instantiation)` will be thrown while using the `as-bignum` functions.
 
 Another option is of course to implement your own arithmetic functions, for example by porting them from as-bignum and removing the throwing of errors.
+
+## DeepWiki
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Soneso/as-soroban-sdk)
